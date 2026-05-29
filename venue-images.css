@@ -1,0 +1,54 @@
+/* Venue-specific image overrides
+   Purpose: keep all wedding imagery tied to the real venues.
+   Spain = Finca Mesa Jardin imagery only.
+   South Africa = Mission House / KZN Midlands venue imagery only, focused on exterior fields and green countryside.
+*/
+
+:root{
+  --finca-hero:url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardin-8377-1024x682.jpg');
+  --finca-cortijo:url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardi%CC%81n-8872-1024x682.jpg');
+  --finca-patio:url('https://fincamesajardin.com/wp-content/uploads/2022/07/IMG-20210520-WA0011.jpg');
+  --finca-garden:url('https://fincamesajardin.com/wp-content/uploads/2022/07/Jardi%CC%81n-1024x682.jpg');
+  --mission-fields:url('https://cdn.prod.website-files.com/685aacf16261e83391c243e8/69847affe9fb3bc0ebce860d_Tab%20Pane%206.avif');
+}
+
+/* Homepage and hub thumbnails */
+.thumb.spain,
+.spain,
+.destination .photo.spain-photo,
+#spain .spain-photo{
+  background-image:linear-gradient(180deg,rgba(45,31,20,.03),rgba(45,31,20,.35)),var(--finca-hero) !important;
+  background-position:center 54% !important;
+  background-size:cover !important;
+}
+
+.thumb.sa,
+.sa,
+.destination .photo.sa-photo,
+#south-africa .sa-photo{
+  background-image:linear-gradient(180deg,rgba(30,48,29,.06),rgba(30,48,29,.38)),var(--mission-fields) !important;
+  background-position:center 58% !important;
+  background-size:cover !important;
+}
+
+/* Main guest guide gallery */
+.venue-gallery .large{background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(42,28,19,.2)),var(--finca-cortijo) !important;}
+.venue-gallery .patio{background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(42,28,19,.16)),var(--finca-patio) !important;}
+.venue-gallery .garden{background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(42,28,19,.16)),var(--finca-garden) !important;}
+
+.mission-gallery .large,
+.mission-gallery .patio,
+.mission-gallery .fields{
+  background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(30,48,29,.20)),var(--mission-fields) !important;
+  background-position:center 58% !important;
+}
+
+/* Inline guest-list pages use a generic .hero background; these body classes make them venue-specific. */
+body.spain-page .hero{
+  background-image:linear-gradient(180deg,rgba(255,249,237,.72),rgba(255,249,237,.96)),var(--finca-hero) !important;
+  background-position:center 54% !important;
+}
+body.south-africa-page .hero{
+  background-image:linear-gradient(180deg,rgba(248,243,232,.70),rgba(248,243,232,.96)),var(--mission-fields) !important;
+  background-position:center 58% !important;
+}
