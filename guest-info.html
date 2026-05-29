@@ -5,6 +5,45 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>EventFlow | What Guests Can Expect</title>
 <link rel="stylesheet" href="style.css" />
+<style>
+/* Spain venue refresh: elegant Andalusian finca direction */
+:root{--finca-cream:#fffaf0;--finca-paper:#fbf1df;--finca-olive:#4c5734;--finca-sage:#7f845e;--finca-clay:#a7653f;--finca-terracotta:#b9794f;--finca-earth:#4b3124;--finca-line:#dec8a7;--finca-gold:#c9a46b;}
+#spain.finca-editorial{background:linear-gradient(180deg,#fffaf0 0%,#fbf1df 100%);border-color:rgba(165,116,70,.28);box-shadow:0 26px 70px rgba(78,49,29,.14);}
+#spain.finca-editorial:before{border-color:rgba(184,137,78,.24)}
+#spain .spain-photo{min-height:390px;background-image:linear-gradient(180deg,rgba(45,31,20,.04),rgba(45,31,20,.40)),url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardin-8377-1024x682.jpg');background-position:center 54%;position:relative;}
+#spain .spain-photo:after{content:"Finca Mesa Jardín · Andalusian cortijo in the Cádiz countryside";position:absolute;left:24px;bottom:22px;background:rgba(255,250,240,.88);border:1px solid rgba(222,200,167,.82);border-radius:999px;padding:10px 15px;color:var(--finca-earth);font-size:11px;font-weight:950;text-transform:uppercase;letter-spacing:.14em;backdrop-filter:blur(10px);}
+.finca-kicker{display:inline-flex;align-items:center;gap:9px;margin-top:6px;color:var(--finca-olive);font-size:11px;font-weight:950;letter-spacing:.18em;text-transform:uppercase;}
+.finca-kicker:before{content:"";width:34px;height:1px;background:var(--finca-olive);display:inline-block;}
+#spain .body{padding:30px;background:radial-gradient(circle at top left,rgba(201,164,107,.17),transparent 35%),linear-gradient(180deg,rgba(255,253,247,.72),rgba(255,250,240,.96));}
+#spain .serif{font-size:clamp(42px,5.6vw,76px);line-height:.96;color:var(--finca-earth);letter-spacing:-.035em;}
+#spain .lead{max-width:1050px;color:#654633;font-family:Georgia,"Times New Roman",serif;font-size:20px;line-height:1.72;}
+#spain .tag{border-radius:999px;}
+#spain .tag:first-child{background:var(--finca-olive)}
+#spain .tag.rust{background:var(--finca-clay)}
+#spain .tag.gold{background:#ead6b8;color:#60412b;border-color:#d4b98c;}
+#spain .stat{background:rgba(255,253,247,.78);border-color:rgba(201,164,107,.38);}
+#spain .stat b{color:var(--finca-earth);font-size:34px;}
+#spain .stat span{color:#7c6048;}
+.venue-intro{display:grid;grid-template-columns:1.12fr .88fr;gap:16px;margin-top:18px;align-items:stretch;}
+.venue-card{background:rgba(255,253,247,.86);border:1px solid rgba(222,200,167,.86);border-radius:10px;padding:24px;box-shadow:0 14px 34px rgba(78,49,29,.08);position:relative;overflow:hidden;}
+.venue-card:before{content:"";position:absolute;inset:7px;border:1px solid rgba(184,137,78,.18);border-radius:8px;pointer-events:none;}
+.venue-card h3{font-size:28px;margin:0 0 12px;color:var(--finca-earth);font-weight:500;}
+.venue-card p{font-size:15px;line-height:1.68;color:#6f5440;}
+.venue-card .note{max-width:none;background:#fff8ea;border-left-color:var(--finca-clay);}
+.venue-highlights{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:14px;}
+.venue-mini{border:1px solid rgba(222,200,167,.9);background:#fffaf0;border-radius:10px;padding:13px;}
+.venue-mini b{display:block;font-family:Georgia,serif;font-size:18px;font-weight:500;color:var(--finca-earth);}
+.venue-mini span{display:block;color:#80644f;font-size:12px;line-height:1.5;margin-top:4px;}
+.venue-gallery{display:grid;grid-template-columns:1.2fr .8fr;grid-template-rows:1fr 1fr;gap:10px;min-height:360px;}
+.venue-gallery div{border-radius:10px;background-size:cover;background-position:center;box-shadow:inset 0 0 0 1px rgba(255,255,255,.34),0 12px 26px rgba(78,49,29,.1);position:relative;overflow:hidden;}
+.venue-gallery div:after{content:attr(data-label);position:absolute;left:10px;bottom:10px;background:rgba(255,250,240,.84);border:1px solid rgba(222,200,167,.78);border-radius:999px;padding:7px 10px;color:var(--finca-earth);font-size:10px;font-weight:950;letter-spacing:.1em;text-transform:uppercase;}
+.venue-gallery .large{grid-row:span 2;background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(42,28,19,.2)),url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardi%CC%81n-8872-1024x682.jpg');}
+.venue-gallery .patio{background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(42,28,19,.16)),url('https://fincamesajardin.com/wp-content/uploads/2022/07/IMG-20210520-WA0011.jpg');}
+.venue-gallery .garden{background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(42,28,19,.16)),url('https://fincamesajardin.com/wp-content/uploads/2022/07/Jardi%CC%81n-1024x682.jpg');}
+#spain .twocol .card{background:rgba(255,253,247,.86);border-color:rgba(222,200,167,.82);}
+#spain .pill{border-radius:999px;background:#f2e2c7;}
+@media(max-width:900px){#spain .spain-photo{min-height:300px}#spain .spain-photo:after{left:14px;right:14px;border-radius:12px;line-height:1.4}.venue-intro{grid-template-columns:1fr}.venue-gallery{min-height:460px}.venue-highlights{grid-template-columns:1fr}#spain .body{padding:20px}}
+</style>
 </head>
 <body>
 <div class="mobilebar"><a href="index.html">Home</a><a class="active" href="guest-info.html">Guest Guide</a><a href="guests.html">Guest Hub</a><a href="guests-spain.html">Spain</a><a href="guests-south-africa.html">South Africa</a></div>
@@ -28,20 +67,25 @@
     <article class="card advisor-note"><h3>A note from your hosts</h3><p class="muted">We cannot wait to celebrate with you. This guide is here to help you feel prepared, relaxed and excited before you arrive.</p></article>
   </section>
 
-  <section id="spain" class="section card destination" style="margin-top:18px">
+  <section id="spain" class="section card destination finca-editorial" style="margin-top:18px">
     <div class="photo spain-photo"></div>
     <div class="body">
       <div class="pillbox"><span class="tag">Spain</span><span class="tag gold">10 October 2026</span><span class="tag rust">Finca Mesa Jardín · Arcos de la Frontera</span></div>
+      <div class="finca-kicker">Elegant Andalusian finca</div>
       <h1 class="serif" style="font-weight:500;margin:18px 0 8px">Spain Wedding</h1>
       <p class="lead">Expect a warm Andalusian finca wedding at Finca Mesa Jardín: a traditional cortijo set between Arcos de la Frontera and the Sierra de Grazalema, surrounded by gardens, olive trees, almond trees and open countryside views.</p>
       <div class="grid threecol" style="margin-top:16px"><div class="card stat"><span>Typical October day</span><b>24–26°C</b></div><div class="card stat"><span>Typical night</span><b>14–17°C</b></div><div class="card stat"><span>Guest mood</span><b>Spanish finca</b></div></div>
-      <div class="grid twocol" style="margin-top:16px">
-        <article class="card"><h3>About the venue</h3><p class="muted">Finca Mesa Jardín is the main house of a family finca dedicated to cereals, sunflowers, almond trees and olive trees. The venue opens the doors of a typical Andalusian cortijo, with outdoor celebration spaces, a patio, landscaped gardens and panoramic 360º views towards the Sierra de Grazalema.</p><div class="note">The feel is rustic, elegant and countryside-led — more Spanish farm finca than coastal beach wedding.</div></article>
-        <article class="card"><h3>What to wear</h3><div class="list"><div class="item"><div class="ico">👗</div><div><b>Wedding outfit</b><span class="muted">Smart finca wedding style — breathable dresses, linen blends, shirts, lightweight suits and polished but comfortable shoes.</span></div></div><div class="item"><div class="ico olive">🧥</div><div><b>Evening layer</b><span class="muted">Bring a wrap, blazer or cardigan for after sunset, when the countryside air may feel cooler.</span></div></div><div class="item"><div class="ico rust">👞</div><div><b>Shoes</b><span class="muted">Block heels, loafers or smart flats are best for garden paths, patio areas and cortijo-style outdoor spaces.</span></div></div></div></article>
+      <div class="venue-intro">
+        <article class="venue-card"><h3>The venue</h3><p>Finca Mesa Jardín is the main house of a family finca dedicated to cereals, sunflowers, almond trees and olive trees. The celebration setting is not coastal — it is a peaceful Andalusian cortijo with garden spaces, patio areas and panoramic 360º views towards the Sierra de Grazalema.</p><div class="note">The feeling is rustic, elegant and countryside-led: whitewashed cortijo walls, warm stone, olive green, terracotta, candlelight, garden paths and long-table finca atmosphere.</div><div class="venue-highlights"><div class="venue-mini"><b>Cortijo setting</b><span>Traditional Andalusian finca architecture and patio character.</span></div><div class="venue-mini"><b>Garden spaces</b><span>Outdoor celebration areas surrounded by landscaped greenery.</span></div><div class="venue-mini"><b>Sierra views</b><span>Countryside calm with views towards Grazalema.</span></div><div class="venue-mini"><b>Arcos base</b><span>Close to the Ruta de los Pueblos Blancos and Jerez.</span></div></div></article>
+        <div class="venue-gallery" aria-label="Finca Mesa Jardín image gallery"><div class="large" data-label="Cortijo"></div><div class="patio" data-label="Patio"></div><div class="garden" data-label="Gardens"></div></div>
       </div>
       <div class="grid twocol" style="margin-top:16px">
+        <article class="card"><h3>What to wear</h3><div class="list"><div class="item"><div class="ico">👗</div><div><b>Wedding outfit</b><span class="muted">Smart finca wedding style — breathable dresses, linen blends, shirts, lightweight suits and polished but comfortable shoes.</span></div></div><div class="item"><div class="ico olive">🧥</div><div><b>Evening layer</b><span class="muted">Bring a wrap, blazer or cardigan for after sunset, when the countryside air may feel cooler.</span></div></div><div class="item"><div class="ico rust">👞</div><div><b>Shoes</b><span class="muted">Block heels, loafers or smart flats are best for garden paths, patio areas and cortijo-style outdoor spaces.</span></div></div></div></article>
         <article class="card"><h3>Where it is</h3><p class="muted">The finca sits in the municipality of Arcos de la Frontera, at the start of Andalucía’s Ruta de los Pueblos Blancos. It is around 10 minutes from Arcos de la Frontera and around 35 minutes from Jerez de la Frontera by motorway.</p><div class="pillbox"><span class="pill">Nearest practical airport: Jerez</span><span class="pill">Also consider: Seville</span><span class="pill">Nearby: Arcos de la Frontera</span><span class="pill">Setting: Sierra de Grazalema views</span></div></article>
+      </div>
+      <div class="grid twocol" style="margin-top:16px">
         <article class="card"><h3>Local favourites</h3><div class="list"><div class="item"><div class="ico">🏘️</div><div><b>Arcos de la Frontera</b><span class="muted">White village views, old-town streets and a beautiful base close to the finca.</span></div></div><div class="item"><div class="ico olive">⛰️</div><div><b>Sierra de Grazalema</b><span class="muted">Mountain views, countryside drives and the natural backdrop around the wedding setting.</span></div></div><div class="item"><div class="ico rust">🍷</div><div><b>Jerez</b><span class="muted">Sherry bodegas, flamenco culture, old-town lunches and easy travel links.</span></div></div></div></article>
+        <article class="card"><h3>Guest feel</h3><p class="muted">Think warm rural Spain rather than seaside holiday: ochre light, olive trees, garden drinks, cortijo textures, mountain air and a relaxed countryside evening under the stars.</p><div class="pillbox"><span class="pill">Cortijo</span><span class="pill">Olive trees</span><span class="pill">Terracotta</span><span class="pill">Garden dinner</span><span class="pill">Sierra views</span></div></article>
       </div>
     </div>
   </section>
