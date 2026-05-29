@@ -6,8 +6,8 @@
 <title>EventFlow | What Guests Can Expect</title>
 <link rel="stylesheet" href="style.css" />
 <style>
-/* Spain venue refresh: elegant Andalusian finca direction */
-:root{--finca-cream:#fffaf0;--finca-paper:#fbf1df;--finca-olive:#4c5734;--finca-sage:#7f845e;--finca-clay:#a7653f;--finca-terracotta:#b9794f;--finca-earth:#4b3124;--finca-line:#dec8a7;--finca-gold:#c9a46b;}
+/* Spain + South Africa guest refresh: western editorial direction */
+:root{--finca-cream:#fffaf0;--finca-paper:#fbf1df;--finca-olive:#4c5734;--finca-sage:#7f845e;--finca-clay:#a7653f;--finca-terracotta:#b9794f;--finca-earth:#4b3124;--finca-line:#dec8a7;--finca-gold:#c9a46b;--western-ink:#3d2a1f;--western-sand:#f4e7cf;--western-copper:#9f633f;}
 #spain.finca-editorial{background:linear-gradient(180deg,#fffaf0 0%,#fbf1df 100%);border-color:rgba(165,116,70,.28);box-shadow:0 26px 70px rgba(78,49,29,.14);}
 #spain.finca-editorial:before{border-color:rgba(184,137,78,.24)}
 #spain .spain-photo{min-height:390px;background-image:linear-gradient(180deg,rgba(45,31,20,.04),rgba(45,31,20,.40)),url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardin-8377-1024x682.jpg');background-position:center 54%;position:relative;}
@@ -42,7 +42,20 @@
 .venue-gallery .garden{background-image:linear-gradient(180deg,rgba(0,0,0,0),rgba(42,28,19,.16)),url('https://fincamesajardin.com/wp-content/uploads/2022/07/Jardi%CC%81n-1024x682.jpg');}
 #spain .twocol .card{background:rgba(255,253,247,.86);border-color:rgba(222,200,167,.82);}
 #spain .pill{border-radius:999px;background:#f2e2c7;}
-@media(max-width:900px){#spain .spain-photo{min-height:300px}#spain .spain-photo:after{left:14px;right:14px;border-radius:12px;line-height:1.4}.venue-intro{grid-template-columns:1fr}.venue-gallery{min-height:460px}.venue-highlights{grid-template-columns:1fr}#spain .body{padding:20px}}
+
+/* Shared Yellowstone-inspired guest tone across both destination sections */
+.western-editorial{position:relative;overflow:hidden;}
+.western-editorial .body{background:radial-gradient(circle at top right,rgba(201,164,107,.18),transparent 36%),linear-gradient(180deg,rgba(255,254,250,.86),rgba(244,231,207,.62));}
+.western-editorial .card{border-color:rgba(159,99,63,.22);box-shadow:0 10px 26px rgba(61,42,31,.08);}
+.western-editorial .serif{color:var(--western-ink);}
+.western-editorial .lead{color:#5c4434;}
+.western-editorial .pill,.western-editorial .tag{border-radius:999px;}
+.western-editorial .finca-kicker{color:var(--western-copper);}
+.western-editorial .finca-kicker:before{background:var(--western-copper);}
+#south-africa.western-editorial{background:linear-gradient(180deg,#fcf6ea 0%,#f4e7cf 100%);border-color:rgba(159,99,63,.28);}
+#south-africa.western-editorial .sa-photo{position:relative;min-height:360px;background-image:linear-gradient(180deg,rgba(48,31,19,.08),rgba(48,31,19,.36)),url('https://images.unsplash.com/photo-1511203466129-824e631920d7?auto=format&fit=crop&w=1400&q=80');background-position:center;}
+#south-africa.western-editorial .sa-photo:after{content:"KZN Midlands countryside · western guest mood";position:absolute;left:22px;bottom:18px;background:rgba(252,246,234,.9);border:1px solid rgba(159,99,63,.34);border-radius:999px;padding:9px 13px;color:#4b3124;font-size:10px;font-weight:900;letter-spacing:.12em;text-transform:uppercase;}
+@media(max-width:900px){#spain .spain-photo{min-height:300px}#spain .spain-photo:after{left:14px;right:14px;border-radius:12px;line-height:1.4}.venue-intro{grid-template-columns:1fr}.venue-gallery{min-height:460px}.venue-highlights{grid-template-columns:1fr}#spain .body{padding:20px}#south-africa.western-editorial .sa-photo:after{left:14px;right:14px;border-radius:12px;line-height:1.4}}
 </style>
 </head>
 <body>
@@ -62,44 +75,45 @@
 </section>
 <main class="wrap">
   <section class="grid threecol info-strip">
-    <article class="card"><h3>Guest tone</h3><p class="muted">Friendly, polished and personal — less admin dashboard, more travel-agent style guidance for guests planning a holiday around the wedding.</p></article>
+    <article class="card"><h3>Guest tone</h3><p class="muted">Polished western editorial for both weekends: elegant countryside, warm earth tones, quality textures and relaxed luxury over formal fuss.</p></article>
     <article class="card"><h3>Forecast note</h3><p class="muted">These dates are outside reliable short-range forecasting. Use seasonal guidance now, then refresh weather 7–10 days before each wedding.</p></article>
     <article class="card advisor-note"><h3>A note from your hosts</h3><p class="muted">We cannot wait to celebrate with you. This guide is here to help you feel prepared, relaxed and excited before you arrive.</p></article>
   </section>
 
-  <section id="spain" class="section card destination finca-editorial" style="margin-top:18px">
+  <section id="spain" class="section card destination finca-editorial western-editorial" style="margin-top:18px">
     <div class="photo spain-photo"></div>
     <div class="body">
       <div class="pillbox"><span class="tag">Spain</span><span class="tag gold">10 October 2026</span><span class="tag rust">Finca Mesa Jardín · Arcos de la Frontera</span></div>
-      <div class="finca-kicker">Elegant Andalusian finca</div>
+      <div class="finca-kicker">Western editorial · Andalusian finca</div>
       <h1 class="serif" style="font-weight:500;margin:18px 0 8px">Spain Wedding</h1>
-      <p class="lead">Expect a warm Andalusian finca wedding at Finca Mesa Jardín: a traditional cortijo set between Arcos de la Frontera and the Sierra de Grazalema, surrounded by gardens, olive trees, almond trees and open countryside views.</p>
-      <div class="grid threecol" style="margin-top:16px"><div class="card stat"><span>Typical October day</span><b>24–26°C</b></div><div class="card stat"><span>Typical night</span><b>14–17°C</b></div><div class="card stat"><span>Guest mood</span><b>Spanish finca</b></div></div>
+      <p class="lead">Expect an elegant Andalusian cortijo celebration with western-country warmth: garden cocktails, terracotta tones, olive groves, mountain air and long-table finca atmosphere.</p>
+      <div class="grid threecol" style="margin-top:16px"><div class="card stat"><span>Typical October day</span><b>24–26°C</b></div><div class="card stat"><span>Typical night</span><b>14–17°C</b></div><div class="card stat"><span>Guest mood</span><b>Western finca</b></div></div>
       <div class="venue-intro">
         <article class="venue-card"><h3>The venue</h3><p>Finca Mesa Jardín is the main house of a family finca dedicated to cereals, sunflowers, almond trees and olive trees. The celebration setting is not coastal — it is a peaceful Andalusian cortijo with garden spaces, patio areas and panoramic 360º views towards the Sierra de Grazalema.</p><div class="note">The feeling is rustic, elegant and countryside-led: whitewashed cortijo walls, warm stone, olive green, terracotta, candlelight, garden paths and long-table finca atmosphere.</div><div class="venue-highlights"><div class="venue-mini"><b>Cortijo setting</b><span>Traditional Andalusian finca architecture and patio character.</span></div><div class="venue-mini"><b>Garden spaces</b><span>Outdoor celebration areas surrounded by landscaped greenery.</span></div><div class="venue-mini"><b>Sierra views</b><span>Countryside calm with views towards Grazalema.</span></div><div class="venue-mini"><b>Arcos base</b><span>Close to the Ruta de los Pueblos Blancos and Jerez.</span></div></div></article>
         <div class="venue-gallery" aria-label="Finca Mesa Jardín image gallery"><div class="large" data-label="Cortijo"></div><div class="patio" data-label="Patio"></div><div class="garden" data-label="Gardens"></div></div>
       </div>
       <div class="grid twocol" style="margin-top:16px">
-        <article class="card"><h3>What to wear</h3><div class="list"><div class="item"><div class="ico">👗</div><div><b>Wedding outfit</b><span class="muted">Smart finca wedding style — breathable dresses, linen blends, shirts, lightweight suits and polished but comfortable shoes.</span></div></div><div class="item"><div class="ico olive">🧥</div><div><b>Evening layer</b><span class="muted">Bring a wrap, blazer or cardigan for after sunset, when the countryside air may feel cooler.</span></div></div><div class="item"><div class="ico rust">👞</div><div><b>Shoes</b><span class="muted">Block heels, loafers or smart flats are best for garden paths, patio areas and cortijo-style outdoor spaces.</span></div></div></div></article>
+        <article class="card"><h3>What to wear</h3><div class="list"><div class="item"><div class="ico">👗</div><div><b>Wedding outfit</b><span class="muted">Smart western-finca style — breathable dresses, linen blends, shirts, lightweight suits and polished but comfortable shoes.</span></div></div><div class="item"><div class="ico olive">🧥</div><div><b>Evening layer</b><span class="muted">Bring a wrap, blazer or cardigan for after sunset, when the countryside air may feel cooler.</span></div></div><div class="item"><div class="ico rust">👞</div><div><b>Shoes</b><span class="muted">Block heels, loafers, smart boots or flats are best for garden paths, patio areas and cortijo-style outdoor spaces.</span></div></div></div></article>
         <article class="card"><h3>Where it is</h3><p class="muted">The finca sits in the municipality of Arcos de la Frontera, at the start of Andalucía’s Ruta de los Pueblos Blancos. It is around 10 minutes from Arcos de la Frontera and around 35 minutes from Jerez de la Frontera by motorway.</p><div class="pillbox"><span class="pill">Nearest practical airport: Jerez</span><span class="pill">Also consider: Seville</span><span class="pill">Nearby: Arcos de la Frontera</span><span class="pill">Setting: Sierra de Grazalema views</span></div></article>
       </div>
       <div class="grid twocol" style="margin-top:16px">
         <article class="card"><h3>Local favourites</h3><div class="list"><div class="item"><div class="ico">🏘️</div><div><b>Arcos de la Frontera</b><span class="muted">White village views, old-town streets and a beautiful base close to the finca.</span></div></div><div class="item"><div class="ico olive">⛰️</div><div><b>Sierra de Grazalema</b><span class="muted">Mountain views, countryside drives and the natural backdrop around the wedding setting.</span></div></div><div class="item"><div class="ico rust">🍷</div><div><b>Jerez</b><span class="muted">Sherry bodegas, flamenco culture, old-town lunches and easy travel links.</span></div></div></div></article>
-        <article class="card"><h3>Guest feel</h3><p class="muted">Think warm rural Spain rather than seaside holiday: ochre light, olive trees, garden drinks, cortijo textures, mountain air and a relaxed countryside evening under the stars.</p><div class="pillbox"><span class="pill">Cortijo</span><span class="pill">Olive trees</span><span class="pill">Terracotta</span><span class="pill">Garden dinner</span><span class="pill">Sierra views</span></div></article>
+        <article class="card"><h3>Guest feel</h3><p class="muted">Think western elegance in southern Spain: ochre light, olive trees, tailored-yet-relaxed dress, garden dinner energy and countryside skies.</p><div class="pillbox"><span class="pill">Cortijo</span><span class="pill">Olive trees</span><span class="pill">Terracotta</span><span class="pill">Garden dinner</span><span class="pill">Sierra views</span></div></article>
       </div>
     </div>
   </section>
 
-  <section id="south-africa" class="section card destination" style="margin-top:18px">
+  <section id="south-africa" class="section card destination western-editorial" style="margin-top:18px">
     <div class="photo sa-photo"></div>
     <div class="body">
       <div class="pillbox"><span class="tag rust">South Africa</span><span class="tag gold">19 December 2026</span><span class="tag">Mission House · KZN Midlands</span></div>
+      <div class="finca-kicker">Western editorial · KZN countryside</div>
       <h1 class="serif" style="font-weight:500;margin:18px 0 8px">South Africa Wedding</h1>
-      <p class="lead">Expect a green Midlands summer wedding: warm days, long daylight, countryside views, relaxed stays and a real chance of afternoon or evening rain.</p>
-      <div class="grid threecol" style="margin-top:16px"><div class="card stat"><span>Typical December day</span><b>25–26°C</b></div><div class="card stat"><span>Typical night</span><b>14–15°C</b></div><div class="card stat"><span>Guest mood</span><b>Country</b></div></div>
+      <p class="lead">Expect a western-country summer wedding mood in the Midlands: open landscapes, warm light, polished ranch-inspired outfits and relaxed celebration flow with a chance of afternoon rain.</p>
+      <div class="grid threecol" style="margin-top:16px"><div class="card stat"><span>Typical December day</span><b>25–26°C</b></div><div class="card stat"><span>Typical night</span><b>14–15°C</b></div><div class="card stat"><span>Guest mood</span><b>Western country</b></div></div>
       <div class="grid twocol" style="margin-top:16px">
         <article class="card"><h3>What the weather should feel like</h3><p class="muted">December in the KZN Midlands is warm, green and often wet. Guests should prepare for sunshine and the possibility of a passing summer storm.</p><div class="note">Pack for summer, but bring a rain-friendly layer and shoes that can handle damp grass.</div></article>
-        <article class="card"><h3>What to wear</h3><div class="list"><div class="item"><div class="ico rust">🤠</div><div><b>Wedding outfit</b><span class="muted">Smart countryside wedding style. Breathable fabrics, summer suits, dresses and western touches all work.</span></div></div><div class="item"><div class="ico olive">🌧️</div><div><b>Rain plan</b><span class="muted">Bring a light rain jacket or wrap for transfers between accommodation and venue spaces.</span></div></div><div class="item"><div class="ico">🥾</div><div><b>Shoes</b><span class="muted">Choose wedges, block heels, boots, loafers or smart flats. Avoid stilettos on lawns or farm-style ground.</span></div></div></div></article>
+        <article class="card"><h3>What to wear</h3><div class="list"><div class="item"><div class="ico rust">🤠</div><div><b>Wedding outfit</b><span class="muted">Smart western countryside style. Breathable fabrics, summer suits, dresses and refined western touches all work.</span></div></div><div class="item"><div class="ico olive">🌧️</div><div><b>Rain plan</b><span class="muted">Bring a light rain jacket or wrap for transfers between accommodation and venue spaces.</span></div></div><div class="item"><div class="ico">🥾</div><div><b>Shoes</b><span class="muted">Choose wedges, block heels, smart boots, loafers or flats. Avoid stilettos on lawns or farm-style ground.</span></div></div></div></article>
       </div>
       <div class="grid twocol" style="margin-top:16px">
         <article class="card"><h3>Where it is</h3><p class="muted">Mission House is in the KwaZulu-Natal Midlands near Howick and Curry’s Post, close to the Midlands Meander’s food, craft and countryside stops.</p><div class="pillbox"><span class="pill">Nearest major airport: Durban / King Shaka</span><span class="pill">Nearby towns: Howick, Hilton, Nottingham Road</span><span class="pill">Transport groups: Durban / Howick</span></div></article>
