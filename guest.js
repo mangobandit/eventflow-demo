@@ -1,6 +1,8 @@
 (() => {
   "use strict";
 
+  stripTrackingParams();
+
   const config = window.MXC_CONFIG || {};
   const menuButton = document.querySelector(".menu-button");
   const publicNav = document.querySelector(".public-nav");
@@ -152,6 +154,19 @@
       footerLink.dataset.rsvpEntry = "footer";
       footerMeta.insertBefore(footerLink, footerMeta.firstChild);
     }
+  }
+
+  function stripTrackingParams() {
+    if (!history.replaceState) return;
+    const url = new URL(window.location.href);
+    const trackingKeys = [...url.searchParams.keys()].filter((key) => {
+      const lower = key.toLowerCase();
+      return lower.startsWith("utm_") || ["fbclid", "gclid", "mc_cid", "mc_eid", "igshid", "ref", "source"].includes(lower);
+    });
+    if (!trackingKeys.length) return;
+    trackingKeys.forEach((key) => url.searchParams.delete(key));
+    const clean = `${url.pathname}${url.search}${url.hash}`;
+    history.replaceState(null, document.title, clean || "/");
   }
 
   function renderLiveNotes(containerId, notes) {
