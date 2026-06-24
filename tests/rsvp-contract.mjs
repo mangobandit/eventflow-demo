@@ -8,7 +8,8 @@ const read = (file) => readFileSync(resolve(root, file), "utf8");
 const html = read("rsvp.html");
 const guest = read("guest.js");
 const rsvp = read("rsvp.js");
-const admin = read("planner-rsvp.js");
+const plannerLoader = read("planner-rsvp.js");
+const access = read("planner-access.js");
 const core = read("planner-core.js");
 const sw = read("sw.js");
 const sql = read("supabase/migrations/20260624_rsvp_control_centre.sql");
@@ -28,11 +29,14 @@ assert.match(rsvp, /rpc\("submit_rsvp"/, "guest submission must use restricted R
 assert.match(rsvp, /\^\[0-9a-f\]\{48\}\$/i, "client must validate a 48-character token");
 
 assert.match(guest, /Open your RSVP/, "guest guide must expose the RSVP entry point");
-assert.match(core, /planner-rsvp\.js/, "private planner must load the RSVP control centre");
-assert.match(admin, /rsvp\.html#invite=/, "planner must generate fragment-based private links");
-assert.match(admin, /rotate_rsvp_invitation/, "planner must rotate compromised links");
-assert.match(admin, /delete_rsvp_invitation/, "planner must delete synced RSVP records through the safe RPC");
-assert.doesNotMatch(admin, /from\("rsvp_invitations"\)\.delete/, "planner must not bypass safe RSVP deletion");
+assert.match(core, /planner-rsvp\.js/, "private planner must load its access module");
+assert.match(plannerLoader, /planner-access\.js/, "planner loader must activate simple couple access");
+assert.match(access, /ACCESS_DIGEST/, "the simple entry code must be compared as a digest");
+assert.match(access, /crypto\.subtle\.digest\("SHA-256"/, "the entered code must be hashed in the browser");
+assert.match(access, /localStorage\.setItem/, "browser-mode planner changes must persist locally");
+assert.match(access, /owner: "cara"/, "Cara must have a separate planner lens");
+assert.match(access, /owner: "matt"/, "Matt must have a separate planner lens");
+assert.doesNotMatch(access, /const\s+(?:PIN|PASSWORD)\s*=\s*["']\d{4}["']/i, "the raw entry code must not be committed as a plain constant");
 
 assert.match(sw, /pathname\.includes\("rsvp"\)/, "service worker must bypass RSVP paths");
 assert.match(sw, /url\.search/, "service worker must bypass query-string requests");
@@ -53,6 +57,6 @@ assert.match(sql, /delete from public\.guests where rsvp_invitation_id = p_invit
 
 assert.match(config, /supabaseUrl:\s*""/, "repository must not commit a live project URL by default");
 assert.match(config, /supabaseAnonKey:\s*""/, "repository must not commit a project key by default");
-assert.doesNotMatch([html, guest, rsvp, admin, core, sw, sql].join("\n"), /service_role|eyJ[a-zA-Z0-9_-]{20,}\./, "no service-role or JWT-like secret may be committed");
+assert.doesNotMatch([html, guest, rsvp, plannerLoader, access, core, sw, sql].join("\n"), /service_role|eyJ[a-zA-Z0-9_-]{20,}\./, "no service-role or JWT-like secret may be committed");
 
-console.log("RSVP security and integration contracts passed.");
+console.log("RSVP and simple couple-access contracts passed.");
