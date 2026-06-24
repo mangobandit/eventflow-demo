@@ -5,6 +5,8 @@
   const menuButton = document.querySelector(".menu-button");
   const publicNav = document.querySelector(".public-nav");
 
+  installRsvpLinks();
+
   menuButton?.addEventListener("click", () => {
     const open = document.body.classList.toggle("menu-open");
     menuButton.setAttribute("aria-expanded", String(open));
@@ -111,6 +113,46 @@
     }
   };
 
+  function installRsvpLinks() {
+    if (document.querySelector('[data-rsvp-entry]')) return;
+
+    const navLink = document.createElement("a");
+    navLink.href = "rsvp.html";
+    navLink.textContent = "RSVP";
+    navLink.dataset.rsvpEntry = "nav";
+    const faqLink = publicNav?.querySelector('a[href="#faq"]');
+    publicNav?.insertBefore(navLink, faqLink || null);
+
+    const heroActions = document.querySelector(".hero-actions");
+    if (heroActions) {
+      const heroLink = document.createElement("a");
+      heroLink.className = "button button-dark";
+      heroLink.href = "rsvp.html";
+      heroLink.textContent = "Open your RSVP";
+      heroLink.dataset.rsvpEntry = "hero";
+      heroActions.insertBefore(heroLink, heroActions.firstChild);
+    }
+
+    const mobileNav = document.querySelector(".mobile-nav");
+    if (mobileNav) {
+      const mobileLink = document.createElement("a");
+      mobileLink.href = "rsvp.html";
+      mobileLink.textContent = "RSVP";
+      mobileLink.dataset.rsvpEntry = "mobile";
+      const portal = mobileNav.querySelector('a[href="planner.html"]');
+      mobileNav.insertBefore(mobileLink, portal || null);
+      mobileNav.style.gridTemplateColumns = "repeat(5, 1fr)";
+    }
+
+    const footerMeta = document.querySelector(".footer-meta");
+    if (footerMeta) {
+      const footerLink = document.createElement("a");
+      footerLink.href = "rsvp.html";
+      footerLink.textContent = "Guest RSVP";
+      footerLink.dataset.rsvpEntry = "footer";
+      footerMeta.insertBefore(footerLink, footerMeta.firstChild);
+    }
+  }
 
   function renderLiveNotes(containerId, notes) {
     const container = document.getElementById(containerId);

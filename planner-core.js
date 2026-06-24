@@ -152,3 +152,19 @@
   };
 
   function field(name, label, type, options = {}) { return { name, label, type, ...options }; }
+
+  /* The RSVP control centre is isolated from the core planner and loaded only
+     after every existing planner module has finished. This keeps the base
+     planner usable even before the RSVP database migration is installed. */
+  window.addEventListener("load", () => {
+    if (document.querySelector('script[data-mxc-rsvp-admin]')) return;
+    const stylesheet = document.createElement("link");
+    stylesheet.rel = "stylesheet";
+    stylesheet.href = "planner-rsvp.css";
+    document.head.appendChild(stylesheet);
+
+    const script = document.createElement("script");
+    script.src = "planner-rsvp.js";
+    script.dataset.mxcRsvpAdmin = "true";
+    document.body.appendChild(script);
+  });

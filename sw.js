@@ -1,4 +1,4 @@
-const CACHE = "mxc-guest-v1";
+const CACHE = "mxc-guest-v2";
 const PUBLIC_ASSETS = ["/", "/index.html", "/style.css", "/style-core.css", "/guest-layout.css", "/responsive.css", "/guest.js", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
@@ -13,7 +13,8 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
-  if (url.origin !== self.location.origin || url.pathname.includes("planner") || url.pathname.endsWith("config.js")) return;
+  const privatePath = url.pathname.includes("planner") || url.pathname.includes("rsvp") || url.pathname.endsWith("config.js");
+  if (url.origin !== self.location.origin || privatePath || url.search) return;
   event.respondWith(fetch(request).then((response) => {
     if (response.ok) caches.open(CACHE).then((cache) => cache.put(request, response.clone()));
     return response;

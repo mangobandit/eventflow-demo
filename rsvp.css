@@ -1,0 +1,84 @@
+.rsvp-site { min-height: 100vh; background: #e9e1d5; }
+.rsvp-header { position: fixed; z-index: 30; top: 0; left: 0; right: 0; display: grid; grid-template-columns: 180px 1fr 180px; align-items: center; min-height: 74px; padding: 0 4vw; color: #fff; background: rgba(30,36,28,.82); border-bottom: 1px solid rgba(255,255,255,.16); backdrop-filter: blur(18px); }
+.rsvp-header .monogram { color: #fff; }
+.rsvp-header > div { text-align: center; }
+.rsvp-header b { display: block; font-family: var(--serif); font-size: 18px; font-weight: 500; }
+.rsvp-header small { display: block; margin-top: 2px; color: rgba(255,255,255,.66); font-size: 8px; letter-spacing: .12em; text-transform: uppercase; }
+.rsvp-back { justify-self: end; color: #fff; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }
+.rsvp-main { display: grid; grid-template-columns: .9fr 1.1fr; min-height: 100vh; }
+.rsvp-visual { position: sticky; top: 0; display: flex; height: 100vh; align-items: flex-end; overflow: hidden; padding: clamp(36px, 6vw, 90px); color: #fff; background-image: linear-gradient(180deg, rgba(20,24,19,.08), rgba(20,24,19,.82)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardi%CC%81n-8872-1024x682.jpg'); background-position: center; background-size: cover; }
+.rsvp-visual:after { content: ""; position: absolute; width: 420px; height: 420px; right: -170px; top: -170px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; box-shadow: 0 0 0 70px rgba(255,255,255,.035), 0 0 0 140px rgba(255,255,255,.02); }
+.rsvp-visual-copy { position: relative; z-index: 1; max-width: 720px; }
+.rsvp-visual-copy .eyebrow { color: #d8dfd4; }
+.rsvp-visual h1 { margin: 0; font-family: var(--serif); font-size: clamp(64px, 8vw, 126px); font-weight: 400; letter-spacing: -.055em; line-height: .82; }
+.rsvp-visual p:last-child { max-width: 560px; color: rgba(255,255,255,.82); font-family: var(--serif); font-size: 20px; line-height: 1.55; }
+.rsvp-panel { display: grid; align-content: start; min-height: 100vh; padding: 112px clamp(24px, 6vw, 90px) 70px; background: radial-gradient(circle at top right, rgba(183,145,91,.12), transparent 28%), var(--paper); }
+.rsvp-card { width: min(760px, 100%); margin: 0 auto; }
+.rsvp-state { padding: clamp(36px, 6vw, 76px) 0; }
+.rsvp-state h2, .rsvp-intro h2 { margin: 0; font-family: var(--serif); font-size: clamp(46px, 6vw, 76px); font-weight: 400; letter-spacing: -.04em; line-height: .96; }
+.rsvp-state > p:not(.eyebrow), .rsvp-intro > p:not(.eyebrow) { max-width: 620px; color: var(--ink-soft); font-family: var(--serif); font-size: 18px; line-height: 1.6; }
+.rsvp-spinner { width: 38px; height: 38px; margin-bottom: 28px; border: 3px solid rgba(77,90,67,.16); border-top-color: var(--olive); border-radius: 50%; animation: rsvp-spin .8s linear infinite; }
+@keyframes rsvp-spin { to { transform: rotate(360deg); } }
+.rsvp-code-form { display: grid; gap: 12px; margin-top: 32px; }
+.rsvp-code-form label, .rsvp-contact-grid label, .rsvp-contact-section > label { display: grid; gap: 8px; color: var(--ink-soft); font-size: 9px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.rsvp-code-form input, .rsvp-contact-section input, .rsvp-contact-section textarea, .guest-response input, .guest-response textarea, .guest-response select { width: 100%; min-height: 50px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; color: var(--ink); background: #fffefa; }
+.rsvp-code-form input { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; letter-spacing: .07em; }
+.rsvp-code-form input:focus, .rsvp-contact-section input:focus, .rsvp-contact-section textarea:focus, .guest-response input:focus, .guest-response textarea:focus, .guest-response select:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(77,90,67,.1); }
+.rsvp-code-form .button { justify-self: start; border: 0; cursor: pointer; }
+.rsvp-status { min-height: 24px; margin-top: 14px; color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
+.rsvp-intro { padding-bottom: 34px; border-bottom: 1px solid var(--line); }
+.rsvp-people { display: grid; gap: 16px; margin-top: 28px; }
+.guest-response { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fffefa; box-shadow: var(--shadow-sm); }
+.guest-response-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); background: #f3ede3; }
+.guest-response-head h3 { margin: 0; font-family: var(--serif); font-size: 27px; font-weight: 500; }
+.attendance-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; min-width: 210px; }
+.attendance-choice label { cursor: pointer; }
+.attendance-choice input { position: absolute; opacity: 0; pointer-events: none; }
+.attendance-choice span { display: grid; min-height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); background: #fff; font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.attendance-choice input:checked + span { color: #fff; border-color: var(--olive-dark); background: var(--olive-dark); }
+.guest-response-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px 22px 22px; }
+.guest-response-fields label { display: grid; gap: 7px; color: var(--ink-soft); font-size: 8px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.guest-response-fields .full { grid-column: 1 / -1; }
+.guest-response textarea { min-height: 84px; resize: vertical; }
+.rsvp-contact-section { display: grid; grid-template-columns: .7fr 1.3fr; gap: 24px; margin-top: 28px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: #eee7db; }
+.rsvp-contact-section h3 { margin: 0; font-family: var(--serif); font-size: 30px; font-weight: 500; }
+.rsvp-contact-section p { color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
+.rsvp-contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rsvp-contact-section > .full { grid-column: 1 / -1; }
+.rsvp-contact-section textarea { min-height: 100px; resize: vertical; }
+.rsvp-submit-row { display: flex; align-items: center; justify-content: space-between; gap: 28px; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
+.rsvp-submit-row p { max-width: 450px; margin: 0; color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
+.rsvp-submit-row .button { border: 0; cursor: pointer; white-space: nowrap; }
+.rsvp-submit-row .button:disabled { cursor: wait; opacity: .55; }
+.rsvp-privacy { display: flex; gap: 12px; width: min(760px, 100%); margin: 38px auto 0; padding-top: 20px; border-top: 1px solid var(--line); color: var(--ink-soft); }
+.rsvp-privacy > span { color: var(--clay); font-size: 20px; }
+.rsvp-privacy p { margin: 0; font-size: 10px; line-height: 1.65; }
+.success-mark { display: grid; width: 70px; height: 70px; place-items: center; margin-bottom: 28px; border-radius: 50%; color: #fff; background: var(--success); font-size: 28px; }
+.rsvp-success-summary { display: grid; gap: 8px; margin: 26px 0; }
+.rsvp-success-summary div { display: flex; justify-content: space-between; gap: 16px; padding: 13px 0; border-bottom: 1px solid var(--line); font-size: 12px; }
+.rsvp-success-summary b { font-family: var(--serif); font-size: 18px; font-weight: 500; }
+.rsvp-success-actions { display: flex; flex-wrap: wrap; gap: 10px; }
+
+@media (max-width: 900px) {
+  .rsvp-header { grid-template-columns: auto 1fr auto; padding: 0 18px; }
+  .rsvp-header > div small { display: none; }
+  .rsvp-main { grid-template-columns: 1fr; }
+  .rsvp-visual { position: relative; height: 480px; min-height: 0; }
+  .rsvp-panel { min-height: auto; padding-top: 60px; }
+}
+@media (max-width: 620px) {
+  .rsvp-header { min-height: 66px; }
+  .rsvp-header > div { display: none; }
+  .rsvp-visual { height: 390px; padding: 28px 20px; }
+  .rsvp-visual h1 { font-size: 68px; }
+  .rsvp-visual p:last-child { font-size: 17px; }
+  .rsvp-panel { padding: 48px 16px 60px; }
+  .guest-response-head { align-items: flex-start; flex-direction: column; }
+  .attendance-choice { width: 100%; min-width: 0; }
+  .guest-response-fields, .rsvp-contact-grid { grid-template-columns: 1fr; }
+  .guest-response-fields .full { grid-column: auto; }
+  .rsvp-contact-section { grid-template-columns: 1fr; padding: 20px; }
+  .rsvp-contact-section > .full { grid-column: auto; }
+  .rsvp-submit-row { align-items: stretch; flex-direction: column; }
+  .rsvp-submit-row .button { width: 100%; }
+}

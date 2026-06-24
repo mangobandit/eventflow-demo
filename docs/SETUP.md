@@ -6,7 +6,8 @@ The repository can stay public because it contains only application code and pub
 
 1. Create a new Supabase project in a region suitable for you.
 2. Open **SQL Editor** and run `supabase/schema.sql` in full.
-3. In a new private SQL query, add the two approved users using their real lowercase email addresses:
+3. Run each SQL file in `supabase/migrations/` in filename order. The current RSVP migration is `20260624_rsvp_control_centre.sql`.
+4. In a new private SQL query, add the two approved users using their real lowercase email addresses:
 
 ```sql
 insert into public.allowed_users (email, planner_person, display_name) values
@@ -47,7 +48,11 @@ Two files are generated outside the repository:
 
 Review the SQL, then run it in Supabase SQL Editor. It includes guest data, so keep it private and delete local copies when no longer needed.
 
-## 5. Publish and test
+## 5. Configure and test RSVP
+
+Follow `docs/RSVP_SETUP.md` to create a test household, submit a response, rotate the link and verify anonymous table access is denied.
+
+## 6. Publish and test
 
 Before merging/deploying:
 
@@ -58,9 +63,12 @@ Before merging/deploying:
 5. Publish it and verify it appears on the guest guide.
 6. Test the public site in a private browser window without signing in.
 7. Confirm old budget/guest/vendor URLs redirect to the authenticated planner and contain no private HTML.
+8. Confirm `rsvp.html` removes invitation tokens from the visible URL and is not cached by the service worker.
+9. Run `npm test` and confirm the site security contracts pass.
 
 ## Privacy model
 
 - Public guest page: wedding dates, venue guidance, travel suggestions, accommodation guidance, things to do, FAQs and deliberately published updates.
-- Private couple portal: guest records, budgets, supplier contacts, private notes, action board and planning timeline.
+- Private couple portal: guest records, invitations, RSVP responses, budgets, supplier contacts, private notes, action board and planning timeline.
+- Private RSVP page: a bearer-token view limited to one household; anonymous users never receive table access.
 - Publishing is one-way and explicit: only `content_blocks.published = true` is readable anonymously.
