@@ -1,0 +1,80 @@
+.action-row { display: grid; grid-template-columns: 8px minmax(0, 1fr) auto; gap: 12px; align-items: center; padding: 13px 0; border-bottom: 1px solid var(--line); }
+.action-row:last-child { border-bottom: 0; }
+.action-dot { width: 8px; height: 8px; border-radius: 50%; background: var(--warning); }
+.action-row.approved .action-dot { background: var(--success); }
+.action-row.pending .action-dot { background: var(--gold); }
+.action-row b { display: block; font-size: 12px; }
+.action-row small { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 9px; }
+.action-row time { color: var(--ink-soft); font-size: 9px; }
+
+.kanban-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
+.kanban-column { min-height: 520px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.44); }
+.kanban-column-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 14px; }
+.kanban-column-head h3 { margin: 0; font-size: 10px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
+.kanban-column-head span { display: grid; min-width: 24px; height: 24px; place-items: center; border-radius: 99px; background: rgba(31,35,29,.08); font-size: 9px; font-weight: 800; }
+.kanban-list { display: grid; gap: 9px; }
+.task-card { padding: 15px; border: 1px solid var(--line); border-radius: 14px; background: #fffefa; box-shadow: 0 8px 20px rgba(39,36,28,.06); cursor: pointer; transition: transform .16s ease, box-shadow .16s ease; }
+.task-card:hover { transform: translateY(-2px); box-shadow: 0 12px 28px rgba(39,36,28,.1); }
+.task-card-meta { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 11px; }
+.mini-tag { display: inline-flex; align-items: center; min-height: 22px; padding: 0 7px; border-radius: 999px; color: #5e6658; background: #edf0e9; font-size: 7px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.mini-tag.matt { color: #4c5d72; background: #e8eef5; }
+.mini-tag.cara { color: #77545b; background: #f4e8eb; }
+.mini-tag.spain { color: #7c573c; background: #f5e8db; }
+.mini-tag.south_africa { color: #48634a; background: #e5efe4; }
+.task-card h4 { margin: 0; font-family: var(--serif); font-size: 20px; font-weight: 500; line-height: 1.2; }
+.task-card p { margin: 8px 0 0; color: var(--ink-soft); font-size: 10px; line-height: 1.55; }
+.task-card-foot { display: flex; justify-content: space-between; gap: 8px; margin-top: 17px; padding-top: 11px; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: 8px; font-weight: 750; text-transform: uppercase; }
+.empty-state { padding: 38px 18px; border: 1px dashed var(--line); border-radius: 14px; color: var(--ink-soft); text-align: center; font-size: 11px; line-height: 1.6; }
+
+.table-panel { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.72); box-shadow: var(--shadow-sm); }
+.table-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 14px; padding: 15px 18px; border-bottom: 1px solid var(--line); }
+.search-field { position: relative; width: min(360px, 100%); }
+.search-field input { width: 100%; min-height: 40px; padding: 0 14px 0 36px; border: 1px solid var(--line); border-radius: 999px; outline: none; background: #fff; font-size: 11px; }
+.search-field:before { content: "⌕"; position: absolute; left: 13px; top: 8px; color: var(--ink-soft); font-size: 18px; }
+.data-table-wrap { overflow: auto; }
+.data-table { width: 100%; min-width: 920px; border-collapse: collapse; }
+.data-table th { padding: 13px 15px; border-bottom: 1px solid var(--line); color: var(--ink-soft); background: #eee8de; font-size: 8px; font-weight: 850; letter-spacing: .12em; text-align: left; text-transform: uppercase; }
+.data-table td { padding: 14px 15px; border-bottom: 1px solid rgba(48,54,44,.11); font-size: 11px; line-height: 1.45; vertical-align: top; }
+.data-table tr:last-child td { border-bottom: 0; }
+.data-table tbody tr { cursor: pointer; }
+.data-table tbody tr:hover td { background: rgba(255,255,255,.7); }
+.status-badge { display: inline-flex; min-height: 24px; align-items: center; padding: 0 8px; border-radius: 999px; font-size: 7px; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+.status-outstanding { color: #8b493e; background: #f7e5e1; }
+.status-pending { color: #815d28; background: #f6ecd6; }
+.status-approved { color: #376047; background: #e0eee5; }
+.money { font-variant-numeric: tabular-nums; font-weight: 750; white-space: nowrap; }
+.private-chip { color: var(--ink-soft); font-size: 8px; }
+
+.publish-grid { display: grid; grid-template-columns: 1fr .8fr; gap: 14px; }
+.publish-list { display: grid; gap: 9px; }
+.publish-card { display: grid; grid-template-columns: minmax(0, 1fr) auto; gap: 16px; padding: 16px; border: 1px solid var(--line); border-radius: 14px; background: #fffefa; cursor: pointer; }
+.publish-card h4 { margin: 0; font-family: var(--serif); font-size: 19px; font-weight: 500; }
+.publish-card p { margin: 7px 0 0; color: var(--ink-soft); font-size: 10px; line-height: 1.55; }
+.publish-state { align-self: start; }
+.preview-phone { position: sticky; top: 102px; width: min(330px, 100%); min-height: 610px; margin: 0 auto; padding: 12px; border: 8px solid var(--ink); border-radius: 36px; background: #fff; box-shadow: var(--shadow-lg); }
+.preview-screen { min-height: 570px; overflow: hidden; border-radius: 20px; background: #f2ebe0; }
+.preview-hero { min-height: 190px; padding: 24px 18px; color: #fff; background-image: linear-gradient(rgba(31,35,29,.55), rgba(31,35,29,.15)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardin-8377-1024x682.jpg'); background-size: cover; }
+.preview-hero small { font-size: 7px; letter-spacing: .13em; text-transform: uppercase; }
+.preview-hero h3 { margin: 58px 0 0; font-family: var(--serif); font-size: 34px; font-weight: 400; line-height: .9; }
+.preview-content { padding: 16px; }
+.preview-update { padding: 13px; border-radius: 12px; color: #fff; background: var(--olive-dark); }
+.preview-update small { font-size: 7px; text-transform: uppercase; }
+.preview-update b { display: block; margin-top: 7px; font-family: var(--serif); font-size: 18px; font-weight: 500; }
+
+.modal-backdrop { position: fixed; inset: 0; z-index: 500; display: grid; place-items: center; padding: 20px; background: rgba(24,28,22,.52); backdrop-filter: blur(5px); }
+.modal { width: min(680px, 100%); max-height: min(860px, 92vh); overflow: auto; border-radius: var(--radius); background: var(--paper); box-shadow: 0 40px 120px rgba(18,21,17,.28); }
+.modal-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 22px 24px; border-bottom: 1px solid var(--line); background: rgba(255,253,248,.94); backdrop-filter: blur(12px); }
+.modal-head h3 { margin: 0; font-family: var(--serif); font-size: 30px; font-weight: 500; }
+.modal-close { width: 38px; height: 38px; border: 1px solid var(--line); border-radius: 50%; background: transparent; cursor: pointer; font-size: 21px; }
+.entity-form { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; padding: 24px; }
+.entity-form .full { grid-column: 1 / -1; }
+.form-actions { display: flex; justify-content: space-between; gap: 10px; grid-column: 1 / -1; padding-top: 18px; border-top: 1px solid var(--line); }
+.secondary-action, .danger-action { min-height: 42px; padding: 0 15px; border: 1px solid var(--line); border-radius: 999px; background: transparent; cursor: pointer; font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.danger-action { color: var(--danger); border-color: rgba(155,79,69,.35); }
+.toast-region { position: fixed; z-index: 800; right: 22px; bottom: 22px; display: grid; gap: 8px; width: min(360px, calc(100vw - 44px)); }
+.toast { padding: 14px 16px; border-radius: 12px; color: #fff; background: var(--olive-dark); box-shadow: var(--shadow-lg); font-size: 11px; line-height: 1.5; animation: toast-in .2s ease; }
+.toast.error { background: var(--danger); }
+@keyframes toast-in { from { opacity: 0; transform: translateY(12px); } }
+.loading-shell { display: grid; min-height: 60vh; place-items: center; color: var(--ink-soft); text-align: center; }
+.spinner { width: 34px; height: 34px; margin: 0 auto 14px; border: 3px solid rgba(77,90,67,.18); border-top-color: var(--olive); border-radius: 50%; animation: spin .8s linear infinite; }
+@keyframes spin { to { transform: rotate(360deg); } }
