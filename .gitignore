@@ -1,0 +1,19 @@
+# Secrets and private configuration
+.env
+.env.*
+!.env.example
+
+# Wedding data must never be committed to this public repository
+*.xlsx
+*.xls
+*Secure_Import*.json
+*Supabase_Seed*.sql
+private-data/
+data/private/
+
+# Local tooling
+.DS_Store
+Thumbs.db
+node_modules/
+playwright-report/
+test-results/

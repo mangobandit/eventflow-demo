@@ -1,0 +1,12 @@
+{
+  "name": "Matt & Cara Wedding Guest Guide",
+  "short_name": "M × C Wedding",
+  "description": "Guest travel and celebration guide for Matt and Cara's weddings in Spain and South Africa.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#f6f0e6",
+  "theme_color": "#303a2d",
+  "icons": [
+    { "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }
+  ]
+}

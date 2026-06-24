@@ -1,0 +1,103 @@
+.event-content { display: flex; flex-direction: column; justify-content: center; padding: clamp(60px, 8vw, 130px); background: var(--paper); }
+.event-sa .event-content { background: #e6e1d6; }
+.event-meta { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding-bottom: 14px; border-bottom: 1px solid var(--line); color: var(--olive); font-size: 10px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; }
+.event-content h2 { margin: 46px 0 2px; font-family: var(--serif); font-size: clamp(52px, 6vw, 96px); font-weight: 400; letter-spacing: -.055em; line-height: .9; }
+.event-location { margin: 14px 0 0; color: var(--clay); font-size: 11px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.event-lead { max-width: 660px; margin: 30px 0 0; color: var(--ink-soft); font-family: var(--serif); font-size: 22px; line-height: 1.55; }
+.detail-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); margin: 42px 0 0; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.detail-grid > div { padding: 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.detail-grid dt { color: var(--ink-soft); font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+.detail-grid dd { margin: 8px 0 0; font-family: var(--serif); font-size: 24px; }
+.note-box { margin-top: 24px; padding: 18px 20px; border-left: 3px solid var(--clay); background: rgba(255,255,255,.55); color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
+
+.countdown-section { display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: center; padding: clamp(70px, 9vw, 130px) 7vw; color: #fff; background: var(--olive-dark); }
+.countdown-section h2 { margin: 0; font-family: var(--serif); font-size: clamp(40px, 5vw, 76px); font-weight: 400; line-height: 1; }
+.countdown-section .eyebrow { color: #c3ccbd; }
+.countdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+.countdown-card { position: relative; overflow: hidden; min-height: 260px; padding: 24px; border: 1px solid rgba(255,255,255,.18); border-radius: var(--radius); background: rgba(255,255,255,.055); }
+.countdown-card:after { content: ""; position: absolute; width: 170px; height: 170px; right: -65px; bottom: -65px; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; }
+.countdown-card span { font-size: 10px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+.countdown-card strong { display: block; margin-top: 46px; font-family: var(--serif); font-size: clamp(70px, 8vw, 116px); font-weight: 400; line-height: .7; }
+.countdown-card small { display: block; margin-top: 22px; color: #c8d0c2; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+
+.travel-section { padding-bottom: 110px; background: #f2ebe0; }
+.travel-plan { max-width: 1420px; margin: 0 auto 34px; padding: clamp(28px, 5vw, 78px); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--paper); box-shadow: var(--shadow-sm); }
+.travel-plan-head { display: flex; align-items: center; gap: 28px; padding-bottom: 32px; border-bottom: 1px solid var(--line); }
+.country-index { display: grid; width: 68px; height: 68px; place-items: center; border: 1px solid var(--line); border-radius: 50%; color: var(--clay); font-family: var(--serif); font-size: 22px; }
+.travel-plan-head h3 { margin: 0; font-family: var(--serif); font-size: clamp(38px, 4vw, 60px); font-weight: 400; }
+.airport-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); margin-top: 40px; }
+.airport-grid article { position: relative; min-height: 270px; padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.airport-code { display: block; color: var(--clay); font-family: var(--serif); font-size: 42px; }
+.airport-grid h4 { margin: 20px 0 10px; font-family: var(--serif); font-size: 23px; font-weight: 500; }
+.airport-grid p { color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
+.route-tag { position: absolute; right: 20px; bottom: 20px; padding: 6px 9px; border-radius: 999px; color: var(--olive-dark); background: #edf0e9; font-size: 8px; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; }
+.itinerary-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-top: 32px; }
+.itinerary-card { padding: 30px; border: 1px solid var(--line); border-radius: var(--radius); background: #f7f1e7; }
+.itinerary-card.featured { color: #fff; background: var(--olive-dark); }
+.itinerary-length { color: var(--clay); font-size: 9px; font-weight: 800; letter-spacing: .16em; text-transform: uppercase; }
+.itinerary-card.featured .itinerary-length { color: #cad2c4; }
+.itinerary-card h4 { margin: 12px 0 24px; font-family: var(--serif); font-size: 30px; font-weight: 400; }
+.itinerary-card ol { margin: 0; padding-left: 20px; }
+.itinerary-card li { margin: 0 0 12px; padding-left: 6px; color: var(--ink-soft); font-size: 13px; line-height: 1.58; }
+.itinerary-card.featured li { color: #e4e8e1; }
+.travel-callout { margin-top: 28px; padding: 18px 22px; border-radius: var(--radius-sm); color: var(--ink-soft); background: #e9e0d2; font-size: 13px; line-height: 1.65; }
+
+.stay-section { padding-bottom: 120px; }
+.compact-heading { padding-bottom: 48px; }
+.stay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 6vw; }
+.stay-card { min-height: 460px; padding: clamp(36px, 5vw, 74px); border-radius: var(--radius-lg); color: #fff; background-position: center; background-size: cover; box-shadow: var(--shadow-lg); }
+.finca-stay { background-image: linear-gradient(110deg, rgba(31,35,29,.84), rgba(31,35,29,.22)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/IMG-20210520-WA0011.jpg'); }
+.mission-stay { background-image: linear-gradient(110deg, rgba(31,35,29,.84), rgba(31,35,29,.22)), url('https://cdn.prod.website-files.com/685aacf16261e83391c243e8/69847affe9fb3bc0ebce860d_Tab%20Pane%206.avif'); }
+.stay-card > span { font-size: 10px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+.stay-card h3 { max-width: 540px; margin: 50px 0 18px; font-family: var(--serif); font-size: clamp(48px, 5vw, 72px); font-weight: 400; line-height: .94; }
+.stay-card p { max-width: 600px; color: rgba(255,255,255,.88); font-family: var(--serif); font-size: 20px; line-height: 1.55; }
+.stay-card ul { margin: 30px 0 0; padding: 0; list-style: none; }
+.stay-card li { margin-top: 11px; font-size: 12px; }
+.stay-card li:before { content: "—"; margin-right: 9px; }
+
+.experience-section { padding: 0 6vw 120px; color: #fff; background: var(--ink); }
+.light-heading { padding-left: 0; padding-right: 0; }
+.light-heading .eyebrow, .light-heading .intro-number { color: #bdc9b7; }
+.light-heading > p { color: #c8cec4; }
+.experience-tabs { display: flex; gap: 6px; margin: 0 0 28px 86px; }
+.experience-tabs button { min-width: 130px; min-height: 44px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; color: #fff; background: transparent; cursor: pointer; font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
+.experience-tabs button.active { color: var(--ink); background: var(--paper); }
+.experience-panel { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(255,255,255,.16); border-left: 1px solid rgba(255,255,255,.16); }
+.experience-panel article { min-height: 290px; padding: 30px; border-right: 1px solid rgba(255,255,255,.16); border-bottom: 1px solid rgba(255,255,255,.16); }
+.experience-panel article > span { color: #aebba8; font-family: var(--serif); font-size: 18px; }
+.experience-panel h3 { margin: 58px 0 12px; font-family: var(--serif); font-size: 30px; font-weight: 400; }
+.experience-panel p { color: #c8cec4; font-size: 13px; line-height: 1.7; }
+
+.practical-section { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; padding: clamp(70px, 9vw, 130px) 7vw; background: #e5dbcd; }
+.practical-intro h2 { margin: 0; font-family: var(--serif); font-size: clamp(40px, 4.8vw, 72px); font-weight: 400; line-height: 1; }
+.practical-grid { display: grid; grid-template-columns: 1fr 1fr; border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.practical-grid article { padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.practical-icon { color: var(--clay); font-size: 26px; }
+.practical-grid h3 { margin: 30px 0 10px; font-family: var(--serif); font-size: 24px; font-weight: 500; }
+.practical-grid p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.68; }
+
+.faq-section { display: grid; grid-template-columns: .72fr 1.28fr; gap: 80px; padding: clamp(70px, 9vw, 130px) 7vw; background: var(--paper); }
+.faq-heading h2 { margin: 0; font-family: var(--serif); font-size: clamp(44px, 5vw, 74px); font-weight: 400; line-height: .98; }
+.faq-heading > p:last-child { color: var(--ink-soft); font-size: 14px; line-height: 1.6; }
+.faq-list details { border-top: 1px solid var(--line); }
+.faq-list details:last-child { border-bottom: 1px solid var(--line); }
+.faq-list summary { position: relative; padding: 24px 46px 24px 0; cursor: pointer; list-style: none; font-family: var(--serif); font-size: 21px; }
+.faq-list summary::-webkit-details-marker { display: none; }
+.faq-list summary:after { content: "+"; position: absolute; right: 8px; top: 20px; font-size: 26px; font-weight: 300; transition: transform .2s ease; }
+.faq-list details[open] summary:after { transform: rotate(45deg); }
+.faq-list details p { max-width: 760px; margin: -4px 0 24px; color: var(--ink-soft); font-size: 14px; line-height: 1.72; }
+
+.closing-section { position: relative; min-height: 720px; overflow: hidden; }
+.closing-photo { position: absolute; inset: 0; background-image: linear-gradient(90deg, rgba(22,25,20,.76), rgba(22,25,20,.15)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Jardi%CC%81n-1024x682.jpg'); background-position: center; background-size: cover; }
+.closing-copy { position: relative; z-index: 1; display: flex; min-height: 720px; flex-direction: column; align-items: flex-start; justify-content: center; width: min(760px, 80%); padding: 8vw; color: #fff; }
+.closing-copy .eyebrow { color: #d2dacf; }
+.closing-copy h2 { margin: 0; font-family: var(--serif); font-size: clamp(54px, 7vw, 108px); font-weight: 400; line-height: .9; }
+.closing-copy p { font-family: var(--serif); font-size: 21px; }
+.closing-copy .button { margin-top: 22px; }
+
+.public-footer { display: grid; grid-template-columns: 160px 1fr 1fr; gap: 28px; align-items: center; padding: 42px 6vw 96px; border-top: 1px solid var(--line); background: var(--cream); }
+.footer-monogram { font-size: 30px; }
+.public-footer > div:nth-child(2) { display: grid; gap: 5px; }
+.public-footer b { font-family: var(--serif); font-size: 20px; font-weight: 500; }
+.public-footer span, .public-footer a { color: var(--ink-soft); font-size: 11px; text-decoration: none; }
+.footer-meta { display: flex; justify-content: flex-end; gap: 22px; text-align: right; }

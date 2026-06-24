@@ -1,0 +1,217 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#303a2d">
+  <meta name="robots" content="noindex,nofollow,noarchive">
+  <title>Matt & Cara · Private Wedding Planner</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="planner.css">
+  <link rel="stylesheet" href="responsive.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script defer src="config.js"></script>
+  <script defer src="planner-core.js"></script>
+  <script defer src="planner-auth.js"></script>
+  <script defer src="planner-views.js"></script>
+  <script defer src="planner-forms.js"></script>
+</head>
+<body class="planner-site">
+  <section class="auth-screen" id="auth-screen">
+    <div class="auth-visual">
+      <div class="auth-brand">
+        <div class="monogram"><span>M</span><i>×</i><span>C</span></div>
+        <div><b>Wedding House</b><small>Private planning portal</small></div>
+      </div>
+      <div class="auth-message">
+        <p class="eyebrow">For Matt & Cara only</p>
+        <h1>Everything,<br>beautifully clear.</h1>
+        <p>One calm place for private tasks, budgets, guests, suppliers, timelines and the guest information you choose to publish.</p>
+      </div>
+    </div>
+    <div class="auth-panel">
+      <div class="auth-card">
+        <p class="eyebrow">Secure access</p>
+        <h2>Enter the planner</h2>
+        <p>Use your approved email address. We will send a secure sign-in link—no password to remember.</p>
+
+        <div class="setup-card" id="setup-card" hidden>
+          <b>The secure database still needs connecting.</b>
+          <p>This build is ready, but the portal remains closed until the Supabase URL, anon key and the two approved emails are configured.</p>
+          <code>See docs/SETUP.md in the repository.</code>
+        </div>
+
+        <form class="auth-form" id="login-form">
+          <label class="form-label">Email address
+            <input id="login-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          </label>
+          <button class="button button-dark" type="submit">Send secure link</button>
+          <div class="auth-status" id="auth-status" role="status" aria-live="polite"></div>
+        </form>
+        <p class="auth-footnote">Private information is stored in Supabase with Row Level Security. The public guest guide never receives budgets, contact details, private notes or guest records.</p>
+        <a class="text-link" href="index.html">Return to guest guide <span>→</span></a>
+      </div>
+    </div>
+  </section>
+
+  <div class="planner-shell" id="planner-shell" hidden>
+    <aside class="planner-sidebar" id="planner-sidebar">
+      <div class="planner-brand">
+        <div class="monogram"><span>M</span><i>×</i><span>C</span></div>
+        <div><b>Wedding House</b><small>Private command centre</small></div>
+      </div>
+
+      <nav class="planner-nav" aria-label="Planner sections">
+        <button class="active" type="button" data-view="overview"><span>◫</span>Overview</button>
+        <button type="button" data-view="tasks"><span>✓</span>Tasks</button>
+        <button type="button" data-view="budget"><span>€</span>Budget</button>
+        <button type="button" data-view="guests"><span>◎</span>Guests</button>
+        <button type="button" data-view="vendors"><span>◇</span>Vendors</button>
+        <button type="button" data-view="timeline"><span>◷</span>Timeline</button>
+        <button type="button" data-view="publishing"><span>↗</span>Guest publishing</button>
+      </nav>
+
+      <div class="owner-switch">
+        <span>Planner lens</span>
+        <div class="owner-pills" role="group" aria-label="Filter by owner">
+          <button class="active" type="button" data-owner="shared">Shared</button>
+          <button type="button" data-owner="matt">Matt</button>
+          <button type="button" data-owner="cara">Cara</button>
+        </div>
+      </div>
+
+      <div class="planner-account">
+        <div class="account-avatar" id="account-avatar">M</div>
+        <div><b id="account-name">Planner</b><small id="account-email"></small></div>
+        <button class="signout-button" id="signout-button" type="button" aria-label="Sign out">↪</button>
+      </div>
+    </aside>
+
+    <main class="planner-main">
+      <header class="planner-topbar">
+        <div style="display:flex;align-items:center;gap:12px">
+          <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle" type="button" aria-label="Open planner menu">☰</button>
+          <div><h1 id="topbar-title">Overview</h1><p id="topbar-subtitle">Shared planner · Spain and South Africa</p></div>
+        </div>
+        <div class="topbar-actions">
+          <span class="sync-state" id="sync-state">Securely synced</span>
+          <button class="primary-action" id="global-add" type="button">+ Add task</button>
+        </div>
+      </header>
+
+      <div class="planner-content">
+        <section class="loading-shell" id="planner-loading">
+          <div><div class="spinner"></div><b>Opening your planner</b><p>Loading the latest secure records…</p></div>
+        </section>
+
+        <section class="planner-view" data-view-panel="overview">
+          <div class="view-intro">
+            <div><p class="eyebrow">Private overview</p><h2>What needs attention now.</h2><p>The dashboard shows only the active planner lens: Shared, Matt or Cara. Nothing private appears on the guest site unless it is deliberately published.</p></div>
+            <div class="view-tools"><button class="filter-button active" type="button" data-celebration="all">Both weddings</button><button class="filter-button" type="button" data-celebration="spain">Spain</button><button class="filter-button" type="button" data-celebration="south_africa">South Africa</button></div>
+          </div>
+          <div class="kpi-grid">
+            <article class="kpi-card"><span>Outstanding</span><strong id="kpi-outstanding">0</strong><small>needs an owner or action</small></article>
+            <article class="kpi-card"><span>Pending</span><strong id="kpi-pending">0</strong><small>waiting on reply or decision</small></article>
+            <article class="kpi-card"><span>Approved</span><strong id="kpi-approved">0</strong><small>locked or completed</small></article>
+            <article class="kpi-card"><span>Next due</span><strong id="kpi-next-due">—</strong><small id="kpi-next-due-label">no dated actions yet</small></article>
+          </div>
+          <div class="dashboard-grid">
+            <article class="panel">
+              <div class="panel-head"><h3>Planning progress</h3><button type="button" data-jump="tasks">Open tasks</button></div>
+              <div class="progress-bar"><i id="progress-fill" style="width:0%"></i></div>
+              <div class="progress-legend"><div><span>Outstanding</span><b id="progress-outstanding">0</b></div><div><span>Pending</span><b id="progress-pending">0</b></div><div><span>Approved</span><b id="progress-approved">0</b></div></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><h3>Next event</h3><button type="button" data-jump="timeline">Timeline</button></div>
+              <div id="next-event-card" class="empty-state">Add dated timeline items to see the next milestone.</div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><h3>Priority actions</h3><button type="button" data-jump="tasks">See all</button></div>
+              <div class="action-list" id="priority-actions"><div class="empty-state">No priority tasks in this lens.</div></div>
+            </article>
+            <article class="panel">
+              <div class="panel-head"><h3>Upcoming payments</h3><button type="button" data-jump="budget">Budget</button></div>
+              <div class="action-list" id="payment-actions"><div class="empty-state">No dated payments recorded.</div></div>
+            </article>
+          </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="tasks">
+          <div class="view-intro">
+            <div><p class="eyebrow">Action board</p><h2>Outstanding. Pending. Approved.</h2><p>Three states only, so you can see exactly what must happen next without turning wedding planning into project-management theatre.</p></div>
+            <div class="view-tools"><button class="primary-action" type="button" data-add="tasks">+ Add task</button></div>
+          </div>
+          <div class="kanban-board">
+            <section class="kanban-column"><div class="kanban-column-head"><h3>Outstanding</h3><span id="task-count-outstanding">0</span></div><div class="kanban-list" id="tasks-outstanding"></div></section>
+            <section class="kanban-column"><div class="kanban-column-head"><h3>Pending</h3><span id="task-count-pending">0</span></div><div class="kanban-list" id="tasks-pending"></div></section>
+            <section class="kanban-column"><div class="kanban-column-head"><h3>Approved</h3><span id="task-count-approved">0</span></div><div class="kanban-list" id="tasks-approved"></div></section>
+          </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="budget">
+          <div class="view-intro">
+            <div><p class="eyebrow">Money view</p><h2>Deposits, balances and due dates.</h2><p>Track Spain in euros and South Africa in rand without forcing a misleading combined total.</p></div>
+            <div class="view-tools"><button class="primary-action" type="button" data-add="budget_items">+ Add cost</button></div>
+          </div>
+          <div class="table-panel">
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="budget" placeholder="Search budget items"></div><div id="budget-summary" class="money">€0 · R0</div></div>
+            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Item</th><th>Wedding</th><th>Category</th><th>Estimated</th><th>Paid</th><th>Balance</th><th>Due</th><th>Status</th></tr></thead><tbody id="budget-table-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="guests">
+          <div class="view-intro">
+            <div><p class="eyebrow">Private guest register</p><h2>RSVPs, dietaries and transport.</h2><p>Guest names and personal details stay inside this authenticated portal and never ship with the public website files.</p></div>
+            <div class="view-tools"><button class="primary-action" type="button" data-add="guests">+ Add guest</button></div>
+          </div>
+          <div class="table-panel">
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="guests" placeholder="Search guests or parties"></div><div id="guest-summary">0 guests</div></div>
+            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Guest</th><th>Party</th><th>Wedding</th><th>RSVP</th><th>Dietary</th><th>Transport</th><th>Accommodation</th><th>Private notes</th></tr></thead><tbody id="guests-table-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="vendors">
+          <div class="view-intro">
+            <div><p class="eyebrow">Supplier hub</p><h2>Every quote and next action.</h2><p>Keep supplier decisions attached to owners, deadlines and the correct celebration.</p></div>
+            <div class="view-tools"><button class="primary-action" type="button" data-add="vendors">+ Add vendor</button></div>
+          </div>
+          <div class="table-panel">
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="vendors" placeholder="Search suppliers"></div><div id="vendor-summary">0 suppliers</div></div>
+            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Supplier</th><th>Wedding</th><th>Category</th><th>Contact</th><th>Quote</th><th>Next action</th><th>Due</th><th>Status</th></tr></thead><tbody id="vendors-table-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="timeline">
+          <div class="view-intro">
+            <div><p class="eyebrow">Dates and run sheet</p><h2>Milestones before moments.</h2><p>Use dated planning milestones now and the exact wedding-day run sheet when suppliers are confirmed.</p></div>
+            <div class="view-tools"><button class="primary-action" type="button" data-add="timeline_items">+ Add milestone</button></div>
+          </div>
+          <div class="table-panel">
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="timeline" placeholder="Search timeline"></div><div id="timeline-summary">0 milestones</div></div>
+            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>Time</th><th>Milestone</th><th>Wedding</th><th>Owner</th><th>Audience</th><th>Location</th><th>Status</th></tr></thead><tbody id="timeline-table-body"></tbody></table></div>
+          </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="publishing">
+          <div class="view-intro">
+            <div><p class="eyebrow">Guest publishing</p><h2>Update guests without exposing the planner.</h2><p>Publish announcements and FAQs here. Only records marked Published can be read by the public guest page.</p></div>
+            <div class="view-tools"><a class="filter-button" href="index.html" target="_blank" rel="noopener">Preview guest page ↗</a><button class="primary-action" type="button" data-add="content_blocks">+ Add update</button></div>
+          </div>
+          <div class="publish-grid">
+            <article class="panel"><div class="panel-head"><h3>Published content</h3><button type="button" data-add="content_blocks">Add</button></div><div class="publish-list" id="publish-list"><div class="empty-state">No live updates yet.</div></div></article>
+            <article class="panel"><div class="panel-head"><h3>Guest preview</h3><a href="index.html" target="_blank" rel="noopener">Open live</a></div><div class="preview-phone"><div class="preview-screen"><div class="preview-hero"><small>Matt & Cara · Guest guide</small><h3>Two celebrations,<br>one story.</h3></div><div class="preview-content"><div class="preview-update"><small>Latest update</small><b id="preview-update-title">No published updates yet.</b></div></div></div></div></article>
+          </div>
+        </section>
+      </div>
+    </main>
+  </div>
+
+  <div class="modal-backdrop" id="entity-modal" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-head"><h3 id="modal-title">Add item</h3><button class="modal-close" id="modal-close" type="button" aria-label="Close">×</button></div>
+      <form class="entity-form" id="entity-form"></form>
+    </div>
+  </div>
+  <div class="toast-region" id="toast-region" aria-live="polite"></div>
+</body>
+</html>

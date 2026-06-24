@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /planner.html
+Disallow: /supabase/
+Disallow: /docs/
+Sitemap: https://mxcwedding.com/sitemap.xml
