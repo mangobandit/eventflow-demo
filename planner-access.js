@@ -4,6 +4,7 @@
   const ACCESS_DIGEST = "9be87048f0913385e325dce080fd7684b2a0b29578721a36f0e841c0aee231d5";
   const STORAGE_KEY = "mxc-planner-browser-v1";
   const SESSION_KEY = "mxc-planner-open";
+  const PRIVATE_IMPORT_URL = "private-data/MXC_Wedding_Secure_Import.json";
   let bound = false;
 
   async function start() {
@@ -48,7 +49,7 @@
         return;
       }
       sessionStorage.setItem(SESSION_KEY, "yes");
-      openPlanner();
+      await openPlanner();
     }, true);
   }
 
@@ -58,12 +59,12 @@
     return [...new Uint8Array(digest)].map((byte) => byte.toString(16).padStart(2, "0")).join("");
   }
 
-  function openPlanner() {
+  async function openPlanner() {
     state.session = { user: { id: "pin-access" } };
     state.identity = { display_name: "Matt & Cara", planner_person: "shared", email: "PIN access" };
     state.owner = "shared";
     state.celebration = "all";
-    loadData();
+    await loadData();
     bindPlanner();
     saveEntity = saveLocalEntity;
     deleteEntity = deleteLocalEntity;
@@ -142,7 +143,7 @@
     toast(`${definitions[table].title} deleted.`);
   }
 
-  function loadData() {
+  async function loadData() {
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (saved) {
@@ -152,8 +153,27 @@
     } catch (_error) {
       localStorage.removeItem(STORAGE_KEY);
     }
-    state.data = seedData();
+    state.data = await loadPrivateImport() || seedData();
     persist();
+  }
+
+  async function loadPrivateImport() {
+    try {
+      const response = await fetch(`${PRIVATE_IMPORT_URL}?v=${Date.now()}`, { cache: "no-store" });
+      if (!response.ok) return null;
+      const packageData = await response.json();
+      const importData = packageData?.data || packageData;
+      return normalizeImport(importData);
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  function normalizeImport(importData) {
+    if (!importData || typeof importData !== "object") return null;
+    const normalized = {};
+    Object.keys(state.data).forEach((table) => { normalized[table] = Array.isArray(importData[table]) ? importData[table] : []; });
+    return normalized;
   }
 
   function persist() {
