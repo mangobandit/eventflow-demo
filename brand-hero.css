@@ -1,0 +1,82 @@
+/* Homepage hero: branded black-and-white hand photo */
+.guest-hero {
+  display: grid;
+  grid-template-columns: 1fr;
+  min-height: calc(100vh - 76px);
+  background:
+    linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.46)),
+    url("assets/invitation-picture.jpg"),
+    url("https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardin-8377-1024x682.jpg");
+  background-position: center;
+  background-size: cover;
+  color: #fff;
+}
+
+.guest-hero .hero-photo { display: none; }
+
+.guest-hero .hero-copy {
+  min-height: calc(100vh - 76px);
+  width: min(960px, 92vw);
+  margin: auto;
+  padding: clamp(42px, 7vw, 96px) 24px;
+  color: #fff;
+  background: transparent;
+  text-shadow: 0 2px 18px rgba(0,0,0,.28);
+}
+
+.guest-hero .hero-copy::before,
+.guest-hero .hero-copy::after { display: none; }
+
+.guest-hero .eyebrow {
+  color: #fff;
+  letter-spacing: .24em;
+}
+
+.guest-hero .hero-copy h1 {
+  position: relative;
+  width: min(520px, 82vw);
+  height: min(360px, 58vw);
+  margin: 0 auto;
+  overflow: hidden;
+  text-indent: -9999px;
+}
+
+.guest-hero .hero-copy h1::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: #fff;
+  -webkit-mask: url("assets/mxc-logo.svg") center / contain no-repeat;
+  mask: url("assets/mxc-logo.svg") center / contain no-repeat;
+}
+
+.guest-hero .hero-deck {
+  max-width: 760px;
+  margin-top: 24px;
+  color: rgba(255,255,255,.92);
+  font-size: clamp(18px, 1.8vw, 25px);
+}
+
+.guest-hero .date-card {
+  color: #fff;
+  border-color: rgba(255,255,255,.38);
+  background: rgba(0,0,0,.24);
+  backdrop-filter: blur(12px);
+}
+
+.guest-hero .date-card b,
+.guest-hero .date-card small,
+.guest-hero .date-number { color: #fff; }
+
+.guest-hero .button-ghost {
+  color: #fff;
+  border-color: rgba(255,255,255,.42);
+  background: rgba(0,0,0,.20);
+}
+
+@media (max-width: 640px) {
+  .guest-hero .hero-copy h1 {
+    width: min(380px, 84vw);
+    height: min(260px, 56vw);
+  }
+}
