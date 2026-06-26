@@ -12,8 +12,9 @@ A high-end wedding planning and guest experience for `mxcwedding.com`.
 - Three-state workflow: Outstanding, Pending and Approved
 - Secure budgets, guest register, suppliers and timeline
 - Controlled guest publishing for announcements and FAQs
-- Household-based private RSVP links with no guest account required
-- RSVP synchronization into the private guest register
+- Guest check-in flow for 24-hour/day-of household head counts
+- Secure household links with no guest account required
+- Check-in synchronization into the private guest register
 - Supabase schema and migrations protected by Row Level Security
 - Responsive mobile design and lightweight public PWA support
 - Automated JavaScript and privacy-contract checks in GitHub Actions
@@ -26,10 +27,10 @@ python -m http.server 8000
 
 Then open `http://localhost:8000`.
 
-The guest guide works without a database. The private planner and RSVP system stay closed until `config.js` and Supabase are configured.
+The guest guide works without a database. The private planner and guest check-in system stay closed until `config.js` and Supabase are configured.
 
 - Base setup: `docs/SETUP.md`
-- RSVP setup and acceptance checks: `docs/RSVP_SETUP.md`
+- Guest check-in setup and acceptance checks: `docs/RSVP_SETUP.md`
 - Existing GitHub deployment notes: `docs/GIT_DEPLOY.md`
 
 Run the repository checks with:
@@ -40,4 +41,4 @@ npm test
 
 ## Security rule
 
-Never commit spreadsheet exports, guest names, contact details, dietaries, real approved-user emails, raw invitation tokens, service-role keys or private Supabase seed files to this public repository.
+Never commit spreadsheet exports, guest names, contact details, dietaries, real approved-user emails, raw invitation/check-in tokens, service-role keys or private Supabase seed files to this public repository.
