@@ -11,6 +11,11 @@
   }
 
   const access = addScript("planner-access.js", "mxc-access");
-  if (access) access.addEventListener("load", () => addScript("planner-extra-tasks.js", "mxc-extra-tasks"));
-  else addScript("planner-extra-tasks.js", "mxc-extra-tasks");
+  const loadPlannerExtras = () => {
+    addScript("planner-extra-tasks.js", "mxc-extra-tasks");
+    addScript("planner-honeymoon.js", "mxc-honeymoon");
+  };
+
+  if (access) access.addEventListener("load", loadPlannerExtras);
+  else loadPlannerExtras();
 })();
