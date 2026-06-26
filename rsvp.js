@@ -2,7 +2,7 @@
   "use strict";
 
   const config = window.MXC_CONFIG || {};
-  const TOKEN_KEY = "mxc-rsvp-token";
+  const TOKEN_KEY = "mxc-checkin-token";
   const TOKEN_PATTERN = /^[0-9a-f]{48}$/i;
   let client = null;
   let token = "";
@@ -42,7 +42,7 @@
   function readToken() {
     const url = new URL(window.location.href);
     const fragment = new URLSearchParams(url.hash.replace(/^#/, ""));
-    const fromUrl = (fragment.get("invite") || url.searchParams.get("invite") || "").trim();
+    const fromUrl = (fragment.get("checkin") || fragment.get("invite") || url.searchParams.get("checkin") || url.searchParams.get("invite") || "").trim();
     if (TOKEN_PATTERN.test(fromUrl)) {
       sessionStorage.setItem(TOKEN_KEY, fromUrl.toLowerCase());
       history.replaceState(null, document.title, url.pathname);
@@ -56,7 +56,7 @@
     bindEvents();
     await purgeRsvpCaches();
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
-      showError("The RSVP service is not connected yet. Please contact Matt or Cara directly for now.");
+      showError("The guest check-in service is not connected yet. Please contact Matt or Cara directly for now.");
       return;
     }
     client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
@@ -79,11 +79,11 @@
         const requests = await cache.keys();
         await Promise.all(requests.filter((request) => {
           const cachedUrl = new URL(request.url);
-          return cachedUrl.pathname.includes("rsvp") || cachedUrl.searchParams.has("invite");
+          return cachedUrl.pathname.includes("rsvp") || cachedUrl.searchParams.has("invite") || cachedUrl.searchParams.has("checkin");
         }).map((request) => cache.delete(request)));
       }));
     } catch (error) {
-      console.warn("Could not inspect old RSVP cache entries", error);
+      console.warn("Could not inspect old check-in cache entries", error);
     }
   }
 
@@ -117,23 +117,23 @@
     try {
       const { data, error } = await client.rpc("get_rsvp_invitation", { p_token: token });
       if (error) throw error;
-      if (!data || !Array.isArray(data.people)) throw new Error("Invitation not found");
+      if (!data || !Array.isArray(data.people)) throw new Error("Check-in not found");
       invitation = data;
       renderInvitation();
       show(elements.formState);
     } catch (error) {
-      console.warn("RSVP invitation could not be opened", error);
+      console.warn("Guest check-in could not be opened", error);
       sessionStorage.removeItem(TOKEN_KEY);
-      showError("The invitation may have expired, been revoked or been replaced. Ask Matt or Cara for a fresh private link.");
+      showError("The check-in link may have expired, been revoked or been replaced. Ask Matt or Cara for a fresh private link.");
     }
   }
 
   function renderInvitation() {
     elements.household.textContent = invitation.label || "Your household";
-    elements.celebration.textContent = invitation.celebration === "spain" ? "Spain wedding RSVP" : "South Africa wedding RSVP";
+    elements.celebration.textContent = invitation.celebration === "spain" ? "Spain guest check-in" : "South Africa guest check-in";
     elements.deadline.textContent = invitation.deadline
-      ? `Please respond by ${formatDate(invitation.deadline)}. You can reopen this link to make a change.`
-      : "Please respond when you know your plans. You can reopen this link to make a change.";
+      ? `Please check in by ${formatDate(invitation.deadline)}. You can reopen this link to update the head count.`
+      : "Please check in before travelling or when you arrive. You can reopen this link to update the head count.";
     elements.people.innerHTML = invitation.people.map(renderPerson).join("");
     elements.email.value = invitation.contact_email || "";
     elements.phone.value = invitation.contact_phone || "";
@@ -146,13 +146,13 @@
     return `<article class="guest-response" data-person-id="${escapeHtml(person.id)}">
       <div class="guest-response-head">
         <h3>${escapeHtml(person.name)}</h3>
-        <div class="attendance-choice" role="radiogroup" aria-label="Attendance for ${escapeHtml(person.name)}">
-          <label><input type="radio" name="attendance-${index}" value="yes" ${attending === true ? "checked" : ""} required><span>Joyfully yes</span></label>
-          <label><input type="radio" name="attendance-${index}" value="no" ${attending === false ? "checked" : ""} required><span>Sadly no</span></label>
+        <div class="attendance-choice" role="radiogroup" aria-label="Check-in status for ${escapeHtml(person.name)}">
+          <label><input type="radio" name="attendance-${index}" value="yes" ${attending === true ? "checked" : ""} required><span>Still coming</span></label>
+          <label><input type="radio" name="attendance-${index}" value="no" ${attending === false ? "checked" : ""} required><span>Can't make it</span></label>
         </div>
       </div>
       <div class="guest-response-fields">
-        <label>Dietary or allergy notes
+        <label>Food or allergy reminder
           <textarea data-field="dietary" maxlength="800" placeholder="Leave blank when none">${escapeHtml(person.dietary || "")}</textarea>
         </label>
         <label>Wedding-day transport
@@ -168,8 +168,8 @@
         <label>Where are you staying?
           <input data-field="accommodation" maxlength="300" value="${escapeHtml(person.accommodation || "")}" placeholder="Optional or TBC">
         </label>
-        <label class="full">Private note for this guest
-          <textarea data-field="notes" maxlength="800" placeholder="Accessibility, arrival timing or anything useful">${escapeHtml(person.notes || "")}</textarea>
+        <label class="full">Arrival note for this guest
+          <textarea data-field="notes" maxlength="800" placeholder="Running late, accessibility, child note or anything useful">${escapeHtml(person.notes || "")}</textarea>
         </label>
       </div>
     </article>`;
@@ -182,7 +182,7 @@
     try {
       people = [...elements.people.querySelectorAll(".guest-response")].map((card, index) => {
         const attendance = card.querySelector(`input[name="attendance-${index}"]:checked`)?.value;
-        if (!attendance) throw new Error("Please choose an attendance answer for every guest.");
+        if (!attendance) throw new Error("Please choose a check-in answer for every guest.");
         const transport = card.querySelector('[data-field="transport_needed"]').value;
         return {
           id: card.dataset.personId,
@@ -200,7 +200,7 @@
     }
 
     elements.submit.disabled = true;
-    setStatus(elements.submitStatus, "Saving your response securely…");
+    setStatus(elements.submitStatus, "Saving your check-in securely…");
     try {
       const { data, error } = await client.rpc("submit_rsvp", {
         p_token: token,
@@ -216,7 +216,7 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       console.error(error);
-      setStatus(elements.submitStatus, error.message || "We could not save the RSVP. Please try again.", true);
+      setStatus(elements.submitStatus, error.message || "We could not save the check-in. Please try again.", true);
     } finally {
       elements.submit.disabled = false;
     }
@@ -225,10 +225,10 @@
   function renderSuccess(summary) {
     const yes = Number(summary?.attending || 0);
     const no = Number(summary?.declined || 0);
-    elements.successCopy.textContent = `Your response for ${invitation.label || "your household"} has been saved securely.`;
+    elements.successCopy.textContent = `Your check-in for ${invitation.label || "your household"} has been saved securely.`;
     elements.successSummary.innerHTML = `
-      <div><span>Attending</span><b>${yes}</b></div>
-      <div><span>Unable to attend</span><b>${no}</b></div>
+      <div><span>Still coming</span><b>${yes}</b></div>
+      <div><span>Not coming</span><b>${no}</b></div>
       <div><span>Celebration</span><b>${invitation.celebration === "spain" ? "Spain" : "South Africa"}</b></div>`;
   }
 
@@ -269,6 +269,6 @@
 
   start().catch((error) => {
     console.error(error);
-    showError("The RSVP page could not start. Please contact Matt or Cara directly.");
+    showError("The guest check-in page could not start. Please contact Matt or Cara directly.");
   });
 })();
