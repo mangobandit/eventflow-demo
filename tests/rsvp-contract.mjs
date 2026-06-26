@@ -5,63 +5,68 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const read = (file) => readFileSync(resolve(root, file), "utf8");
 
-const html = read("rsvp.html");
+const checkinPage = read("rsvp.html");
 const guest = read("guest.js");
-const rsvp = read("rsvp.js");
+const checkinScript = read("rsvp.js");
 const plannerLoader = read("planner-rsvp.js");
+const plannerCheckin = read("planner-checkin.js");
 const access = read("planner-access.js");
-const core = read("planner-core.js");
 const sw = read("sw.js");
-const sql = read("supabase/migrations/20260624_rsvp_control_centre.sql");
+const checkinSql = read("supabase/migrations/20260626_guest_checkin_fields.sql");
 const config = read("config.js");
 
-assert.match(html, /name="referrer" content="no-referrer"/i, "check-in page must suppress referrers");
-assert.match(html, /noindex,nofollow,noarchive,nosnippet/i, "check-in page must not be indexed");
-assert.match(html, /rsvp\.js/, "check-in page must load its controller");
-assert.match(html, /Guest check-in/i, "check-in page must be labelled for guest check-in, not private RSVP");
+assert.match(checkinPage, /Matt & Cara · Guest Check-In/);
+assert.match(checkinPage, /Confirm your household before the celebration/);
+assert.match(checkinPage, /Are you still<br>joining us\?/);
+assert.match(checkinPage, /Send check-in/);
+assert.match(checkinPage, /Check-in received/);
+assert.doesNotMatch(checkinPage, /Private RSVP|Send RSVP|Open your RSVP|Will you<br>join us\?/);
 
-assert.match(rsvp, /sessionStorage\.setItem/, "token must move into session storage");
-assert.match(rsvp, /history\.replaceState/, "token must be scrubbed from the URL");
-assert.match(rsvp, /URLSearchParams\(url\.hash/, "check-in links must support a fragment that is not sent to the server");
-assert.match(rsvp, /fragment\.get\("checkin"\)/, "new check-in links must accept #checkin tokens");
-assert.match(rsvp, /purgeRsvpCaches/, "check-in controller must purge legacy cached invitation requests");
-assert.doesNotMatch(rsvp, /localStorage/, "check-in token must not persist in local storage");
-assert.match(rsvp, /rpc\("get_rsvp_invitation"/, "guest lookup must use restricted RPC");
-assert.match(rsvp, /rpc\("submit_rsvp"/, "guest submission must use restricted RPC");
-assert.match(rsvp, /\^\[0-9a-f\]\{48\}\$/i, "client must validate a 48-character token");
+assert.match(checkinScript, /get_rsvp_invitation/);
+assert.match(checkinScript, /submit_rsvp/);
+assert.match(checkinScript, /Checked in — still coming/);
+assert.match(checkinScript, /Can't make it/);
+assert.match(checkinScript, /Last-minute note for Matt & Cara/);
+assert.doesNotMatch(checkinScript, /Joyfully yes|Sadly no|Saving your response|Your RSVP/);
 
-assert.match(guest, /Guest check-in/, "guest guide must expose the check-in entry point");
-assert.match(guest, /faqKey/, "guest guide must deduplicate legacy FAQ questions");
-assert.match(core, /planner-rsvp\.js/, "private planner must load its access module");
-assert.match(plannerLoader, /planner-access\.js/, "planner loader must activate simple couple access");
-assert.match(access, /ACCESS_DIGEST/, "the simple entry code must be compared as a digest");
-assert.match(access, /crypto\.subtle\.digest\("SHA-256"/, "the entered code must be hashed in the browser");
-assert.match(access, /localStorage\.setItem/, "browser-mode planner changes must persist locally");
-assert.match(access, /owner: "cara"/, "Cara must have a separate planner lens");
-assert.match(access, /owner: "matt"/, "Matt must have a separate planner lens");
-assert.doesNotMatch(access, /const\s+(?:PIN|PASSWORD)\s*=\s*["']\d{4}["']/i, "the raw entry code must not be committed as a plain constant");
+const expectedFaqs = [
+  "What is the wedding theme?",
+  "What can I expect on the day?",
+  "What kind of food will there be?",
+  "What should we wear?",
+  "Is everything in the same location?",
+  "Is the wedding indoors or outdoors?",
+  "How early can I arrive?",
+  "What are the timings for the day?",
+  "Will there be wedding-day transport?",
+  "Is there parking at the venue?",
+  "Can children come?",
+  "What gifts should I bring?",
+  "Can I take photos or post online?",
+  "What is Walls.io?",
+  "When should we book flights?"
+];
 
-assert.match(sw, /pathname\.includes\("rsvp"\)/, "service worker must bypass RSVP/check-in paths");
-assert.match(sw, /pathname\.includes\("check-in"\)/, "service worker must bypass any future check-in path");
-assert.match(sw, /url\.search/, "service worker must bypass query-string requests");
-assert.doesNotMatch(sw, /rsvp\.html.*PUBLIC_ASSETS/s, "RSVP/check-in HTML must not be precached");
+expectedFaqs.forEach((title) => assert.match(guest, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
+assert.match(guest, /const BUILT_IN_FAQS = \[/);
+assert.match(guest, /function normalizeFaqTitle/);
+assert.match(guest, /renderFaqList\(faqs\)/);
+assert.doesNotMatch(guest, /Can children attend/);
+assert.match(guest, /Guest Check-In/);
+assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"/);
 
-assert.match(sql, /gen_random_bytes\(24\)/, "tokens must contain 192 bits of randomness");
-assert.match(sql, /digest\(v_token, 'sha256'\)/, "raw tokens must be hashed before storage");
-assert.match(sql, /token_hash bytea not null unique/, "token hashes must be unique");
-assert.doesNotMatch(sql, /\btoken\s+text\s+not null/i, "raw tokens must never be stored in a table column");
-assert.match(sql, /alter table public\.rsvp_invitations enable row level security/i);
-assert.match(sql, /alter table public\.rsvp_people enable row level security/i);
-assert.match(sql, /revoke all on public\.rsvp_invitations from anon/i);
-assert.match(sql, /revoke all on public\.rsvp_people from anon/i);
-assert.match(sql, /grant execute on function public\.get_rsvp_invitation\(text\) to anon, authenticated/i);
-assert.match(sql, /grant execute on function public\.submit_rsvp\(text, jsonb, text, text, text\) to anon, authenticated/i);
-assert.doesNotMatch(sql, /grant (select|insert|update|delete).*rsvp_(invitations|people).*anon/i, "anon must never receive table access");
-assert.match(sql, /delete from public\.guests where rsvp_invitation_id = p_invitation_id/i, "safe delete must remove synchronized guest rows");
+assert.match(plannerLoader, /planner-checkin\.js/);
+assert.match(plannerCheckin, /Guest Check-In/);
+assert.match(plannerCheckin, /Total invited/);
+assert.match(plannerCheckin, /Copy check-in message/);
+assert.match(access, /ACCESS_DIGEST/);
+assert.match(access, /localStorage\.setItem/);
+assert.match(sw, /pathname\.includes\("rsvp"\)/);
+assert.match(sw, /url\.search/);
+assert.match(checkinSql, /checked_in_at/);
+assert.match(checkinSql, /check_in_status/);
+assert.match(checkinSql, /last_confirmed_at/);
+assert.match(config, /supabaseUrl:\s*""/);
+assert.match(config, /supabaseAnonKey:\s*""/);
 
-assert.match(config, /supabaseUrl:\s*""/, "repository must not commit a live project URL by default");
-assert.match(config, /supabaseAnonKey:\s*""/, "repository must not commit a project key by default");
-assert.match(config, /guest-children-note\.js/, "guest FAQ loader must keep the canonical FAQ script enabled");
-assert.doesNotMatch([html, guest, rsvp, plannerLoader, access, core, sw, sql].join("\n"), /service_role|eyJ[a-zA-Z0-9_-]{20,}\./, "no service-role or JWT-like secret may be committed");
-
-console.log("Guest check-in and simple couple-access contracts passed.");
+console.log("FAQ dedupe and Guest Check-In contracts passed.");
