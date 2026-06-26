@@ -1,0 +1,50 @@
+/* Matt & Cara brand marks */
+.monogram {
+  display: inline-block;
+  width: 98px;
+  height: 48px;
+  color: var(--olive-dark);
+  background: currentColor;
+  -webkit-mask: url("assets/mxc-logo.svg") center / contain no-repeat;
+  mask: url("assets/mxc-logo.svg") center / contain no-repeat;
+  text-decoration: none;
+  font-size: 0 !important;
+  line-height: 0;
+  flex: 0 0 auto;
+}
+.monogram span,
+.monogram i { display: none !important; }
+
+.public-header .monogram { width: 104px; height: 46px; }
+.footer-monogram { width: 138px; height: 68px; }
+.auth-brand .monogram,
+.planner-brand .monogram { width: 124px; height: 62px; color: #fff; }
+.auth-card .monogram { width: 122px; height: 60px; }
+.rsvp-header .monogram { width: 108px; height: 50px; color: #fff; }
+
+.hero-copy::before {
+  background: linear-gradient(transparent, rgba(167, 103, 69, .22), transparent);
+}
+.hero-copy::after {
+  background: linear-gradient(transparent, rgba(77, 90, 67, .22), transparent);
+}
+
+.planner-topbar::after {
+  content: "";
+  position: absolute;
+  right: 20px;
+  bottom: -1px;
+  width: 92px;
+  height: 38px;
+  opacity: .10;
+  background: var(--olive-dark);
+  -webkit-mask: url("assets/mxc-logo.svg") center / contain no-repeat;
+  mask: url("assets/mxc-logo.svg") center / contain no-repeat;
+  pointer-events: none;
+}
+
+@media (max-width: 640px) {
+  .public-header .monogram { width: 88px; height: 40px; }
+  .auth-brand .monogram,
+  .planner-brand .monogram { width: 104px; height: 52px; }
+}
