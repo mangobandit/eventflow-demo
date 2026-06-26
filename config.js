@@ -7,10 +7,21 @@ window.MXC_CONFIG = Object.freeze({
 });
 
 window.addEventListener("load", () => {
-  const ok = document.body.classList.contains("guest-site") || document.body.classList.contains("planner-site");
-  if (!ok || document.querySelector('script[data-mxc-chat]')) return;
-  const script = document.createElement("script");
-  script.src = "wedding-chat.js";
-  script.dataset.mxcChat = "true";
-  document.body.appendChild(script);
+  const isGuest = document.body.classList.contains("guest-site");
+  const isPlanner = document.body.classList.contains("planner-site");
+  if (!isGuest && !isPlanner) return;
+
+  function addScript(src, marker) {
+    if (document.querySelector(`script[data-${marker}]`)) return;
+    const script = document.createElement("script");
+    script.src = src;
+    script.dataset[marker.replace(/-([a-z])/g, (_match, char) => char.toUpperCase())] = "true";
+    document.body.appendChild(script);
+  }
+
+  addScript("wedding-chat.js", "mxc-chat");
+  if (isGuest) {
+    addScript("guest-children-note.js", "mxc-children-note");
+    addScript("wedding-chat-family.js", "mxc-family-chat");
+  }
 });
