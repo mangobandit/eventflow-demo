@@ -13,6 +13,7 @@
   const access = addScript("planner-access.js", "mxc-access");
   const loadPlannerExtras = () => {
     addScript("planner-extra-tasks.js", "mxc-extra-tasks");
+    addScript("planner-checkin.js", "mxc-checkin");
     addScript("planner-honeymoon.js", "mxc-honeymoon");
   };
 
