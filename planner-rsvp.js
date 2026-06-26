@@ -1,6 +1,8 @@
 (() => {
   "use strict";
-  import("./planner-access.js").catch((error) => {
-    console.error("Could not open the couple portal", error);
-  });
+  if (document.querySelector('script[data-mxc-access]')) return;
+  const script = document.createElement("script");
+  script.src = "planner-access.js";
+  script.dataset.mxcAccess = "true";
+  document.body.appendChild(script);
 })();
