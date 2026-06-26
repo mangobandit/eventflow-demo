@@ -11,10 +11,17 @@ window.addEventListener("load", () => {
   const isPlanner = document.body.classList.contains("planner-site");
   if (!isGuest && !isPlanner) return;
 
+  const ASSET_VERSION = "20260626-checkin";
+
+  function versioned(src) {
+    if (/^https?:\/\//i.test(src)) return src;
+    return `${src}?v=${ASSET_VERSION}`;
+  }
+
   function addScript(src, marker) {
     if (document.querySelector(`script[data-${marker}]`)) return;
     const script = document.createElement("script");
-    script.src = src;
+    script.src = versioned(src);
     script.dataset[marker.replace(/-([a-z])/g, (_match, char) => char.toUpperCase())] = "true";
     document.body.appendChild(script);
   }
