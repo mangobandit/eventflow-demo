@@ -7,6 +7,7 @@
   const menuButton = document.querySelector(".menu-button");
   const publicNav = document.querySelector(".public-nav");
 
+  installRodeoTheme();
   installRsvpLinks();
 
   menuButton?.addEventListener("click", () => {
@@ -114,6 +115,70 @@
       console.warn("Guest updates are using the built-in fallback content.", error.message);
     }
   };
+
+  function installRodeoTheme() {
+    const heroDeck = document.querySelector(".hero-deck");
+    if (heroDeck) {
+      heroDeck.textContent = "We're embracing our love of Western music and great BBQ food with Rodeo-style wedding celebrations in Spain and South Africa.";
+    }
+
+    const introHeading = document.querySelector(".intro-section h2");
+    if (introHeading) introHeading.innerHTML = "Western music, great BBQ,<br>and the people we love.";
+    const introCopy = document.querySelector(".intro-copy");
+    if (introCopy) introCopy.textContent = "Both celebrations will carry the same Rodeo-style spirit: relaxed Western energy, good food, good music, cowboy boots, hats, leather and denim welcome.";
+
+    const liveUpdates = document.getElementById("live-updates");
+    if (liveUpdates && !document.getElementById("rodeo-theme-note")) {
+      const theme = document.createElement("div");
+      theme.id = "rodeo-theme-note";
+      theme.className = "live-note-grid live-note-grid-dark";
+      theme.innerHTML = `
+        <article class="live-note-card">
+          <span>Wedding theme</span>
+          <h3>Rodeo-style celebration</h3>
+          <p>We're embracing our love of Western music and great BBQ food by hosting Rodeo-style weddings. Cowboy boots, hats, leather and denim are welcome, and encouraged.</p>
+        </article>
+        <article class="live-note-card">
+          <span>What to wear</span>
+          <h3>Western, comfortable, celebration-ready</h3>
+          <p>Think boots, hats, denim, leather, belts, bolo ties, fringe, country shirts and dresses that can handle gardens, lawns and a dancefloor.</p>
+        </article>`;
+      liveUpdates.appendChild(theme);
+    }
+
+    const eventBlocks = [
+      { selector: "#spain", copy: "Spain will bring the Rodeo spirit to the Andalusian countryside: Western music, BBQ food, boots, hats, denim and leather against a finca backdrop." },
+      { selector: "#south-africa", copy: "South Africa will carry the same Rodeo-style energy in the KZN Midlands: great BBQ food, Western music, cowboy boots, hats, leather and denim encouraged." }
+    ];
+
+    eventBlocks.forEach(({ selector, copy }) => {
+      const block = document.querySelector(selector);
+      if (!block) return;
+      const lead = block.querySelector(".event-lead");
+      if (lead) lead.textContent = copy;
+      const dress = [...block.querySelectorAll("dt")].find((item) => item.textContent.trim().toLowerCase() === "dress feel");
+      if (dress?.nextElementSibling) dress.nextElementSibling.textContent = "Rodeo Western";
+      const note = block.querySelector(".note-box");
+      if (note) note.innerHTML = "<b>Rodeo-style dress code.</b> Cowboy boots, hats, leather and denim are welcome, and encouraged. Dress for good BBQ, Western music, outdoor spaces and a proper dancefloor.";
+    });
+
+    const practicalIntro = document.querySelector(".practical-intro h2");
+    if (practicalIntro) practicalIntro.innerHTML = "Pack for the Rodeo,<br>not just the photograph.";
+    const practicalCards = [...document.querySelectorAll(".practical-grid article")];
+    if (practicalCards[2]) {
+      practicalCards[2].querySelector("h3").textContent = "Boots, hats, denim";
+      practicalCards[2].querySelector("p").textContent = "Cowboy boots, hats, leather and denim are welcome and encouraged. Choose shoes that work on gardens, lawns and country surfaces.";
+    }
+
+    const faqList = document.getElementById("faq-list");
+    if (faqList && !faqList.querySelector('[data-rodeo-faq="true"]')) {
+      const details = document.createElement("details");
+      details.dataset.rodeoFaq = "true";
+      details.open = true;
+      details.innerHTML = "<summary>What is the wedding theme?</summary><p>We're hosting Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged.</p>";
+      faqList.prepend(details);
+    }
+  }
 
   function installRsvpLinks() {
     if (document.querySelector('[data-rsvp-entry]')) return;
