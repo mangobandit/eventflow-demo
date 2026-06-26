@@ -30,5 +30,6 @@ window.addEventListener("load", () => {
   if (isGuest) {
     addScript("guest-children-note.js", "mxc-children-note");
     addScript("wedding-chat-family.js", "mxc-family-chat");
+    addScript("wedding-chat-checkin.js", "mxc-checkin-chat");
   }
 });
