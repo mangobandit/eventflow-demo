@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#303a2d">
   <meta name="referrer" content="no-referrer">
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
-  <title>Matt & Cara · RSVP</title>
+  <title>Matt & Cara · Guest Check-In</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="rsvp.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -14,10 +14,10 @@
   <script defer src="rsvp.js"></script>
 </head>
 <body class="rsvp-site">
-  <a class="skip-link" href="#rsvp-main">Skip to RSVP form</a>
+  <a class="skip-link" href="#rsvp-main">Skip to guest check-in form</a>
   <header class="rsvp-header">
     <a class="monogram" href="index.html" aria-label="Matt and Cara guest guide"><span>M</span><i>×</i><span>C</span></a>
-    <div><b>Private RSVP</b><small>Your invitation link is unique to your household</small></div>
+    <div><b>Guest check-in</b><small>Confirm your household headcount before the day</small></div>
     <a class="rsvp-back" href="index.html">Guest guide <span aria-hidden="true">↗</span></a>
   </header>
 
@@ -25,8 +25,8 @@
     <section class="rsvp-visual" aria-hidden="true">
       <div class="rsvp-visual-copy">
         <p class="eyebrow">Matt & Cara · 2026</p>
-        <h1>Will you<br>join us?</h1>
-        <p>Two celebrations, two beautiful places, and one very simple way to let us know your plans.</p>
+        <h1>Check in<br>for the day.</h1>
+        <p>Like a simple 24-hour flight check-in: confirm who is still coming, update transport notes and help us keep the final head count clean.</p>
       </div>
     </section>
 
@@ -34,36 +34,36 @@
       <div class="rsvp-card">
         <div id="rsvp-loading" class="rsvp-state">
           <div class="rsvp-spinner" aria-hidden="true"></div>
-          <p class="eyebrow">Opening your invitation</p>
+          <p class="eyebrow">Opening check-in</p>
           <h2>One moment…</h2>
-          <p>We are loading the invitation attached to this private link.</p>
+          <p>We are loading the household check-in attached to this private link.</p>
         </div>
 
         <div id="rsvp-code-state" class="rsvp-state" hidden>
-          <p class="eyebrow">Private invitation</p>
-          <h2>Open your RSVP</h2>
-          <p>Paste the invitation code from Matt and Cara. Codes contain only letters A–F and numbers.</p>
+          <p class="eyebrow">Guest check-in</p>
+          <h2>Open your check-in</h2>
+          <p>Paste the check-in code from Matt and Cara. Codes contain only letters A–F and numbers.</p>
           <form id="rsvp-code-form" class="rsvp-code-form">
-            <label>Invitation code
+            <label>Check-in code
               <input id="rsvp-code" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="48" placeholder="Paste your 48-character code" required>
             </label>
-            <button class="button button-dark" type="submit">Open invitation</button>
+            <button class="button button-dark" type="submit">Open check-in</button>
           </form>
           <div class="rsvp-status" id="rsvp-code-status" role="status" aria-live="polite"></div>
         </div>
 
         <div id="rsvp-error-state" class="rsvp-state" hidden>
-          <p class="eyebrow">Invitation unavailable</p>
-          <h2>We could not open that link.</h2>
-          <p id="rsvp-error-message">The invitation may have expired or been replaced. Ask Matt or Cara for a fresh link.</p>
+          <p class="eyebrow">Check-in unavailable</p>
+          <h2>We could not open that check-in.</h2>
+          <p id="rsvp-error-message">The check-in link may have expired or been replaced. Ask Matt or Cara for a fresh link.</p>
           <button class="button button-dark" id="try-another-code" type="button">Try another code</button>
         </div>
 
         <div id="rsvp-form-state" hidden>
           <div class="rsvp-intro">
-            <p class="eyebrow" id="rsvp-celebration">Your invitation</p>
+            <p class="eyebrow" id="rsvp-celebration">Your check-in</p>
             <h2 id="rsvp-household">Welcome</h2>
-            <p id="rsvp-deadline">Please respond when you know your plans.</p>
+            <p id="rsvp-deadline">Please check in before travelling or when you arrive.</p>
           </div>
 
           <form id="rsvp-form" class="rsvp-form">
@@ -71,9 +71,9 @@
 
             <section class="rsvp-contact-section">
               <div>
-                <p class="eyebrow">Household contact</p>
-                <h3>How can we reach you?</h3>
-                <p>One email or phone number is enough. It stays in the private couple portal.</p>
+                <p class="eyebrow">Check-in contact</p>
+                <h3>How can we reach you today?</h3>
+                <p>One WhatsApp number or email is enough. It stays in the private couple portal.</p>
               </div>
               <div class="rsvp-contact-grid">
                 <label>Email address
@@ -83,14 +83,14 @@
                   <input id="rsvp-phone" type="tel" autocomplete="tel" maxlength="80" placeholder="Optional">
                 </label>
               </div>
-              <label class="full">Message for Matt & Cara
-                <textarea id="rsvp-message" maxlength="2000" placeholder="Anything else we should know? Optional."></textarea>
+              <label class="full">Arrival note for Matt & Cara
+                <textarea id="rsvp-message" maxlength="2000" placeholder="Running late, transport change, child note, or anything else? Optional."></textarea>
               </label>
             </section>
 
             <div class="rsvp-submit-row">
-              <p>Review each guest before sending. You can reopen the same private link to update your answers.</p>
-              <button class="button button-dark" id="rsvp-submit" type="submit">Send RSVP</button>
+              <p>Confirm who is still coming before sending. You can reopen the same private link to update the check-in.</p>
+              <button class="button button-dark" id="rsvp-submit" type="submit">Complete check-in</button>
             </div>
             <div class="rsvp-status" id="rsvp-submit-status" role="status" aria-live="polite"></div>
           </form>
@@ -98,12 +98,12 @@
 
         <div id="rsvp-success-state" class="rsvp-state rsvp-success" hidden>
           <div class="success-mark" aria-hidden="true">✓</div>
-          <p class="eyebrow">Response received</p>
+          <p class="eyebrow">Check-in received</p>
           <h2>Thank you.</h2>
-          <p id="rsvp-success-copy">Your RSVP has been saved securely in Matt and Cara's planner.</p>
+          <p id="rsvp-success-copy">Your check-in has been saved securely in Matt and Cara's planner.</p>
           <div id="rsvp-success-summary" class="rsvp-success-summary"></div>
           <div class="rsvp-success-actions">
-            <button class="button button-dark" id="edit-rsvp" type="button">Review or update</button>
+            <button class="button button-dark" id="edit-rsvp" type="button">Review or update check-in</button>
             <a class="button button-ghost" href="index.html">Open guest guide</a>
           </div>
         </div>
@@ -111,7 +111,7 @@
 
       <aside class="rsvp-privacy">
         <span aria-hidden="true">◇</span>
-        <p><b>Private by design.</b> Your response is sent directly to the secure wedding database. It is not published on the guest website or stored in the public GitHub repository.</p>
+        <p><b>Private by design.</b> Your check-in is sent directly to the secure wedding database. It is not published on the guest website or stored in the public GitHub repository.</p>
       </aside>
     </section>
   </main>
