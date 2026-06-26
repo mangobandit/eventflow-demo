@@ -34,11 +34,20 @@
 
 .guest-hero .hero-copy h1 {
   position: relative;
-  width: min(520px, 82vw);
-  height: min(360px, 58vw);
-  margin: 0 auto;
-  overflow: hidden;
-  text-indent: -9999px;
+  width: min(420px, 72vw);
+  height: min(285px, 50vw);
+  margin: 10px auto 22px;
+  overflow: visible;
+  color: transparent !important;
+  font-size: 0 !important;
+  line-height: 0 !important;
+  text-indent: 0 !important;
+  text-shadow: none !important;
+}
+
+.guest-hero .hero-copy h1 em,
+.guest-hero .hero-copy h1 span {
+  display: none !important;
 }
 
 .guest-hero .hero-copy h1::before {
@@ -48,35 +57,73 @@
   background: #fff;
   -webkit-mask: url("assets/mxc-logo.svg") center / contain no-repeat;
   mask: url("assets/mxc-logo.svg") center / contain no-repeat;
+  filter: drop-shadow(0 6px 22px rgba(0,0,0,.22));
 }
 
 .guest-hero .hero-deck {
   max-width: 760px;
-  margin-top: 24px;
-  color: rgba(255,255,255,.92);
+  margin-top: 18px;
+  color: rgba(255,255,255,.94);
   font-size: clamp(18px, 1.8vw, 25px);
 }
 
+.guest-hero .date-lockup {
+  gap: 12px;
+  width: min(100%, 560px);
+  margin-top: 34px;
+}
+
 .guest-hero .date-card {
-  color: #fff;
-  border-color: rgba(255,255,255,.38);
-  background: rgba(0,0,0,.24);
-  backdrop-filter: blur(12px);
+  color: var(--olive-dark);
+  border-color: rgba(255,255,255,.78);
+  background: rgba(255,253,248,.92);
+  box-shadow: 0 14px 34px rgba(0,0,0,.18);
+  backdrop-filter: blur(14px);
+}
+
+.guest-hero .date-card:hover {
+  background: #fffdf8;
 }
 
 .guest-hero .date-card b,
-.guest-hero .date-card small,
-.guest-hero .date-number { color: #fff; }
+.guest-hero .date-card small { color: var(--olive-dark); }
+.guest-hero .date-number { color: var(--clay); }
 
-.guest-hero .button-ghost {
+.guest-hero .hero-actions .button {
+  min-height: 50px;
+  min-width: 154px;
+  border: 1px solid rgba(255,255,255,.82);
+  box-shadow: 0 12px 30px rgba(0,0,0,.16);
+}
+
+.guest-hero .hero-actions .button-dark,
+.guest-hero .hero-actions .button-ghost {
+  color: var(--olive-dark);
+  background: rgba(255,253,248,.94);
+  border-color: rgba(255,255,255,.82);
+}
+
+.guest-hero .hero-actions .button:hover,
+.guest-hero .hero-actions .button-dark:hover,
+.guest-hero .hero-actions .button-ghost:hover {
   color: #fff;
-  border-color: rgba(255,255,255,.42);
-  background: rgba(0,0,0,.20);
+  background: var(--olive-dark);
+  border-color: var(--olive-dark);
 }
 
 @media (max-width: 640px) {
   .guest-hero .hero-copy h1 {
-    width: min(380px, 84vw);
-    height: min(260px, 56vw);
+    width: min(320px, 78vw);
+    height: min(220px, 54vw);
+    margin-bottom: 14px;
+  }
+
+  .guest-hero .date-lockup {
+    grid-template-columns: 1fr;
+    width: min(100%, 360px);
+  }
+
+  .guest-hero .hero-actions .button {
+    width: min(100%, 310px);
   }
 }
