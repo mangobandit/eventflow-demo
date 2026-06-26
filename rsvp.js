@@ -2,7 +2,7 @@
   "use strict";
 
   const config = window.MXC_CONFIG || {};
-  const TOKEN_KEY = "mxc-checkin-token";
+  const TOKEN_KEY = "mxc-rsvp-token";
   const TOKEN_PATTERN = /^[0-9a-f]{48}$/i;
   let client = null;
   let token = "";
@@ -42,7 +42,7 @@
   function readToken() {
     const url = new URL(window.location.href);
     const fragment = new URLSearchParams(url.hash.replace(/^#/, ""));
-    const fromUrl = (fragment.get("checkin") || fragment.get("invite") || url.searchParams.get("checkin") || url.searchParams.get("invite") || "").trim();
+    const fromUrl = (fragment.get("invite") || url.searchParams.get("invite") || "").trim();
     if (TOKEN_PATTERN.test(fromUrl)) {
       sessionStorage.setItem(TOKEN_KEY, fromUrl.toLowerCase());
       history.replaceState(null, document.title, url.pathname);
@@ -56,7 +56,7 @@
     bindEvents();
     await purgeRsvpCaches();
     if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
-      showError("The guest check-in service is not connected yet. Please contact Matt or Cara directly for now.");
+      showError("The check-in service is not connected yet. Please contact Matt or Cara directly for now.");
       return;
     }
     client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
@@ -79,7 +79,7 @@
         const requests = await cache.keys();
         await Promise.all(requests.filter((request) => {
           const cachedUrl = new URL(request.url);
-          return cachedUrl.pathname.includes("rsvp") || cachedUrl.searchParams.has("invite") || cachedUrl.searchParams.has("checkin");
+          return cachedUrl.pathname.includes("rsvp") || cachedUrl.searchParams.has("invite");
         }).map((request) => cache.delete(request)));
       }));
     } catch (error) {
@@ -124,7 +124,7 @@
     } catch (error) {
       console.warn("Guest check-in could not be opened", error);
       sessionStorage.removeItem(TOKEN_KEY);
-      showError("The check-in link may have expired, been revoked or been replaced. Ask Matt or Cara for a fresh private link.");
+      showError("The check-in service is not connected yet. Please contact Matt or Cara directly for now.");
     }
   }
 
@@ -132,8 +132,8 @@
     elements.household.textContent = invitation.label || "Your household";
     elements.celebration.textContent = invitation.celebration === "spain" ? "Spain guest check-in" : "South Africa guest check-in";
     elements.deadline.textContent = invitation.deadline
-      ? `Please check in by ${formatDate(invitation.deadline)}. You can reopen this link to update the head count.`
-      : "Please check in before travelling or when you arrive. You can reopen this link to update the head count.";
+      ? `Please confirm by ${formatDate(invitation.deadline)}. You can reopen this link to update your check-in.`
+      : "Use this to confirm your household 24 hours before the celebration so we can keep the final head count, transport and food planning accurate.";
     elements.people.innerHTML = invitation.people.map(renderPerson).join("");
     elements.email.value = invitation.contact_email || "";
     elements.phone.value = invitation.contact_phone || "";
@@ -146,13 +146,13 @@
     return `<article class="guest-response" data-person-id="${escapeHtml(person.id)}">
       <div class="guest-response-head">
         <h3>${escapeHtml(person.name)}</h3>
-        <div class="attendance-choice" role="radiogroup" aria-label="Check-in status for ${escapeHtml(person.name)}">
-          <label><input type="radio" name="attendance-${index}" value="yes" ${attending === true ? "checked" : ""} required><span>Still coming</span></label>
+        <div class="attendance-choice" role="radiogroup" aria-label="Attendance for ${escapeHtml(person.name)}">
+          <label><input type="radio" name="attendance-${index}" value="yes" ${attending === true ? "checked" : ""} required><span>Checked in — still coming</span></label>
           <label><input type="radio" name="attendance-${index}" value="no" ${attending === false ? "checked" : ""} required><span>Can't make it</span></label>
         </div>
       </div>
       <div class="guest-response-fields">
-        <label>Food or allergy reminder
+        <label>Dietary or allergy notes
           <textarea data-field="dietary" maxlength="800" placeholder="Leave blank when none">${escapeHtml(person.dietary || "")}</textarea>
         </label>
         <label>Wedding-day transport
@@ -168,8 +168,8 @@
         <label>Where are you staying?
           <input data-field="accommodation" maxlength="300" value="${escapeHtml(person.accommodation || "")}" placeholder="Optional or TBC">
         </label>
-        <label class="full">Arrival note for this guest
-          <textarea data-field="notes" maxlength="800" placeholder="Running late, accessibility, child note or anything useful">${escapeHtml(person.notes || "")}</textarea>
+        <label class="full">Last-minute note for Matt & Cara
+          <textarea data-field="notes" maxlength="800" placeholder="Arrival timing, transport change, child note, accessibility need or anything useful.">${escapeHtml(person.notes || "")}</textarea>
         </label>
       </div>
     </article>`;
@@ -228,7 +228,7 @@
     elements.successCopy.textContent = `Your check-in for ${invitation.label || "your household"} has been saved securely.`;
     elements.successSummary.innerHTML = `
       <div><span>Still coming</span><b>${yes}</b></div>
-      <div><span>Not coming</span><b>${no}</b></div>
+      <div><span>Can't make it</span><b>${no}</b></div>
       <div><span>Celebration</span><b>${invitation.celebration === "spain" ? "Spain" : "South Africa"}</b></div>`;
   }
 
@@ -269,6 +269,6 @@
 
   start().catch((error) => {
     console.error(error);
-    showError("The guest check-in page could not start. Please contact Matt or Cara directly.");
+    showError("The check-in page could not start. Please contact Matt or Cara directly.");
   });
 })();
