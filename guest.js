@@ -6,9 +6,53 @@
   const config = window.MXC_CONFIG || {};
   const menuButton = document.querySelector(".menu-button");
   const publicNav = document.querySelector(".public-nav");
+  const CANONICAL_FAQS = [
+    {
+      title: "What is the wedding theme?",
+      body: "We are hosting Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather, denim, belts, bolo ties, fringe, country shirts and country dresses are welcome and encouraged."
+    },
+    {
+      title: "Can children attend?",
+      aliases: ["Can children come?", "Are children invited?"],
+      body: "Please follow the invitation addressed to your household. Some children may be specifically included, but the headcount has to stay controlled for venue, seating and catering reasons. Message Matt or Cara directly if anything is unclear."
+    },
+    {
+      title: "Can we bring a plus-one?",
+      body: "Please only bring the people named on your invitation or check-in link. If something changes, message Matt or Cara before making travel plans around an extra guest."
+    },
+    {
+      title: "When should we book flights?",
+      body: "Once your attendance is confirmed, start tracking routes and book when the itinerary and price feel right. Flexible fares are best where possible because regional schedules can change."
+    },
+    {
+      title: "Where should we stay?",
+      body: "For Spain, Arcos or Jerez are the easiest bases. For South Africa, Howick or the Midlands Meander area are the most practical. Final pickup points will depend on where guests stay."
+    },
+    {
+      title: "Will there be wedding-day transport?",
+      body: "We are planning route groups for Spain and South Africa. Final pickup locations depend on guest accommodation and the final number needing seats, so please answer transport questions in the check-in link."
+    },
+    {
+      title: "What should we wear?",
+      body: "Think polished Rodeo Western: boots, hats, denim, leather, belts, bolo ties, fringe, country shirts and dresses that can handle gardens, lawns and a dancefloor. Avoid stilettos or shoes that struggle on grass."
+    },
+    {
+      title: "When will final timings be shared?",
+      body: "The core schedule is shown above. Exact transport, arrival, weather and venue notes will be refreshed closer to each wedding week and again around the 24-hour check-in window."
+    },
+    {
+      title: "What happens 24 hours before?",
+      body: "We will send a guest check-in link or code so each household can confirm who is still coming, whether transport is needed and whether anything has changed. Think of it like an airline check-in for the wedding headcount."
+    },
+    {
+      title: "What if our plans change?",
+      body: "Use your check-in link to update the household response when it is available. For anything urgent, contact Matt or Cara directly so the final headcount, catering and transport list can be corrected."
+    }
+  ];
 
+  installCanonicalFaqs();
   installRodeoTheme();
-  installRsvpLinks();
+  installCheckinLinks();
 
   menuButton?.addEventListener("click", () => {
     const open = document.body.classList.toggle("menu-open");
@@ -74,15 +118,18 @@
 
     if (faqs.length) {
       const list = document.getElementById("faq-list");
-      const staticFaqs = [...list.querySelectorAll("details:not([data-live])")];
-      list.innerHTML = "";
-      staticFaqs.forEach((faq) => list.appendChild(faq));
+      const seenFaqs = installCanonicalFaqs();
       faqs.forEach((faq) => {
+        const key = normalizeFaqTitle(faq.title);
+        if (!list || !key || seenFaqs.has(key)) return;
         const details = document.createElement("details");
         details.dataset.live = "true";
+        details.dataset.faqKey = key;
         details.innerHTML = `<summary>${escapeHtml(faq.title)}</summary><p>${formatBody(faq.body)}</p>`;
         list.appendChild(details);
+        seenFaqs.add(key);
       });
+      dedupeFaqList(list);
     }
 
     renderLiveNotes("travel-live-notes", travelNotes);
@@ -171,22 +218,23 @@
     }
 
     const faqList = document.getElementById("faq-list");
-    if (faqList && !faqList.querySelector('[data-rodeo-faq="true"]')) {
+    if (faqList && !hasFaq(faqList, "What is the wedding theme?")) {
       const details = document.createElement("details");
       details.dataset.rodeoFaq = "true";
-      details.open = true;
+      details.dataset.faqKey = normalizeFaqTitle("What is the wedding theme?");
       details.innerHTML = "<summary>What is the wedding theme?</summary><p>We're hosting Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged.</p>";
       faqList.prepend(details);
     }
+    dedupeFaqList(faqList);
   }
 
-  function installRsvpLinks() {
-    if (document.querySelector('[data-rsvp-entry]')) return;
+  function installCheckinLinks() {
+    if (document.querySelector('[data-checkin-entry]')) return;
 
     const navLink = document.createElement("a");
     navLink.href = "rsvp.html";
-    navLink.textContent = "RSVP";
-    navLink.dataset.rsvpEntry = "nav";
+    navLink.textContent = "Check-in";
+    navLink.dataset.checkinEntry = "nav";
     const faqLink = publicNav?.querySelector('a[href="#faq"]');
     publicNav?.insertBefore(navLink, faqLink || null);
 
@@ -195,8 +243,8 @@
       const heroLink = document.createElement("a");
       heroLink.className = "button button-dark";
       heroLink.href = "rsvp.html";
-      heroLink.textContent = "Open your RSVP";
-      heroLink.dataset.rsvpEntry = "hero";
+      heroLink.textContent = "Guest check-in";
+      heroLink.dataset.checkinEntry = "hero";
       heroActions.insertBefore(heroLink, heroActions.firstChild);
     }
 
@@ -204,8 +252,8 @@
     if (mobileNav) {
       const mobileLink = document.createElement("a");
       mobileLink.href = "rsvp.html";
-      mobileLink.textContent = "RSVP";
-      mobileLink.dataset.rsvpEntry = "mobile";
+      mobileLink.textContent = "Check-in";
+      mobileLink.dataset.checkinEntry = "mobile";
       const portal = mobileNav.querySelector('a[href="planner.html"]');
       mobileNav.insertBefore(mobileLink, portal || null);
       mobileNav.style.gridTemplateColumns = "repeat(5, 1fr)";
@@ -215,10 +263,70 @@
     if (footerMeta) {
       const footerLink = document.createElement("a");
       footerLink.href = "rsvp.html";
-      footerLink.textContent = "Guest RSVP";
-      footerLink.dataset.rsvpEntry = "footer";
+      footerLink.textContent = "Guest check-in";
+      footerLink.dataset.checkinEntry = "footer";
       footerMeta.insertBefore(footerLink, footerMeta.firstChild);
     }
+  }
+
+  function installCanonicalFaqs() {
+    const list = document.getElementById("faq-list");
+    if (!list) return new Set();
+    list.innerHTML = "";
+    CANONICAL_FAQS.forEach((faq) => {
+      const details = document.createElement("details");
+      details.dataset.faqKey = normalizeFaqTitle(faq.title);
+      details.dataset.canonicalFaq = "true";
+      details.innerHTML = `<summary>${escapeHtml(faq.title)}</summary><p>${formatBody(faq.body)}</p>`;
+      list.appendChild(details);
+    });
+    return dedupeFaqList(list);
+  }
+
+  function normalizeFaqTitle(value) {
+    const aliases = new Map([
+      ["can children come", "can children attend"],
+      ["are children invited", "can children attend"],
+      ["can kids attend", "can children attend"],
+      ["can kids come", "can children attend"],
+      ["what is wedding theme", "what is the wedding theme"],
+      ["what is the theme", "what is the wedding theme"],
+      ["rsvp", "what happens 24 hours before"],
+      ["guest rsvp", "what happens 24 hours before"],
+      ["guest check in", "what happens 24 hours before"],
+      ["guest checkin", "what happens 24 hours before"]
+    ]);
+    const key = String(value || "")
+      .toLowerCase()
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+    return aliases.get(key) || key;
+  }
+
+  function getFaqTitle(details) {
+    return details?.dataset?.faqKey || details?.querySelector("summary")?.textContent || "";
+  }
+
+  function hasFaq(list, title) {
+    const key = normalizeFaqTitle(title);
+    return [...(list?.querySelectorAll("details") || [])].some((details) => normalizeFaqTitle(getFaqTitle(details)) === key);
+  }
+
+  function dedupeFaqList(list) {
+    const seen = new Set();
+    if (!list) return seen;
+    [...list.querySelectorAll("details")].forEach((details) => {
+      const key = normalizeFaqTitle(getFaqTitle(details));
+      if (!key) return;
+      if (seen.has(key)) {
+        details.remove();
+        return;
+      }
+      details.dataset.faqKey = key;
+      seen.add(key);
+    });
+    return seen;
   }
 
   function stripTrackingParams() {
@@ -260,10 +368,4 @@
   }
 
   loadPublishedContent();
-  const refreshMinutes = Math.max(Number(config.guestContentRefreshMinutes) || 15, 5);
-  window.setInterval(loadPublishedContent, refreshMinutes * 60_000);
-
-  if ("serviceWorker" in navigator && location.protocol === "https:") {
-    navigator.serviceWorker.register("sw.js").catch((error) => console.warn("Service worker registration skipped", error));
-  }
 })();
