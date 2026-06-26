@@ -37,7 +37,9 @@
     if (!panel.hidden && !log.children.length) greet();
     input.focus();
   });
+
   panel.querySelector(".chat-close").addEventListener("click", () => { panel.hidden = true; });
+
   form.addEventListener("submit", async (event) => {
     event.preventDefault();
     const text = input.value.trim();
@@ -51,10 +53,10 @@
   function greet() {
     addMessage(isPlanner
       ? "Tell me what to add or ask what is outstanding. I can add wedding tasks, honeymoon tasks, Japan places, and basic budget placeholders."
-      : "Ask me about the dates, dress code, Rodeo theme, travel, accommodation, RSVP, weather, or things to do.", "bot");
+      : "Ask me about the dates, dress code, children, parking, open bar, gifts, food, photos, travel, accommodation, RSVP, weather, or things to do.", "bot");
     chips.innerHTML = (isPlanner
       ? ["Add task book flights", "What is outstanding?", "Add honeymoon task", "Show travel tasks"]
-      : ["What is the dress code?", "When are the weddings?", "How do I travel?", "Where should I stay?"])
+      : ["What is the dress code?", "Will there be an open bar?", "Can children come?", "Can I post photos online?"])
       .map((label) => `<button class="chat-chip" type="button">${escapeHtml(label)}</button>`).join("");
     chips.querySelectorAll("button").forEach((button) => button.addEventListener("click", () => {
       input.value = button.textContent;
@@ -75,7 +77,7 @@
           if (data?.answer) return data.answer;
         }
       } catch (_error) {
-        /* fall back to local assistant */
+        // Local fallback below.
       }
     }
     return isPlanner ? plannerReply(text) : guestReply(text);
@@ -83,15 +85,32 @@
 
   function guestReply(text) {
     const q = text.toLowerCase();
+    const faq = guestFaqAnswer(q);
+    if (faq) return faq;
     if (has(q, ["date", "when", "day"])) return "Spain is Saturday 10 October 2026 at Finca Mesa Jardín near Arcos de la Frontera. South Africa is Saturday 19 December 2026 at Mission House in the KZN Midlands.";
-    if (has(q, ["dress", "wear", "theme", "cowboy", "boots", "hat", "denim", "leather", "rodeo"])) return "The theme is Rodeo-style: Western music, great BBQ food, cowboy boots, hats, leather and denim are welcome and encouraged. Choose shoes that work on gardens, lawns and a dancefloor.";
     if (has(q, ["rsvp", "respond", "invite"])) return "Use the RSVP button on the site. If you have a private RSVP link, open it and answer for each person in your household. Final transport and dietaries depend on RSVP answers.";
     if (has(q, ["travel", "airport", "flight", "fly"])) return "For Spain: Jerez is closest, Seville is the best all-round option, and Málaga has the most flight choice. For South Africa: fly into Durban/King Shaka, then transfer or drive to the KZN Midlands.";
-    if (has(q, ["stay", "hotel", "accommodation", "where"])) return "For Spain, Arcos is closest to the venue and Jerez is better for restaurants and transport. For South Africa, Howick is practical and the Midlands Meander gives the best country-weekend feel.";
-    if (has(q, ["weather", "rain", "temperature"])) return "Spain in October should be mild with cooler evenings. South Africa in December is warm summer weather with a real chance of afternoon storms. Final forecasts will be updated closer to each week.";
+    if (has(q, ["stay", "hotel", "accommodation", "lodging", "sleep"])) return "For Spain, Arcos is closest to the venue and Jerez is better for restaurants and transport. For South Africa, Howick is practical and the Midlands Meander gives the best country-weekend feel.";
+    if (has(q, ["weather", "temperature"])) return "Spain in October should be mild with cooler evenings. South Africa in December is warm summer weather with a real chance of afternoon storms. Final forecasts will be updated closer to each week.";
     if (has(q, ["things", "do", "visit", "activities"])) return "Spain ideas: Arcos, Jerez, Cádiz, Chiclana, Vejer, Grazalema and Seville. South Africa ideas: Midlands Meander, Howick Falls, Mandela Capture Site, Drakensberg, Durban/Umhlanga, safari or Cape Town add-on.";
     if (has(q, ["transport", "bus", "pickup", "shuttle"])) return "Transport routes are still being grouped. Spain likely needs Chiclana/Jerez-style pickup clusters. South Africa likely needs Durban/Howick/Midlands clusters. Answer RSVP transport questions early.";
-    return "I can help with dates, locations, Rodeo dress code, RSVP, travel, accommodation, weather, transport and things to do. Ask me one of those and I’ll answer from the wedding guide.";
+    return "I can help with dates, locations, Rodeo dress code, children, parking, open bar, gifts, food, photos, RSVP, travel, accommodation, weather, transport and things to do. Ask me one of those and I’ll answer from the wedding guide.";
+  }
+
+  function guestFaqAnswer(q) {
+    if (has(q, ["child", "children", "kid", "kids", "baby", "babies", "toddler", "toddlers", "family", "families"])) return "Yes, children are very welcome. We’ll provide some things to help keep them entertained, and there will be people nearby to keep a friendly eye on them. Parents and guardians are still responsible for their own children throughout the celebration, so please keep an eye on them as you normally would.";
+    if (has(q, ["same location", "one location", "different location", "move venue", "moving venue", "all in one place"])) return "Yes, everything is planned around the same venue. Once you arrive, you can settle in and enjoy the ceremony, food, drinks and celebration without moving between locations.";
+    if (has(q, ["parking", "park car", "car park"])) return "Yes, there will be parking available at the venue. We’ll share any final parking or arrival notes closer to the wedding date.";
+    if (has(q, ["how early", "arrive early", "early can", "early arrive", "arrival time"])) return "You may arrive up to two hours before the official start time if you need to. The bar will remain closed until the official kick-off time, so early arrival is mainly for settling in and avoiding a rush.";
+    if (has(q, ["open bar", "bar", "drinks", "paid bar", "cash bar", "alcohol"])) return "Yes, the bar will be hosted up to a certain time. After that point, any extra drinks will be for guests’ own account. We’ll make the final bar timing clear on the day.";
+    if (has(q, ["indoors", "outdoors", "inside", "outside", "tent", "rain", "inclement"])) return "The wedding has a country/Rodeo feel and is planned as an outdoor celebration. If the weather turns, there will be cover under a tent or suitable shelter so the day can keep flowing comfortably.";
+    if (has(q, ["gift", "gifts", "cash", "eft", "bank", "banking", "present", "registry"])) return "Your presence is the main thing. If you would like to give a gift, a cash or EFT contribution is most helpful and very appreciated. We can accept EUR or ZAR; please message Matt or Cara privately for banking details.";
+    if (has(q, ["timing", "times", "schedule", "late", "start", "ceremony time", "what time"])) return "We’ll keep the day running with clear start and stop times, so please arrive promptly and avoid being late. If you want a drink before the ceremony, please grab it before the bar closes for the ceremony start. Final timings will be shared closer to the day.";
+    if (has(q, ["food", "eat", "meal", "bbq", "braai", "meat", "vegetarian", "grazer", "grazers"])) return "Expect a Western-inspired feast: BBQ and braai-style meats, with much of the food cooked over open fire. There will be options for lighter grazers as well as those who want something more hearty.";
+    if (has(q, ["expect", "what happens", "on the day", "games", "entertainment", "horseshoe", "horse shoe"])) return "Expect food, drinks, laughs and a relaxed Rodeo-style celebration. Depending on which wedding you’re attending, there will be small Western-inspired games and entertainment, such as horseshoe toss and other fun touches to keep the day moving.";
+    if (has(q, ["photo", "photos", "picture", "pictures", "post", "instagram", "online", "social", "video", "walls", "walls.io"])) return "You’re welcome to take a few personal photos, but please don’t post the day publicly online without our permission. This is a private, intimate celebration and we’ve invested in a professional photography team. We’ll also use Walls.io, a private wedding social wall where guests can share selected photos and messages into one private feed instead of posting everything publicly.";
+    if (has(q, ["dress", "wear", "theme", "cowboy", "boots", "hat", "denim", "leather", "rodeo"])) return "The theme is Rodeo-style: Western music, great BBQ food, cowboy boots, hats, leather and denim are welcome and encouraged. Choose shoes that work on gardens, lawns and a dancefloor.";
+    return null;
   }
 
   function plannerReply(text) {
