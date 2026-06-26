@@ -8,7 +8,7 @@
   const publicNav = document.querySelector(".public-nav");
 
   installRodeoTheme();
-  installRsvpLinks();
+  installCheckInLinks();
 
   menuButton?.addEventListener("click", () => {
     const open = document.body.classList.toggle("menu-open");
@@ -74,12 +74,22 @@
 
     if (faqs.length) {
       const list = document.getElementById("faq-list");
+      const seen = new Set();
       const staticFaqs = [...list.querySelectorAll("details:not([data-live])")];
       list.innerHTML = "";
-      staticFaqs.forEach((faq) => list.appendChild(faq));
+      staticFaqs.forEach((faq) => {
+        const key = faqKey(faq.querySelector("summary")?.textContent || "");
+        if (seen.has(key)) return;
+        seen.add(key);
+        list.appendChild(faq);
+      });
       faqs.forEach((faq) => {
+        const key = faqKey(faq.title);
+        if (seen.has(key)) return;
+        seen.add(key);
         const details = document.createElement("details");
         details.dataset.live = "true";
+        details.dataset.faqKey = key;
         details.innerHTML = `<summary>${escapeHtml(faq.title)}</summary><p>${formatBody(faq.body)}</p>`;
         list.appendChild(details);
       });
@@ -171,22 +181,23 @@
     }
 
     const faqList = document.getElementById("faq-list");
-    if (faqList && !faqList.querySelector('[data-rodeo-faq="true"]')) {
+    if (faqList && !hasFaqQuestion(faqList, "theme")) {
       const details = document.createElement("details");
       details.dataset.rodeoFaq = "true";
+      details.dataset.faqKey = "theme";
       details.open = true;
       details.innerHTML = "<summary>What is the wedding theme?</summary><p>We're hosting Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged.</p>";
       faqList.prepend(details);
     }
   }
 
-  function installRsvpLinks() {
-    if (document.querySelector('[data-rsvp-entry]')) return;
+  function installCheckInLinks() {
+    if (document.querySelector('[data-checkin-entry], [data-rsvp-entry]')) return;
 
     const navLink = document.createElement("a");
     navLink.href = "rsvp.html";
-    navLink.textContent = "RSVP";
-    navLink.dataset.rsvpEntry = "nav";
+    navLink.textContent = "Guest check-in";
+    navLink.dataset.checkinEntry = "nav";
     const faqLink = publicNav?.querySelector('a[href="#faq"]');
     publicNav?.insertBefore(navLink, faqLink || null);
 
@@ -195,8 +206,8 @@
       const heroLink = document.createElement("a");
       heroLink.className = "button button-dark";
       heroLink.href = "rsvp.html";
-      heroLink.textContent = "Open your RSVP";
-      heroLink.dataset.rsvpEntry = "hero";
+      heroLink.textContent = "Guest check-in";
+      heroLink.dataset.checkinEntry = "hero";
       heroActions.insertBefore(heroLink, heroActions.firstChild);
     }
 
@@ -204,8 +215,8 @@
     if (mobileNav) {
       const mobileLink = document.createElement("a");
       mobileLink.href = "rsvp.html";
-      mobileLink.textContent = "RSVP";
-      mobileLink.dataset.rsvpEntry = "mobile";
+      mobileLink.textContent = "Check-in";
+      mobileLink.dataset.checkinEntry = "mobile";
       const portal = mobileNav.querySelector('a[href="planner.html"]');
       mobileNav.insertBefore(mobileLink, portal || null);
       mobileNav.style.gridTemplateColumns = "repeat(5, 1fr)";
@@ -215,8 +226,8 @@
     if (footerMeta) {
       const footerLink = document.createElement("a");
       footerLink.href = "rsvp.html";
-      footerLink.textContent = "Guest RSVP";
-      footerLink.dataset.rsvpEntry = "footer";
+      footerLink.textContent = "Guest check-in";
+      footerLink.dataset.checkinEntry = "footer";
       footerMeta.insertBefore(footerLink, footerMeta.firstChild);
     }
   }
@@ -244,6 +255,46 @@
         <h3>${escapeHtml(note.title)}</h3>
         <p>${formatBody(note.body)}</p>
       </article>`).join("");
+  }
+
+  function hasFaqQuestion(list, key) {
+    return [...list.querySelectorAll("summary")].some((summary) => faqKey(summary.textContent) === key);
+  }
+
+  function faqKey(value) {
+    const normalized = String(value || "")
+      .toLowerCase()
+      .normalize("NFKD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/&/g, " and ")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim()
+      .replace(/\s+/g, " ");
+
+    const aliases = {
+      "what is the wedding theme": "theme",
+      "can children come": "children",
+      "can children attend": "children",
+      "are children allowed": "children",
+      "is everything in the same location": "same-location",
+      "is there parking at the venue": "parking",
+      "how early can i arrive": "arrival-time",
+      "will there be an open bar": "bar",
+      "is the wedding indoors or outdoors": "indoors-outdoors",
+      "what kind of food will there be": "food",
+      "what can i expect on the day": "expect",
+      "what should we wear": "wear",
+      "what gifts should i bring": "gifts",
+      "what are the timings for the day": "timing",
+      "can i take photos or post online": "photos-online",
+      "what is walls io": "walls-io",
+      "when should we book flights": "flights",
+      "will there be wedding day transport": "transport",
+      "will there be weddingday transport": "transport",
+      "when will final timings be shared": "final-timings"
+    };
+
+    return aliases[normalized] || normalized;
   }
 
   function escapeHtml(value) {
