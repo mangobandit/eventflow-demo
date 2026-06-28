@@ -10,7 +10,10 @@
     const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
-    nodes.forEach((node) => { node.nodeValue = node.nodeValue.replace(/RSVP/g, "Guest Check-In").replace(/rsvp/g, "check-in"); });
+    nodes.forEach((node) => {
+      const next = node.nodeValue.replace(/RSVP/g, "Guest Check-In").replace(/rsvp/g, "check-in");
+      if (next !== node.nodeValue) node.nodeValue = next;
+    });
   }
 
   function addMessage(log, text, type) {
@@ -43,6 +46,6 @@
   }
 
   const observer = new MutationObserver(() => wire(document.querySelector(".chat-panel")));
-  observer.observe(document.body, { childList: true, subtree: true, characterData: true });
+  observer.observe(document.body, { childList: true, subtree: true });
   wire(document.querySelector(".chat-panel"));
 })();
