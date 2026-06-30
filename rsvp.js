@@ -4,6 +4,9 @@
   const config = window.MXC_CONFIG || {};
   const TOKEN_KEY = "mxc-rsvp-token";
   const TOKEN_PATTERN = /^[0-9a-f]{48}$/i;
+  const CHECK_IN_WINDOW_COPY = "Use this to confirm your household in the few days before the celebration so we can keep the final head count, transport and food planning accurate.";
+  const DEMO_TOKEN = "000000000000000000000000000000000000000000000000";
+  const DEMO_STORAGE_KEY = "mxc-demo-checkin";
   let client = null;
   let token = "";
   let invitation = null;
@@ -55,14 +58,19 @@
   async function start() {
     bindEvents();
     await purgeRsvpCaches();
-    if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
+    const demoMode = isLocalDemoEnabled();
+    if (demoMode) {
+      client = createDemoClient();
+    } else if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
       showError("The check-in service is not connected yet. Please contact Matt or Cara directly for now.");
       return;
+    } else {
+      client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
+        auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
+      });
     }
-    client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
-      auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
-    });
     token = readToken();
+    if (demoMode) token = DEMO_TOKEN;
     if (!token) {
       show(elements.codeState);
       return;
@@ -133,7 +141,7 @@
     elements.celebration.textContent = invitation.celebration === "spain" ? "Spain guest check-in" : "South Africa guest check-in";
     elements.deadline.textContent = invitation.deadline
       ? `Please confirm by ${formatDate(invitation.deadline)}. You can reopen this link to update your check-in.`
-      : "Use this to confirm your household 24 hours before the celebration so we can keep the final head count, transport and food planning accurate.";
+      : CHECK_IN_WINDOW_COPY;
     elements.people.innerHTML = invitation.people.map(renderPerson).join("");
     elements.email.value = invitation.contact_email || "";
     elements.phone.value = invitation.contact_phone || "";
@@ -237,6 +245,89 @@
       attending: people.filter((person) => person.attending === true).length,
       declined: people.filter((person) => person.attending === false).length
     };
+  }
+
+  function isLocalDemoEnabled() {
+    const url = new URL(window.location.href);
+    const localHost = ["localhost", "127.0.0.1", "::1", "[::1]", ""].includes(window.location.hostname);
+    const missingConfig = !config.supabaseUrl || !config.supabaseAnonKey;
+    return url.searchParams.get("demo") === "1" && (localHost || window.location.protocol === "file:" || missingConfig);
+  }
+
+  function createDemoClient() {
+    return {
+      async rpc(name, payload = {}) {
+        if (name === "get_rsvp_invitation") return getDemoInvitation(payload.p_token);
+        if (name === "submit_rsvp") return submitDemoInvitation(payload);
+        return { data: null, error: new Error("Unknown local demo action") };
+      }
+    };
+  }
+
+  function getDemoInvitation(rawToken) {
+    if (rawToken !== DEMO_TOKEN) return { data: null, error: null };
+    return { data: readDemoInvitation(), error: null };
+  }
+
+  function submitDemoInvitation(payload) {
+    const next = readDemoInvitation();
+    const submitted = new Map((payload.p_people || []).map((person) => [person.id, person]));
+    next.people = next.people.map((person) => ({ ...person, ...(submitted.get(person.id) || {}) }));
+    next.contact_email = payload.p_contact_email || "";
+    next.contact_phone = payload.p_contact_phone || "";
+    next.guest_message = payload.p_guest_message || "";
+    next.submitted_at = new Date().toISOString();
+    writeDemoInvitation(next);
+    return { data: { ok: true, summary: buildSummary(next.people), invitation: next }, error: null };
+  }
+
+  function readDemoInvitation() {
+    try {
+      const saved = JSON.parse(localStorage.getItem(DEMO_STORAGE_KEY) || "null");
+      if (saved?.people?.length) return saved;
+    } catch (_error) {
+      localStorage.removeItem(DEMO_STORAGE_KEY);
+    }
+    const fresh = {
+      invitation_id: "local-demo",
+      label: "Local test household",
+      celebration: "spain",
+      deadline: null,
+      submitted_at: null,
+      contact_email: "",
+      contact_phone: "",
+      guest_message: "",
+      people: [
+        {
+          id: "11111111-1111-4111-8111-111111111111",
+          name: "Alex Test Guest",
+          attending: null,
+          dietary: "",
+          transport_needed: null,
+          transport_location: "",
+          accommodation: "",
+          notes: "",
+          sort_order: 0
+        },
+        {
+          id: "22222222-2222-4222-8222-222222222222",
+          name: "Sam Test Guest",
+          attending: null,
+          dietary: "",
+          transport_needed: null,
+          transport_location: "",
+          accommodation: "",
+          notes: "",
+          sort_order: 1
+        }
+      ]
+    };
+    writeDemoInvitation(fresh);
+    return fresh;
+  }
+
+  function writeDemoInvitation(next) {
+    localStorage.setItem(DEMO_STORAGE_KEY, JSON.stringify(next));
   }
 
   function value(card, field) {

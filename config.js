@@ -11,7 +11,7 @@ window.addEventListener("load", () => {
   const isPlanner = document.body.classList.contains("planner-site");
   if (!isGuest && !isPlanner) return;
 
-  const ASSET_VERSION = "20260626-checkin";
+  const ASSET_VERSION = "20260630-checkin-window";
 
   function versioned(src) {
     if (/^https?:\/\//i.test(src)) return src;

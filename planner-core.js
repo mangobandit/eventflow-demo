@@ -160,11 +160,11 @@
     if (document.querySelector('script[data-mxc-rsvp-admin]')) return;
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
-    stylesheet.href = "planner-rsvp.css";
+    stylesheet.href = "planner-rsvp.css?v=20260630-checkin-window";
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js";
+    script.src = "planner-rsvp.js?v=20260630-checkin-window";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

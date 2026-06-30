@@ -5,15 +5,15 @@
 .rsvp-header b { display: block; font-family: var(--serif); font-size: 18px; font-weight: 500; }
 .rsvp-header small { display: block; margin-top: 2px; color: rgba(255,255,255,.66); font-size: 8px; letter-spacing: .12em; text-transform: uppercase; }
 .rsvp-back { justify-self: end; color: #fff; font-size: 9px; font-weight: 800; letter-spacing: .12em; text-decoration: none; text-transform: uppercase; }
-.rsvp-main { display: grid; grid-template-columns: .9fr 1.1fr; min-height: 100vh; }
+.rsvp-main { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); min-height: 100vh; }
 .rsvp-visual { position: sticky; top: 0; display: flex; height: 100vh; align-items: flex-end; overflow: hidden; padding: clamp(36px, 6vw, 90px); color: #fff; background-image: linear-gradient(180deg, rgba(20,24,19,.08), rgba(20,24,19,.82)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardi%CC%81n-8872-1024x682.jpg'); background-position: center; background-size: cover; }
 .rsvp-visual:after { content: ""; position: absolute; width: 420px; height: 420px; right: -170px; top: -170px; border: 1px solid rgba(255,255,255,.22); border-radius: 50%; box-shadow: 0 0 0 70px rgba(255,255,255,.035), 0 0 0 140px rgba(255,255,255,.02); }
 .rsvp-visual-copy { position: relative; z-index: 1; max-width: 720px; }
 .rsvp-visual-copy .eyebrow { color: #d8dfd4; }
 .rsvp-visual h1 { margin: 0; font-family: var(--serif); font-size: clamp(64px, 8vw, 126px); font-weight: 400; letter-spacing: -.055em; line-height: .82; }
 .rsvp-visual p:last-child { max-width: 560px; color: rgba(255,255,255,.82); font-family: var(--serif); font-size: 20px; line-height: 1.55; }
-.rsvp-panel { display: grid; align-content: start; min-height: 100vh; padding: 112px clamp(24px, 6vw, 90px) 70px; background: radial-gradient(circle at top right, rgba(183,145,91,.12), transparent 28%), var(--paper); }
-.rsvp-card { width: min(760px, 100%); margin: 0 auto; }
+.rsvp-panel { display: grid; min-width: 0; align-content: start; min-height: 100vh; padding: 112px clamp(24px, 6vw, 90px) 70px; background: radial-gradient(circle at top right, rgba(183,145,91,.12), transparent 28%), var(--paper); }
+.rsvp-card { width: min(760px, 100%); min-width: 0; margin: 0 auto; }
 .rsvp-state { padding: clamp(36px, 6vw, 76px) 0; }
 .rsvp-state h2, .rsvp-intro h2 { margin: 0; font-family: var(--serif); font-size: clamp(46px, 6vw, 76px); font-weight: 400; letter-spacing: -.04em; line-height: .96; }
 .rsvp-state > p:not(.eyebrow), .rsvp-intro > p:not(.eyebrow) { max-width: 620px; color: var(--ink-soft); font-family: var(--serif); font-size: 18px; line-height: 1.6; }
@@ -27,23 +27,23 @@
 .rsvp-code-form .button { justify-self: start; border: 0; cursor: pointer; }
 .rsvp-status { min-height: 24px; margin-top: 14px; color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
 .rsvp-intro { padding-bottom: 34px; border-bottom: 1px solid var(--line); }
-.rsvp-people { display: grid; gap: 16px; margin-top: 28px; }
-.guest-response { overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fffefa; box-shadow: var(--shadow-sm); }
+.rsvp-people { display: grid; min-width: 0; gap: 16px; margin-top: 28px; }
+.guest-response { min-width: 0; overflow: hidden; border: 1px solid var(--line); border-radius: var(--radius); background: #fffefa; box-shadow: var(--shadow-sm); }
 .guest-response-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); background: #f3ede3; }
-.guest-response-head h3 { margin: 0; font-family: var(--serif); font-size: 27px; font-weight: 500; }
-.attendance-choice { display: grid; grid-template-columns: 1fr 1fr; gap: 5px; min-width: 210px; }
+.guest-response-head h3 { min-width: 0; margin: 0; font-family: var(--serif); font-size: 27px; font-weight: 500; }
+.attendance-choice { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 5px; width: min(100%, 300px); min-width: 210px; }
 .attendance-choice label { cursor: pointer; }
-.attendance-choice input { position: absolute; opacity: 0; pointer-events: none; }
-.attendance-choice span { display: grid; min-height: 38px; place-items: center; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); background: #fff; font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.attendance-choice input { position: absolute; width: 1px; min-height: 0; height: 1px; margin: 0; padding: 0; opacity: 0; pointer-events: none; }
+.attendance-choice span { display: grid; min-height: 38px; place-items: center; padding: 0 10px; border: 1px solid var(--line); border-radius: 999px; color: var(--ink-soft); background: #fff; font-size: 9px; font-weight: 850; letter-spacing: .08em; line-height: 1.15; text-align: center; text-transform: uppercase; overflow-wrap: anywhere; }
 .attendance-choice input:checked + span { color: #fff; border-color: var(--olive-dark); background: var(--olive-dark); }
-.guest-response-fields { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; padding: 20px 22px 22px; }
+.guest-response-fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; padding: 20px 22px 22px; }
 .guest-response-fields label { display: grid; gap: 7px; color: var(--ink-soft); font-size: 8px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
 .guest-response-fields .full { grid-column: 1 / -1; }
 .guest-response textarea { min-height: 84px; resize: vertical; }
 .rsvp-contact-section { display: grid; grid-template-columns: .7fr 1.3fr; gap: 24px; margin-top: 28px; padding: 26px; border: 1px solid var(--line); border-radius: var(--radius); background: #eee7db; }
 .rsvp-contact-section h3 { margin: 0; font-family: var(--serif); font-size: 30px; font-weight: 500; }
 .rsvp-contact-section p { color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
-.rsvp-contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.rsvp-contact-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
 .rsvp-contact-section > .full { grid-column: 1 / -1; }
 .rsvp-contact-section textarea { min-height: 100px; resize: vertical; }
 .rsvp-submit-row { display: flex; align-items: center; justify-content: space-between; gap: 28px; margin-top: 24px; padding-top: 22px; border-top: 1px solid var(--line); }
@@ -66,6 +66,10 @@
   .rsvp-visual { position: relative; height: 480px; min-height: 0; }
   .rsvp-panel { min-height: auto; padding-top: 60px; }
 }
+@media (max-width: 1300px) {
+  .guest-response-fields, .rsvp-contact-grid { grid-template-columns: 1fr; }
+  .guest-response-fields .full, .rsvp-contact-section > .full { grid-column: auto; }
+}
 @media (max-width: 620px) {
   .rsvp-header { min-height: 66px; }
   .rsvp-header > div { display: none; }
@@ -75,10 +79,7 @@
   .rsvp-panel { padding: 48px 16px 60px; }
   .guest-response-head { align-items: flex-start; flex-direction: column; }
   .attendance-choice { width: 100%; min-width: 0; }
-  .guest-response-fields, .rsvp-contact-grid { grid-template-columns: 1fr; }
-  .guest-response-fields .full { grid-column: auto; }
   .rsvp-contact-section { grid-template-columns: 1fr; padding: 20px; }
-  .rsvp-contact-section > .full { grid-column: auto; }
   .rsvp-submit-row { align-items: stretch; flex-direction: column; }
   .rsvp-submit-row .button { width: 100%; }
 }

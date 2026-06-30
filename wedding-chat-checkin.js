@@ -3,7 +3,7 @@
 
   if (!document.body.classList.contains("guest-site")) return;
 
-  const ANSWER = "Use the Guest Check-In button on the site. It is our 24-hour / day-before confirmation so we can finalise who is still coming, transport, food and any last-minute notes for your household.";
+  const ANSWER = "Use the Guest Check-In button on the site. It opens in the few days before each celebration so we can finalise who is still coming, transport, food and any last-minute notes for your household.";
 
   function replaceVisibleText(root) {
     if (!root) return;

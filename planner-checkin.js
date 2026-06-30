@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const COPY_MESSAGE = "Hi, quick wedding check-in for Matt & Cara - please confirm your household here so we can finalise numbers, transport and food: [link]";
+  const COPY_MESSAGE = "Hi, quick wedding check-in for Matt & Cara - please confirm your household here in the few days before the celebration so we can finalise numbers, transport and food: [link]";
   const VENUES = [
     ["spain", "Spain", "Finca Mesa Jardin"],
     ["south_africa", "South Africa", "Mission House"]
@@ -89,7 +89,7 @@
     panel.dataset.viewPanel = "checkin";
     panel.innerHTML = `
       <div class="view-intro">
-        <div><p class="eyebrow">Private head count</p><h2>Guest Check-In.</h2><p>Use this as the day-before / 24-hour confirmation view for final head count, transport and food planning.</p></div>
+        <div><p class="eyebrow">Private head count</p><h2>Guest Check-In.</h2><p>Use this in the few days before each celebration for final head count, transport and food planning.</p></div>
         <div class="view-tools"><button class="primary-action" id="copy-checkin-message" type="button">Copy check-in message</button></div>
       </div>
       <div id="checkin-root" class="guest-list-tracker"></div>`;
@@ -128,7 +128,7 @@
         ${kpi("Still attending", counts.attending, "RSVP yes or checked in")}
         ${kpi("Can't make it", counts.declined, "declined or updated")}
         ${kpi("Need RSVP/check-in", counts.pending, "no response or TBC")}
-        ${kpi("Check-ins received", counts.confirmed, "24h confirmations")}
+        ${kpi("Check-ins received", counts.confirmed, "few-day confirmations")}
         ${kpi("Still to check in", counts.stillToCheckIn, "action list")}
       </div>
       <div class="checkin-grid">
@@ -140,7 +140,7 @@
           <div class="panel-head"><h3>Manual check-in nudge</h3></div>
           <textarea readonly>${COPY_MESSAGE}</textarea>
           <button class="primary-action" id="copy-checkin-message-inline" type="button">Copy message</button>
-          <div class="checkin-attention">${attention.length ? attention.map(row).join("") : '<div class="empty-state">No guests currently need a 24-hour check-in.</div>'}</div>
+          <div class="checkin-attention">${attention.length ? attention.map(row).join("") : '<div class="empty-state">No guests currently need a pre-wedding check-in.</div>'}</div>
         </article>
       </div>
       <article class="panel guest-list-tracker">

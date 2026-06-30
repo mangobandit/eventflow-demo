@@ -18,17 +18,24 @@ const config = read("config.js");
 
 assert.match(checkinPage, /Matt & Cara · Guest Check-In/);
 assert.match(checkinPage, /Confirm your household before the celebration/);
+assert.match(checkinPage, /few days before the celebration/);
 assert.match(checkinPage, /Are you still<br>joining us\?/);
 assert.match(checkinPage, /Send check-in/);
 assert.match(checkinPage, /Check-in received/);
 assert.doesNotMatch(checkinPage, /Private RSVP|Send RSVP|Open your RSVP|Will you<br>join us\?/);
+assert.doesNotMatch(checkinPage, /24 hours before/);
 
 assert.match(checkinScript, /get_rsvp_invitation/);
 assert.match(checkinScript, /submit_rsvp/);
+assert.match(checkinScript, /DEMO_TOKEN/);
+assert.match(checkinScript, /isLocalDemoEnabled/);
+assert.match(checkinScript, /createDemoClient/);
+assert.match(checkinScript, /few days before the celebration/);
 assert.match(checkinScript, /Checked in — still coming/);
 assert.match(checkinScript, /Can't make it/);
 assert.match(checkinScript, /Last-minute note for Matt & Cara/);
 assert.doesNotMatch(checkinScript, /Joyfully yes|Sadly no|Saving your response|Your RSVP/);
+assert.doesNotMatch(checkinScript, /24 hours before the celebration/);
 
 const expectedFaqs = [
   "What is the wedding theme?",
@@ -66,6 +73,8 @@ assert.match(plannerCheckin, /Total invited/);
 assert.match(plannerCheckin, /Guests by venue/);
 assert.match(plannerCheckin, /Still attending/);
 assert.match(plannerCheckin, /Still to check in/);
+assert.match(plannerCheckin, /few days before/);
+assert.doesNotMatch(plannerCheckin, /24-hour|24h/);
 assert.match(plannerCheckin, /guest-list-tracker/);
 assert.match(plannerCheckin, /Copy check-in message/);
 assert.match(access, /ACCESS_DIGEST/);

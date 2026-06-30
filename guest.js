@@ -203,8 +203,9 @@
   function installCheckInLinks() {
     if (!CHECK_IN_ENABLED) return;
     if (document.querySelector('[data-checkin-entry]')) return;
+    const checkInHref = getCheckInHref();
     const navLink = document.createElement("a");
-    navLink.href = "rsvp.html";
+    navLink.href = checkInHref;
     navLink.textContent = "Guest Check-In";
     navLink.dataset.checkinEntry = "nav";
     const faqLink = publicNav?.querySelector('a[href="#faq"]');
@@ -214,7 +215,7 @@
     if (heroActions) {
       const heroLink = document.createElement("a");
       heroLink.className = "button button-dark";
-      heroLink.href = "rsvp.html";
+      heroLink.href = checkInHref;
       heroLink.textContent = "Guest check-in";
       heroLink.dataset.checkinEntry = "hero";
       heroActions.insertBefore(heroLink, heroActions.firstChild);
@@ -223,7 +224,7 @@
     const mobileNav = document.querySelector(".mobile-nav");
     if (mobileNav) {
       const mobileLink = document.createElement("a");
-      mobileLink.href = "rsvp.html";
+      mobileLink.href = checkInHref;
       mobileLink.textContent = "Check-In";
       mobileLink.dataset.checkinEntry = "mobile";
       const portal = mobileNav.querySelector('a[href="planner.html"]');
@@ -234,11 +235,17 @@
     const footerMeta = document.querySelector(".footer-meta");
     if (footerMeta) {
       const footerLink = document.createElement("a");
-      footerLink.href = "rsvp.html";
+      footerLink.href = checkInHref;
       footerLink.textContent = "Guest Check-In";
       footerLink.dataset.checkinEntry = "footer";
       footerMeta.insertBefore(footerLink, footerMeta.firstChild);
     }
+  }
+
+  function getCheckInHref() {
+    const localHost = ["localhost", "127.0.0.1", "::1", "[::1]", ""].includes(window.location.hostname);
+    const canUseLocalDemo = (localHost || window.location.protocol === "file:") && (!config.supabaseUrl || !config.supabaseAnonKey);
+    return canUseLocalDemo ? "rsvp.html?demo=1" : "rsvp.html";
   }
 
   function stripTrackingParams() {
