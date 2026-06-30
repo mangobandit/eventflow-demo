@@ -49,21 +49,24 @@
       payload[spec.name] = value;
     });
     if (table === "content_blocks" && !payload.slug) payload.slug = slugify(payload.title);
-    if (!record) payload.created_by = state.session.user.id;
-    if (table === "content_blocks") payload.updated_by = state.session.user.id;
 
     setSync("Saving…", true);
-    let response;
-    if (record) response = await state.client.from(table).update(payload).eq("id", record.id).select().single();
-    else response = await state.client.from(table).insert(payload).select().single();
-    if (response.error) {
-      toast(response.error.message, true);
+    let saved;
+    try {
+      saved = await plannerRpc("planner_save_entity", {
+        p_session_token: state.session?.token || "",
+        p_table: table,
+        p_record_id: record?.id || null,
+        p_payload: payload
+      });
+    } catch (error) {
+      toast(error.message, true);
       setSync("Save failed", false);
       return;
     }
-    const index = state.data[table].findIndex((item) => item.id === response.data.id);
-    if (index >= 0) state.data[table][index] = response.data;
-    else state.data[table].unshift(response.data);
+    const index = state.data[table].findIndex((item) => item.id === saved.id);
+    if (index >= 0) state.data[table][index] = saved;
+    else state.data[table].unshift(saved);
     closeModal();
     renderAll();
     setSync("Securely synced", false);
@@ -74,8 +77,13 @@
     const { table, record } = state.editing;
     if (!record || !window.confirm(`Delete this ${definitions[table].singular}? This cannot be undone.`)) return;
     setSync("Deleting…", true);
-    const { error } = await state.client.from(table).delete().eq("id", record.id);
-    if (error) {
+    try {
+      await plannerRpc("planner_delete_entity", {
+        p_session_token: state.session?.token || "",
+        p_table: table,
+        p_record_id: record.id
+      });
+    } catch (error) {
       toast(error.message, true);
       setSync("Delete failed", false);
       return;

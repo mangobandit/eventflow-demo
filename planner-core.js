@@ -26,7 +26,8 @@
     plannerShell: document.getElementById("planner-shell"),
     setupCard: document.getElementById("setup-card"),
     loginForm: document.getElementById("login-form"),
-    loginEmail: document.getElementById("login-email"),
+    loginUsername: document.getElementById("login-username"),
+    loginPassword: document.getElementById("login-password"),
     authStatus: document.getElementById("auth-status"),
     loading: document.getElementById("planner-loading"),
     topbarTitle: document.getElementById("topbar-title"),
@@ -160,11 +161,11 @@
     if (document.querySelector('script[data-mxc-rsvp-admin]')) return;
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
-    stylesheet.href = "planner-rsvp.css?v=20260630-supabase-live";
+    stylesheet.href = "planner-rsvp.css?v=20260630-user-login";
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20260630-supabase-live";
+    script.src = "planner-rsvp.js?v=20260630-user-login";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

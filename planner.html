@@ -10,11 +10,11 @@
   <link rel="stylesheet" href="planner.css">
   <link rel="stylesheet" href="responsive.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="config.js?v=20260630-supabase-live"></script>
-  <script defer src="planner-core.js?v=20260630-supabase-live"></script>
-  <script defer src="planner-auth.js"></script>
-  <script defer src="planner-views.js"></script>
-  <script defer src="planner-forms.js"></script>
+  <script defer src="config.js?v=20260630-user-login"></script>
+  <script defer src="planner-core.js?v=20260630-user-login"></script>
+  <script defer src="planner-auth.js?v=20260630-user-login"></script>
+  <script defer src="planner-views.js?v=20260630-user-login"></script>
+  <script defer src="planner-forms.js?v=20260630-user-login"></script>
 </head>
 <body class="planner-site">
   <section class="auth-screen" id="auth-screen">
@@ -33,19 +33,22 @@
       <div class="auth-card">
         <p class="eyebrow">Secure access</p>
         <h2>Enter the planner</h2>
-        <p>Use your approved email address. We will send a secure sign-in link—no password to remember.</p>
+        <p>Use the private planner username and password for Matt or Cara. No email link needed.</p>
 
         <div class="setup-card" id="setup-card" hidden>
           <b>The secure database still needs connecting.</b>
-          <p>This build is ready, but the portal remains closed until the Supabase URL, anon key and the two approved emails are configured.</p>
+          <p>This build is ready, but the portal remains closed until the Supabase URL, publishable key and private planner users are configured.</p>
           <code>See docs/SETUP.md in the repository.</code>
         </div>
 
         <form class="auth-form" id="login-form">
-          <label class="form-label">Email address
-            <input id="login-email" type="email" autocomplete="email" placeholder="you@example.com" required>
+          <label class="form-label">Username
+            <input id="login-username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="matt or cara" required>
           </label>
-          <button class="button button-dark" type="submit">Send secure link</button>
+          <label class="form-label">Password
+            <input id="login-password" type="password" autocomplete="current-password" inputmode="numeric" required>
+          </label>
+          <button class="button button-dark" type="submit">Enter planner</button>
           <div class="auth-status" id="auth-status" role="status" aria-live="polite"></div>
         </form>
         <p class="auth-footnote">Private information is stored in Supabase with Row Level Security. The public guest guide never receives budgets, contact details, private notes or guest records.</p>
