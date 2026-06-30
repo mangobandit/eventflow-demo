@@ -49,18 +49,25 @@ const expectedFaqs = [
 
 expectedFaqs.forEach((title) => assert.match(guest, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
 assert.match(guest, /const BUILT_IN_FAQS = \[/);
+assert.match(guest, /const RSVP_ARCHIVED = true;/, "guest check-in entry must stay archived by default");
+assert.match(guest, /if\s*\(\s*RSVP_ARCHIVED\s*\)\s*return;/, "archived check-in must not inject public guest-page entry points");
 assert.match(guest, /function normalizeFaqTitle/);
 assert.match(guest, /renderFaqList\(faqs\)/);
 assert.doesNotMatch(guest, /Can children attend/);
 assert.match(guest, /Guest Check-In/);
 assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"/);
 
+assert.match(plannerLoader, /hasSupabaseSettings/, "simple couple access must detect configured Supabase settings");
+assert.match(plannerLoader, /hasSupabaseSettings\s*\?\s*null\s*:\s*addScript\("planner-access\.js"/, "simple couple access must not override configured Supabase auth");
 assert.match(plannerLoader, /planner-checkin\.js/);
 assert.match(plannerCheckin, /Guest Check-In/);
 assert.match(plannerCheckin, /Total invited/);
 assert.match(plannerCheckin, /Copy check-in message/);
 assert.match(access, /ACCESS_DIGEST/);
+assert.match(access, /crypto\.subtle\.digest\("SHA-256"/, "the entered code must be hashed in the browser");
 assert.match(access, /localStorage\.setItem/);
+assert.doesNotMatch(access, /const\s+(?:PIN|PASSWORD)\s*=\s*["']\d{4}["']/i, "the raw entry code must not be committed as a plain constant");
+assert.doesNotMatch(access, /estimated:\s*\d{3,}|quote_amount:\s*\d{3,}|title:\s*"Spain venue"|name:\s*"Finca Mesa/i, "browser-mode fallback must not ship private budget or vendor seed data");
 assert.match(sw, /pathname\.includes\("rsvp"\)/);
 assert.match(sw, /url\.search/);
 assert.match(checkinSql, /checked_in_at/);

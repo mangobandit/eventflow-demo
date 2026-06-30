@@ -4,6 +4,7 @@
   stripTrackingParams();
 
   const config = window.MXC_CONFIG || {};
+  const RSVP_ARCHIVED = true;
   const menuButton = document.querySelector(".menu-button");
   const publicNav = document.querySelector(".public-nav");
 
@@ -200,6 +201,7 @@
   }
 
   function installCheckInLinks() {
+    if (RSVP_ARCHIVED) return;
     if (document.querySelector('[data-checkin-entry]')) return;
     const navLink = document.createElement("a");
     navLink.href = "rsvp.html";

@@ -10,7 +10,9 @@
     return script;
   }
 
-  const access = addScript("planner-access.js", "mxc-access");
+  const config = window.MXC_CONFIG || {};
+  const hasSupabaseSettings = Boolean(config.supabaseUrl || config.supabaseAnonKey);
+  const access = hasSupabaseSettings ? null : addScript("planner-access.js", "mxc-access");
   const loadPlannerExtras = () => {
     addScript("planner-extra-tasks.js", "mxc-extra-tasks");
     addScript("planner-checkin.js", "mxc-checkin");
