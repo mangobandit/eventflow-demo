@@ -1,6 +1,6 @@
 window.MXC_CONFIG = Object.freeze({
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  supabaseUrl: "https://uwupepywyldwmsktvxdt.supabase.co",
+  supabaseAnonKey: "sb_publishable_PYc6vx29OsEUCwEGFdVtqg_woEuCII1",
   siteUrl: "https://mxcwedding.com",
   guestContentRefreshMinutes: 15,
   chatEndpoint: ""
@@ -11,7 +11,7 @@ window.addEventListener("load", () => {
   const isPlanner = document.body.classList.contains("planner-site");
   if (!isGuest && !isPlanner) return;
 
-  const ASSET_VERSION = "20260630-checkin-window";
+  const ASSET_VERSION = "20260630-supabase-live";
 
   function versioned(src) {
     if (/^https?:\/\//i.test(src)) return src;

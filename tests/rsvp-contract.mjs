@@ -91,7 +91,8 @@ assert.match(checkinSql, /last_confirmed_at/);
 assert.match(checkinStatusSql, /set_guest_checkin_from_rsvp/);
 assert.match(checkinStatusSql, /checked_in/);
 assert.match(checkinStatusSql, /cant_make_it/);
-assert.match(config, /supabaseUrl:\s*""/);
-assert.match(config, /supabaseAnonKey:\s*""/);
+assert.match(config, /supabaseUrl:\s*"https:\/\/uwupepywyldwmsktvxdt\.supabase\.co"/);
+assert.match(config, /supabaseAnonKey:\s*"sb_publishable_[A-Za-z0-9_-]+"/);
+assert.doesNotMatch(config, /service_role|SUPABASE_SERVICE_ROLE|sb_secret_/i);
 
 console.log("FAQ dedupe and Guest Check-In contracts passed.");
