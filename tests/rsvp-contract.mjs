@@ -57,6 +57,7 @@ const expectedFaqs = [
 
 expectedFaqs.forEach((title) => assert.match(guest, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
 assert.match(guest, /const BUILT_IN_FAQS = \[/);
+assert.match(guest, /Don't have a cowboy hat\? We'll provide one for you\./);
 assert.match(guest, /const CHECK_IN_ENABLED = true;/, "guest check-in must stay visible after RSVP is archived");
 assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visibility must be controlled separately from archived RSVP");
 assert.match(guest, /function normalizeFaqTitle/);

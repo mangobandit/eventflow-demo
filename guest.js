@@ -9,7 +9,7 @@
   const publicNav = document.querySelector(".public-nav");
 
   const BUILT_IN_FAQS = [
-    { title: "What is the wedding theme?", body: "Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged." },
+    { title: "What is the wedding theme?", body: "Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged. Don't have a cowboy hat? We'll provide one for you." },
     { title: "What can I expect on the day?", body: "Food, drinks, laughs and a relaxed Rodeo-style celebration. Depending on which wedding you are attending, there will be small Western-inspired games and entertainment, such as horseshoe toss and other fun touches to keep the day moving." },
     { title: "What kind of food will there be?", body: "Expect a Western-inspired feast: BBQ and braai-style meats, with much of the food cooked over open fire. There will be options for lighter grazers as well as those who want something more hearty." },
     { title: "What should we wear?", body: "The dress feel is Rodeo Western. Cowboy boots, hats, leather, denim, belts, bolo ties, fringe, country shirts and country-style dresses are welcome and encouraged. Choose shoes that work on gardens, lawns and a dancefloor." },
