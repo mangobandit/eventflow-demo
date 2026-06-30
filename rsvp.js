@@ -3,13 +3,18 @@
 
   const config = window.MXC_CONFIG || {};
   const TOKEN_KEY = "mxc-rsvp-token";
+  const LOOKUP_KEY = "mxc-rsvp-lookup";
   const TOKEN_PATTERN = /^[0-9a-f]{48}$/i;
+  const LOOKUP_PATTERN = /^[0-9a-f]{32}$/i;
   const CHECK_IN_WINDOW_COPY = "Use this to confirm your household in the few days before the celebration so we can keep the final head count, transport and food planning accurate.";
   const DEMO_TOKEN = "000000000000000000000000000000000000000000000000";
+  const DEMO_LOOKUP_KEY = "11111111111111111111111111111111";
   const DEMO_STORAGE_KEY = "mxc-demo-checkin";
   let client = null;
   let token = "";
+  let lookupKey = "";
   let invitation = null;
+  let checkinOptions = [];
 
   const elements = {
     loading: document.getElementById("rsvp-loading"),
@@ -17,6 +22,9 @@
     errorState: document.getElementById("rsvp-error-state"),
     formState: document.getElementById("rsvp-form-state"),
     successState: document.getElementById("rsvp-success-state"),
+    selectForm: document.getElementById("rsvp-select-form"),
+    guestSelect: document.getElementById("rsvp-guest-select"),
+    selectStatus: document.getElementById("rsvp-select-status"),
     codeForm: document.getElementById("rsvp-code-form"),
     code: document.getElementById("rsvp-code"),
     codeStatus: document.getElementById("rsvp-code-status"),
@@ -55,6 +63,19 @@
     return TOKEN_PATTERN.test(stored) ? stored.toLowerCase() : "";
   }
 
+  function readLookupKey() {
+    const url = new URL(window.location.href);
+    const fragment = new URLSearchParams(url.hash.replace(/^#/, ""));
+    const fromUrl = (fragment.get("guest") || url.searchParams.get("guest") || "").trim();
+    if (LOOKUP_PATTERN.test(fromUrl)) {
+      sessionStorage.setItem(LOOKUP_KEY, fromUrl.toLowerCase());
+      history.replaceState(null, document.title, url.pathname);
+      return fromUrl.toLowerCase();
+    }
+    const stored = (sessionStorage.getItem(LOOKUP_KEY) || "").trim();
+    return LOOKUP_PATTERN.test(stored) ? stored.toLowerCase() : "";
+  }
+
   async function start() {
     bindEvents();
     await purgeRsvpCaches();
@@ -70,9 +91,11 @@
       });
     }
     token = readToken();
+    lookupKey = readLookupKey();
     if (demoMode) token = DEMO_TOKEN;
-    if (!token) {
+    if (!token && !lookupKey) {
       show(elements.codeState);
+      await loadGuestOptions();
       return;
     }
     await loadInvitation();
@@ -96,6 +119,21 @@
   }
 
   function bindEvents() {
+    elements.selectForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const value = elements.guestSelect.value.trim().toLowerCase();
+      if (!LOOKUP_PATTERN.test(value)) {
+        setStatus(elements.selectStatus, "Choose your name or household first.", true);
+        return;
+      }
+      lookupKey = value;
+      token = "";
+      sessionStorage.setItem(LOOKUP_KEY, lookupKey);
+      sessionStorage.removeItem(TOKEN_KEY);
+      show(elements.loading);
+      await loadInvitation();
+    });
+
     elements.codeForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       const value = elements.code.value.trim().toLowerCase();
@@ -104,34 +142,89 @@
         return;
       }
       token = value;
+      lookupKey = "";
       sessionStorage.setItem(TOKEN_KEY, token);
+      sessionStorage.removeItem(LOOKUP_KEY);
       show(elements.loading);
       await loadInvitation();
     });
 
-    elements.tryAnother.addEventListener("click", () => {
+    elements.tryAnother.addEventListener("click", async () => {
       sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(LOOKUP_KEY);
       token = "";
+      lookupKey = "";
       elements.code.value = "";
+      elements.guestSelect.value = "";
       setStatus(elements.codeStatus, "");
+      setStatus(elements.selectStatus, "");
       show(elements.codeState);
+      if (!checkinOptions.length) await loadGuestOptions();
     });
 
     elements.form.addEventListener("submit", submitRsvp);
     elements.edit.addEventListener("click", () => show(elements.formState));
   }
 
+  async function loadGuestOptions() {
+    setStatus(elements.selectStatus, "Loading guest list...");
+    elements.guestSelect.disabled = true;
+    try {
+      const { data, error } = await client.rpc("list_guest_checkin_options");
+      if (error) throw error;
+      checkinOptions = Array.isArray(data) ? data : [];
+      renderGuestOptions();
+      setStatus(
+        elements.selectStatus,
+        checkinOptions.length
+          ? "Pick your name, then review each person before sending."
+          : "No guest check-ins are available yet. You can still use a code if Matt and Cara sent one."
+      );
+    } catch (error) {
+      console.warn("Guest list could not be loaded", error);
+      checkinOptions = [];
+      renderGuestOptions();
+      setStatus(elements.selectStatus, "We could not load the guest list. You can still paste a check-in code below.", true);
+    } finally {
+      elements.guestSelect.disabled = false;
+    }
+  }
+
+  function renderGuestOptions() {
+    const placeholder = '<option value="">Select your name or household</option>';
+    if (!checkinOptions.length) {
+      elements.guestSelect.innerHTML = placeholder;
+      return;
+    }
+    elements.guestSelect.innerHTML = placeholder + checkinOptions.map((option) => {
+      const venue = option.celebration === "spain" ? "Spain" : "South Africa";
+      const count = Number(option.guest_count || 0);
+      const suffix = count > 1 ? ` - ${count} guests` : "";
+      return `<option value="${escapeHtml(option.lookup_key)}">${escapeHtml(`${venue} - ${option.label}${suffix}`)}</option>`;
+    }).join("");
+  }
+
   async function loadInvitation() {
     try {
-      const { data, error } = await client.rpc("get_rsvp_invitation", { p_token: token });
+      const usingLookup = LOOKUP_PATTERN.test(lookupKey);
+      const { data, error } = usingLookup
+        ? await client.rpc("get_rsvp_invitation_by_lookup", { p_lookup_key: lookupKey })
+        : await client.rpc("get_rsvp_invitation", { p_token: token });
       if (error) throw error;
       if (!data || !Array.isArray(data.people)) throw new Error("Check-in not found");
       invitation = data;
+      if (LOOKUP_PATTERN.test(invitation.lookup_key || "")) {
+        lookupKey = invitation.lookup_key.toLowerCase();
+        sessionStorage.setItem(LOOKUP_KEY, lookupKey);
+      }
       renderInvitation();
       show(elements.formState);
     } catch (error) {
       console.warn("Guest check-in could not be opened", error);
       sessionStorage.removeItem(TOKEN_KEY);
+      sessionStorage.removeItem(LOOKUP_KEY);
+      token = "";
+      lookupKey = "";
       showError("The check-in service is not connected yet. Please contact Matt or Cara directly for now.");
     }
   }
@@ -185,7 +278,7 @@
 
   async function submitRsvp(event) {
     event.preventDefault();
-    if (!invitation || !token) return;
+    if (!invitation || (!token && !lookupKey)) return;
     let people;
     try {
       people = [...elements.people.querySelectorAll(".guest-response")].map((card, index) => {
@@ -210,13 +303,16 @@
     elements.submit.disabled = true;
     setStatus(elements.submitStatus, "Saving your check-in securely…");
     try {
-      const { data, error } = await client.rpc("submit_rsvp", {
-        p_token: token,
+      const payload = {
         p_contact_email: elements.email.value.trim() || null,
         p_contact_phone: elements.phone.value.trim() || null,
         p_guest_message: elements.message.value.trim() || null,
         p_people: people
-      });
+      };
+      const usingLookup = LOOKUP_PATTERN.test(lookupKey);
+      const { data, error } = usingLookup
+        ? await client.rpc("submit_rsvp_by_lookup", { p_lookup_key: lookupKey, ...payload })
+        : await client.rpc("submit_rsvp", { p_token: token, ...payload });
       if (error) throw error;
       invitation = data?.invitation || { ...invitation, people };
       renderSuccess(data?.summary || buildSummary(people));
@@ -257,15 +353,35 @@
   function createDemoClient() {
     return {
       async rpc(name, payload = {}) {
+        if (name === "list_guest_checkin_options") return getDemoOptions();
         if (name === "get_rsvp_invitation") return getDemoInvitation(payload.p_token);
+        if (name === "get_rsvp_invitation_by_lookup") return getDemoInvitationByLookup(payload.p_lookup_key);
         if (name === "submit_rsvp") return submitDemoInvitation(payload);
+        if (name === "submit_rsvp_by_lookup") return submitDemoInvitation(payload);
         return { data: null, error: new Error("Unknown local demo action") };
       }
     };
   }
 
+  function getDemoOptions() {
+    return {
+      data: [{
+        lookup_key: DEMO_LOOKUP_KEY,
+        label: "Local test household",
+        celebration: "spain",
+        guest_count: 2
+      }],
+      error: null
+    };
+  }
+
   function getDemoInvitation(rawToken) {
     if (rawToken !== DEMO_TOKEN) return { data: null, error: null };
+    return { data: readDemoInvitation(), error: null };
+  }
+
+  function getDemoInvitationByLookup(rawLookupKey) {
+    if (rawLookupKey !== DEMO_LOOKUP_KEY) return { data: null, error: null };
     return { data: readDemoInvitation(), error: null };
   }
 
@@ -290,6 +406,7 @@
     }
     const fresh = {
       invitation_id: "local-demo",
+      lookup_key: DEMO_LOOKUP_KEY,
       label: "Local test household",
       celebration: "spain",
       deadline: null,

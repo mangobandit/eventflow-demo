@@ -8,10 +8,10 @@
   <meta name="robots" content="noindex,nofollow,noarchive,nosnippet">
   <title>Matt & Cara · Guest Check-In</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="rsvp.css?v=20260630-supabase-live">
+  <link rel="stylesheet" href="rsvp.css?v=20260630-guest-dropdown">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260630-supabase-live"></script>
-  <script defer src="rsvp.js?v=20260630-supabase-live"></script>
+  <script defer src="rsvp.js?v=20260630-guest-dropdown"></script>
 </head>
 <body class="rsvp-site">
   <a class="skip-link" href="#rsvp-main">Skip to guest check-in form</a>
@@ -42,7 +42,17 @@
         <div id="rsvp-code-state" class="rsvp-state" hidden>
           <p class="eyebrow">Guest check-in</p>
           <h2>Open your check-in</h2>
-          <p>Paste the check-in code from Matt and Cara. Codes contain only letters A–F and numbers.</p>
+          <p>Select your name or household from the guest list. You can still paste a check-in code if Matt and Cara sent you one directly.</p>
+          <form id="rsvp-select-form" class="rsvp-code-form">
+            <label>Your name or household
+              <select id="rsvp-guest-select" required>
+                <option value="">Loading guest list...</option>
+              </select>
+            </label>
+            <button class="button button-dark" type="submit">Open check-in</button>
+          </form>
+          <div class="rsvp-status" id="rsvp-select-status" role="status" aria-live="polite"></div>
+          <div class="rsvp-code-divider"><span>Or use a code</span></div>
           <form id="rsvp-code-form" class="rsvp-code-form">
             <label>Check-in code
               <input id="rsvp-code" inputmode="text" autocomplete="off" autocapitalize="off" spellcheck="false" maxlength="48" placeholder="Paste your 48-character code" required>

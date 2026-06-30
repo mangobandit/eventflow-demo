@@ -21,10 +21,13 @@
 @keyframes rsvp-spin { to { transform: rotate(360deg); } }
 .rsvp-code-form { display: grid; gap: 12px; margin-top: 32px; }
 .rsvp-code-form label, .rsvp-contact-grid label, .rsvp-contact-section > label { display: grid; gap: 8px; color: var(--ink-soft); font-size: 9px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
-.rsvp-code-form input, .rsvp-contact-section input, .rsvp-contact-section textarea, .guest-response input, .guest-response textarea, .guest-response select { width: 100%; min-height: 50px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; color: var(--ink); background: #fffefa; }
+.rsvp-code-form input, .rsvp-code-form select, .rsvp-contact-section input, .rsvp-contact-section textarea, .guest-response input, .guest-response textarea, .guest-response select { width: 100%; min-height: 50px; padding: 12px 14px; border: 1px solid var(--line); border-radius: 10px; outline: none; color: var(--ink); background: #fffefa; }
 .rsvp-code-form input { font-family: ui-monospace, SFMono-Regular, Menlo, monospace; font-size: 13px; letter-spacing: .07em; }
-.rsvp-code-form input:focus, .rsvp-contact-section input:focus, .rsvp-contact-section textarea:focus, .guest-response input:focus, .guest-response textarea:focus, .guest-response select:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(77,90,67,.1); }
+.rsvp-code-form select { font-size: 14px; font-weight: 650; letter-spacing: 0; text-transform: none; }
+.rsvp-code-form input:focus, .rsvp-code-form select:focus, .rsvp-contact-section input:focus, .rsvp-contact-section textarea:focus, .guest-response input:focus, .guest-response textarea:focus, .guest-response select:focus { border-color: var(--olive); box-shadow: 0 0 0 3px rgba(77,90,67,.1); }
 .rsvp-code-form .button { justify-self: start; border: 0; cursor: pointer; }
+.rsvp-code-divider { display: flex; align-items: center; gap: 12px; margin: 28px 0 18px; color: var(--ink-soft); font-size: 8px; font-weight: 850; letter-spacing: .14em; text-transform: uppercase; }
+.rsvp-code-divider:before, .rsvp-code-divider:after { content: ""; flex: 1; height: 1px; background: var(--line); }
 .rsvp-status { min-height: 24px; margin-top: 14px; color: var(--ink-soft); font-size: 11px; line-height: 1.55; }
 .rsvp-intro { padding-bottom: 34px; border-bottom: 1px solid var(--line); }
 .rsvp-people { display: grid; min-width: 0; gap: 16px; margin-top: 28px; }
