@@ -10,15 +10,18 @@
 .detail-grid dd { margin: 8px 0 0; font-family: var(--serif); font-size: 24px; }
 .note-box { margin-top: 24px; padding: 18px 20px; border-left: 3px solid var(--clay); background: rgba(255,255,255,.55); color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
 
-.countdown-section { display: grid; grid-template-columns: 1fr 1.1fr; gap: 80px; align-items: center; padding: clamp(70px, 9vw, 130px) 7vw; color: #fff; background: var(--olive-dark); }
-.countdown-section h2 { margin: 0; font-family: var(--serif); font-size: clamp(40px, 5vw, 76px); font-weight: 400; line-height: 1; }
-.countdown-section .eyebrow { color: #c3ccbd; }
-.countdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-.countdown-card { position: relative; overflow: hidden; min-height: 260px; padding: 24px; border: 1px solid rgba(255,255,255,.18); border-radius: var(--radius); background: rgba(255,255,255,.055); }
-.countdown-card:after { content: ""; position: absolute; width: 170px; height: 170px; right: -65px; bottom: -65px; border: 1px solid rgba(255,255,255,.13); border-radius: 50%; }
-.countdown-card span { font-size: 10px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
-.countdown-card strong { display: block; margin-top: 46px; font-family: var(--serif); font-size: clamp(70px, 8vw, 116px); font-weight: 400; line-height: .7; }
-.countdown-card small { display: block; margin-top: 22px; color: #c8d0c2; font-size: 11px; letter-spacing: .12em; text-transform: uppercase; }
+.countdown-section { position: relative; z-index: 6; display: grid; grid-template-columns: minmax(280px, .86fr) minmax(420px, 1.14fr); gap: clamp(22px, 4vw, 58px); align-items: center; width: min(1320px, calc(100% - 48px)); margin: clamp(-72px, -5vw, -44px) auto clamp(44px, 6vw, 84px); padding: clamp(24px, 3.6vw, 46px); overflow: hidden; color: var(--olive-dark); border: 1px solid rgba(255,255,255,.72); border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(255,253,248,.96), rgba(246,240,230,.9)); box-shadow: 0 26px 76px rgba(34,31,25,.2); backdrop-filter: blur(18px); }
+.countdown-section:before { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(48,58,45,.08); border-radius: calc(var(--radius-lg) - 9px); pointer-events: none; }
+.countdown-section:after { content: ""; position: absolute; width: 280px; height: 280px; right: -120px; top: -160px; border: 1px solid rgba(167,103,69,.16); border-radius: 50%; pointer-events: none; }
+.countdown-copy, .countdown-grid { position: relative; z-index: 1; }
+.countdown-section h2 { max-width: 520px; margin: 0; font-family: var(--serif); font-size: clamp(34px, 4.2vw, 64px); font-weight: 400; line-height: .98; letter-spacing: -.04em; }
+.countdown-section .eyebrow { color: var(--clay); }
+.countdown-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.countdown-card { position: relative; overflow: hidden; min-height: 210px; padding: 22px; color: var(--olive-dark); border: 1px solid rgba(48,54,44,.14); border-radius: var(--radius); background: rgba(255,255,255,.56); box-shadow: inset 0 1px 0 rgba(255,255,255,.68); }
+.countdown-card:after { content: ""; position: absolute; width: 160px; height: 160px; right: -62px; bottom: -70px; border: 1px solid rgba(167,103,69,.18); border-radius: 50%; }
+.countdown-card span { color: var(--olive-dark); font-size: 10px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
+.countdown-card strong { display: block; margin-top: 34px; color: var(--clay); font-family: var(--serif); font-size: clamp(64px, 7vw, 104px); font-weight: 400; line-height: .74; }
+.countdown-card small { display: block; margin-top: 18px; color: var(--ink-soft); font-size: 10px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; }
 
 .travel-section { padding-bottom: 110px; background: #f2ebe0; }
 .travel-plan { max-width: 1420px; margin: 0 auto 34px; padding: clamp(28px, 5vw, 78px); border: 1px solid var(--line); border-radius: var(--radius-lg); background: var(--paper); box-shadow: var(--shadow-sm); }
