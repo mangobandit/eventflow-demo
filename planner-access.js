@@ -144,16 +144,19 @@
   }
 
   async function loadData() {
+    const imported = await loadPrivateImport();
     try {
       const saved = JSON.parse(localStorage.getItem(STORAGE_KEY) || "null");
       if (saved) {
-        Object.keys(state.data).forEach((table) => { state.data[table] = Array.isArray(saved[table]) ? saved[table] : []; });
+        const normalizedSaved = normalizeImport(saved) || emptyData();
+        state.data = mergeSavedWithImport(normalizedSaved, imported);
+        persist();
         return;
       }
     } catch (_error) {
       localStorage.removeItem(STORAGE_KEY);
     }
-    state.data = await loadPrivateImport() || emptyData();
+    state.data = imported || emptyData();
     persist();
   }
 
@@ -174,6 +177,17 @@
     const normalized = {};
     Object.keys(state.data).forEach((table) => { normalized[table] = Array.isArray(importData[table]) ? importData[table] : []; });
     return normalized;
+  }
+
+  function mergeSavedWithImport(saved, imported) {
+    if (!imported) return saved;
+    const merged = {};
+    Object.keys(state.data).forEach((table) => {
+      const savedRows = Array.isArray(saved[table]) ? saved[table] : [];
+      const importRows = Array.isArray(imported[table]) ? imported[table] : [];
+      merged[table] = savedRows.length ? savedRows : importRows;
+    });
+    return merged;
   }
 
   function persist() {
