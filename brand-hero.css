@@ -61,10 +61,12 @@
 }
 
 .guest-hero .hero-deck {
-  max-width: 760px;
+  width: min(100%, 700px);
+  max-width: 700px;
   margin-top: 18px;
   color: rgba(255,255,255,.94);
   font-size: clamp(18px, 1.8vw, 25px);
+  text-wrap: balance;
 }
 
 .guest-hero .date-lockup {
