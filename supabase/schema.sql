@@ -107,6 +107,13 @@ create table if not exists public.guests (
   accommodation text,
   contact text,
   notes text,
+  rsvp_invitation_id uuid,
+  rsvp_person_id uuid unique,
+  checked_in_at timestamptz,
+  check_in_status text check (check_in_status is null or check_in_status in ('not_checked_in', 'checked_in', 'cant_make_it')),
+  arrival_status text,
+  eta text,
+  last_confirmed_at timestamptz,
   created_by uuid references auth.users(id) on delete set null,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()
@@ -169,6 +176,7 @@ create table if not exists public.content_blocks (
 create index if not exists tasks_owner_status_due_idx on public.tasks(owner, status, due_date);
 create index if not exists budget_owner_due_idx on public.budget_items(owner, due_date);
 create index if not exists guests_celebration_rsvp_idx on public.guests(celebration, rsvp_status);
+create index if not exists guests_checkin_idx on public.guests(celebration, check_in_status, checked_in_at) where rsvp_person_id is not null;
 create index if not exists vendors_owner_status_idx on public.vendors(owner, status);
 create index if not exists timeline_date_idx on public.timeline_items(item_date, item_time);
 create index if not exists content_public_idx on public.content_blocks(published, publish_at, sort_order);

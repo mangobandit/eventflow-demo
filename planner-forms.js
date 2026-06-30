@@ -109,7 +109,7 @@
   }
 
   function tableForView(view) {
-    return ({ budget: "budget_items", guests: "guests", vendors: "vendors", timeline: "timeline_items", publishing: "content_blocks" })[view] || "tasks";
+    return ({ budget: "budget_items", guests: "guests", checkin: "guests", vendors: "vendors", timeline: "timeline_items", publishing: "content_blocks" })[view] || "tasks";
   }
 
   function countStatuses(rows) {

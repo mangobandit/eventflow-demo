@@ -13,6 +13,7 @@ const plannerCheckin = read("planner-checkin.js");
 const access = read("planner-access.js");
 const sw = read("sw.js");
 const checkinSql = read("supabase/migrations/20260626_guest_checkin_fields.sql");
+const checkinStatusSql = read("supabase/migrations/20260630_checkin_confirmation_status.sql");
 const config = read("config.js");
 
 assert.match(checkinPage, /Matt & Cara · Guest Check-In/);
@@ -49,8 +50,8 @@ const expectedFaqs = [
 
 expectedFaqs.forEach((title) => assert.match(guest, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
 assert.match(guest, /const BUILT_IN_FAQS = \[/);
-assert.match(guest, /const RSVP_ARCHIVED = true;/, "guest check-in entry must stay archived by default");
-assert.match(guest, /if\s*\(\s*RSVP_ARCHIVED\s*\)\s*return;/, "archived check-in must not inject public guest-page entry points");
+assert.match(guest, /const CHECK_IN_ENABLED = true;/, "guest check-in must stay visible after RSVP is archived");
+assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visibility must be controlled separately from archived RSVP");
 assert.match(guest, /function normalizeFaqTitle/);
 assert.match(guest, /renderFaqList\(faqs\)/);
 assert.doesNotMatch(guest, /Can children attend/);
@@ -62,6 +63,10 @@ assert.match(plannerLoader, /hasSupabaseSettings\s*\?\s*null\s*:\s*addScript\("p
 assert.match(plannerLoader, /planner-checkin\.js/);
 assert.match(plannerCheckin, /Guest Check-In/);
 assert.match(plannerCheckin, /Total invited/);
+assert.match(plannerCheckin, /Guests by venue/);
+assert.match(plannerCheckin, /Still attending/);
+assert.match(plannerCheckin, /Still to check in/);
+assert.match(plannerCheckin, /guest-list-tracker/);
 assert.match(plannerCheckin, /Copy check-in message/);
 assert.match(access, /ACCESS_DIGEST/);
 assert.match(access, /crypto\.subtle\.digest\("SHA-256"/, "the entered code must be hashed in the browser");
@@ -73,6 +78,9 @@ assert.match(sw, /url\.search/);
 assert.match(checkinSql, /checked_in_at/);
 assert.match(checkinSql, /check_in_status/);
 assert.match(checkinSql, /last_confirmed_at/);
+assert.match(checkinStatusSql, /set_guest_checkin_from_rsvp/);
+assert.match(checkinStatusSql, /checked_in/);
+assert.match(checkinStatusSql, /cant_make_it/);
 assert.match(config, /supabaseUrl:\s*""/);
 assert.match(config, /supabaseAnonKey:\s*""/);
 

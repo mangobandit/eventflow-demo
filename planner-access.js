@@ -77,7 +77,7 @@
     els.accountAvatar.textContent = "M";
 
     const requested = location.hash.replace(/^#/, "");
-    state.view = ["overview", "tasks", "budget", "guests", "vendors", "timeline", "publishing"].includes(requested) ? requested : "overview";
+    state.view = ["overview", "tasks", "budget", "guests", "checkin", "vendors", "timeline", "publishing"].includes(requested) ? requested : "overview";
     switchView(state.view, false);
     renderAll();
     setSync("Saved on this browser", false);

@@ -1,6 +1,6 @@
   async function init() {
     const requestedView = location.hash.replace(/^#/, "");
-    if (["overview", "tasks", "budget", "guests", "vendors", "timeline", "publishing"].includes(requestedView)) state.view = requestedView;
+    if (["overview", "tasks", "budget", "guests", "checkin", "vendors", "timeline", "publishing"].includes(requestedView)) state.view = requestedView;
     bindUi();
     if (!configured) {
       els.setupCard.hidden = false;

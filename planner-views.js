@@ -131,7 +131,7 @@
     if (history.replaceState) history.replaceState(null, "", `#${state.view}`);
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === state.view));
-    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing" }[state.view] || "Planner";
+    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", checkin: "Guest Check-In", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing" }[state.view] || "Planner";
     els.topbarTitle.textContent = label;
     els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner · ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
     const addButton = document.getElementById("global-add");
