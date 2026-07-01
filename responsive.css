@@ -26,10 +26,11 @@
   .scroll-cue { display: none; }
   .announcement, .intro-section, .section-heading { grid-template-columns: 52px 1fr; gap: 22px; }
   .announcement > p, .intro-copy, .section-heading > p { grid-column: 2; }
+  .announcement-history { grid-template-columns: 1fr; }
   .event-feature { grid-template-columns: 1fr; }
   .event-image { min-height: 540px; }
   .event-sa .event-content { grid-row: 2; }
-  .countdown-section, .practical-section, .faq-section { grid-template-columns: 1fr; gap: 44px; }
+  .countdown-section, .practical-section, .gifts-section, .faq-section { grid-template-columns: 1fr; gap: 44px; }
   .airport-grid, .experience-panel, .live-note-grid { grid-template-columns: 1fr 1fr; }
   .stay-grid { grid-template-columns: 1fr; }
   .nearby-stays-head { grid-template-columns: 1fr; align-items: start; }
@@ -80,7 +81,7 @@
   .travel-plan { padding: 24px 16px; border-radius: 24px; }
   .travel-plan-head { align-items: flex-start; }
   .country-index { width: 50px; height: 50px; flex: 0 0 auto; }
-  .airport-grid, .itinerary-grid, .experience-panel, .practical-grid, .live-note-grid { grid-template-columns: 1fr; }
+  .airport-grid, .itinerary-grid, .experience-panel, .practical-grid, .gifts-grid, .live-note-grid { grid-template-columns: 1fr; }
   .airport-grid article { min-height: 240px; }
   .stay-section { padding-bottom: 70px; }
   .stay-grid { padding: 0 12px; }
@@ -92,7 +93,7 @@
   .experience-section .section-heading { padding-left: 8px; padding-right: 8px; }
   .experience-tabs { margin-left: 8px; }
   .experience-panel article { min-height: 240px; }
-  .practical-section, .faq-section { padding: 70px 20px; }
+  .practical-section, .gifts-section, .faq-section { padding: 70px 20px; }
   .closing-copy { width: 100%; padding: 34px 20px; }
   .public-footer { grid-template-columns: 1fr; padding: 34px 20px 90px; }
   .footer-meta { grid-column: auto; display: grid; }

@@ -35,15 +35,26 @@
     const now = Date.now();
     document.querySelectorAll("[data-countdown]").forEach((card) => {
       const target = Date.parse(card.dataset.countdown || "");
-      const dayElement = card.querySelector("[data-days]");
-      if (!dayElement || Number.isNaN(target)) return;
-      const remaining = Math.ceil((target - now) / 86_400_000);
-      dayElement.textContent = remaining > 0 ? remaining.toLocaleString("en-GB") : "0";
-      if (remaining <= 0) card.querySelector("small").textContent = "celebration day";
+      const valueElement = card.querySelector("[data-days]");
+      const labelElement = card.querySelector("small");
+      if (!valueElement || Number.isNaN(target)) return;
+      const remainingMs = target - now;
+      if (remainingMs <= 0) {
+        valueElement.textContent = "0";
+        labelElement.textContent = "celebration day";
+      } else if (remainingMs <= 48 * 3_600_000) {
+        const hours = Math.max(Math.ceil(remainingMs / 3_600_000), 1);
+        valueElement.textContent = hours.toLocaleString("en-GB");
+        labelElement.textContent = hours === 1 ? "hour to go" : "hours to go";
+      } else {
+        const days = Math.ceil(remainingMs / 86_400_000);
+        valueElement.textContent = days.toLocaleString("en-GB");
+        labelElement.textContent = "days to go";
+      }
     });
   };
   updateCountdowns();
-  window.setInterval(updateCountdowns, 3_600_000);
+  window.setInterval(updateCountdowns, 60_000);
 
   const tabButtons = [...document.querySelectorAll("[data-tab]")];
   tabButtons.forEach((button) => {
@@ -62,7 +73,11 @@
     });
   });
 
-  const renderPublishedContent = (rows) => {
+  const renderPublishedContent = (allRows) => {
+    /* Row Level Security already hides scheduled rows from the anon client;
+       this filter is defence in depth for cached or local data. */
+    const now = Date.now();
+    const rows = allRows.filter((row) => !row.publish_at || Date.parse(row.publish_at) <= now);
     const announcements = rows.filter((row) => row.section === "announcement");
     const faqs = rows.filter((row) => row.section === "faq");
     const travelNotes = rows.filter((row) => row.section === "travel");
@@ -74,10 +89,25 @@
       const latest = announcements[0];
       wrapper.innerHTML = `
         <div>
-          <span class="announcement-kicker">${escapeHtml(latest.country || "Planning update")}</span>
+          <span class="announcement-kicker">${escapeHtml(labelAnnouncementCountry(latest.country))}</span>
           <h2 id="updates-title">${escapeHtml(latest.title)}</h2>
         </div>
         <p>${formatBody(latest.body)}</p>`;
+    }
+
+    const history = document.getElementById("announcement-history");
+    if (history) {
+      const earlier = announcements
+        .slice(1)
+        .sort((a, b) => Date.parse(b.updated_at || 0) - Date.parse(a.updated_at || 0))
+        .slice(0, 2);
+      history.hidden = earlier.length === 0;
+      history.innerHTML = earlier.map((row) => `
+        <article>
+          <span>${escapeHtml(labelAnnouncementCountry(row.country))} · ${formatShortDate(row.updated_at)}</span>
+          <h3>${escapeHtml(row.title)}</h3>
+          <p>${formatBody(row.body)}</p>
+        </article>`).join("");
     }
 
     renderFaqList(faqs);
@@ -101,7 +131,7 @@
       });
       const { data, error } = await client
         .from("content_blocks")
-        .select("slug, section, country, title, body, sort_order, updated_at")
+        .select("slug, section, country, title, body, sort_order, publish_at, updated_at")
         .eq("published", true)
         .order("sort_order", { ascending: true })
         .order("updated_at", { ascending: false });
@@ -217,6 +247,16 @@
         <h3>${escapeHtml(note.title)}</h3>
         <p>${formatBody(note.body)}</p>
       </article>`).join("");
+  }
+
+  function labelAnnouncementCountry(country) {
+    return country === "south_africa" ? "South Africa" : country === "spain" ? "Spain" : "Planning update";
+  }
+
+  function formatShortDate(value) {
+    const parsed = Date.parse(value || "");
+    if (Number.isNaN(parsed)) return "earlier";
+    return new Intl.DateTimeFormat("en-GB", { day: "numeric", month: "short" }).format(new Date(parsed));
   }
 
   function escapeHtml(value) {

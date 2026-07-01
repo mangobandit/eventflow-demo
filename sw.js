@@ -1,6 +1,6 @@
 const CACHE = "mxc-guest-v17";
 const VERSION = "20260701-guest-portal-upgrade";
-const PUBLIC_ASSETS = ["/", "/index.html", `/style.css?v=${VERSION}`, `/style-core.css?v=${VERSION}`, `/guest-layout.css?v=${VERSION}`, `/responsive.css?v=${VERSION}`, `/brand.css?v=${VERSION}`, `/brand-hero.css?v=${VERSION}`, `/wedding-chat.css?v=${VERSION}`, `/guest.js?v=${VERSION}`, "/assets/invitation-picture.jpg", "/manifest.webmanifest", "/icon.svg"];
+const PUBLIC_ASSETS = ["/", "/index.html", `/style.css?v=${VERSION}`, `/style-core.css?v=${VERSION}`, `/guest-layout.css?v=${VERSION}`, `/responsive.css?v=${VERSION}`, `/brand.css?v=${VERSION}`, `/brand-hero.css?v=${VERSION}`, `/wedding-chat.css?v=${VERSION}`, `/guest.js?v=${VERSION}`, "/assets/invitation-picture.jpg", "/assets/mxc-spain-2026.ics", "/assets/mxc-south-africa-2026.ics", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PUBLIC_ASSETS)).then(() => self.skipWaiting()));
