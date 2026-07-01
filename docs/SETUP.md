@@ -6,7 +6,7 @@ The repository can stay public because it contains only application code and pub
 
 1. Create a new Supabase project in a region suitable for you.
 2. Open **SQL Editor** and run `supabase/schema.sql` in full.
-3. Run each SQL file in `supabase/migrations/` in filename order. The current RSVP migration is `20260624_rsvp_control_centre.sql`.
+3. Run each SQL file in `supabase/migrations/` in filename order. The latest migration is `20260701_portal_upgrade.sql` (honeymoon persistence, sliding sessions, structured errors, conflict-safe saves). The web client keeps working against the previous schema until it is applied, but apply it before relying on the Honeymoon tab syncing between devices.
 4. In a new private SQL query, add the two approved users using their real lowercase email addresses:
 
 ```sql

@@ -1,6 +1,8 @@
 # Upgrade Roadmap · Guest Guide & Couple Portal
 
-Status: proposed · July 2026
+Status: **implemented** (Phases 0–5 delivered on this branch, July 2026).
+Remaining follow-ups: apply `supabase/migrations/20260701_portal_upgrade.sql` to the live
+project, and the post-Spain gallery/Walls.io embed from Phase 5.
 Scope: `index.html` guest guide, `rsvp.html` check-in, `planner.html` couple portal, Supabase schema.
 
 The dates drive the sequencing: **Spain · 10 October 2026** and **South Africa · 19 December 2026**.
