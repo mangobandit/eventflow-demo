@@ -10,10 +10,12 @@ const guestPage = read("index.html");
 const guest = read("guest.js");
 const checkinScript = read("rsvp.js");
 const planner = read("planner.html");
+const plannerCore = read("planner-core.js");
 const plannerAuth = read("planner-auth.js");
 const plannerForms = read("planner-forms.js");
-const plannerLoader = read("planner-rsvp.js");
 const plannerCheckin = read("planner-checkin.js");
+const plannerHoneymoon = read("planner-honeymoon.js");
+const plannerExtras = read("planner-extra-tasks.js");
 const access = read("planner-access.js");
 const sw = read("sw.js");
 const checkinSql = read("supabase/migrations/20260626_guest_checkin_fields.sql");
@@ -84,9 +86,23 @@ assert.match(guest, /renderFaqList\(faqs\)/);
 assert.match(guest, /Guest Check-In/);
 assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"/);
 
-assert.match(plannerLoader, /hasSupabaseSettings/, "simple couple access must detect configured Supabase settings");
-assert.match(plannerLoader, /hasSupabaseSettings\s*\?\s*null\s*:\s*addScript\("planner-access\.js"/, "simple couple access must not override configured Supabase auth");
-assert.match(plannerLoader, /planner-checkin\.js/);
+// The demo PIN gate may only ever load when Supabase is unconfigured.
+assert.match(plannerCore, /if \(!config\.supabaseUrl && !config\.supabaseAnonKey\) \{/, "simple couple access must not override configured Supabase auth");
+assert.match(plannerCore, /planner-access\.js/);
+// Check-In and Honeymoon are first-class planner views: static nav + panels,
+// no runtime nav injection or render monkey-patching.
+assert.match(planner, /data-view="checkin"/);
+assert.match(planner, /data-view-panel="checkin"/);
+assert.match(planner, /data-view="honeymoon"/);
+assert.match(planner, /data-view-panel="honeymoon"/);
+assert.match(planner, /planner-checkin\.js/);
+assert.match(planner, /planner-honeymoon\.js/);
+assert.doesNotMatch(plannerCheckin, /waitForPlanner|setTimeout\(waitForPlanner|originalRenderAll/, "check-in must stay a native view, not a polling patch");
+assert.doesNotMatch(plannerHoneymoon, /waitForPlanner|localStorage\.setItem\(LEGACY_HONEYMOON_STORE,/, "honeymoon data must live in the planner store, not browser-only storage");
+assert.match(plannerHoneymoon, /honeymoon_items/);
+assert.match(plannerHoneymoon, /mxc:planner-ready/);
+assert.match(plannerExtras, /mxc:planner-ready/);
+assert.match(plannerExtras, /planner_save_entity/, "the starter checklist must persist through the secure save path");
 assert.match(planner, /id="login-username"/);
 assert.match(planner, /id="login-password"/);
 assert.match(planner, /Enter planner/);
@@ -134,6 +150,14 @@ assert.match(plannerLoginSql, /planner_sessions/);
 assert.match(plannerLoginSql, /planner_login/);
 assert.match(plannerLoginSql, /planner_save_entity/);
 assert.doesNotMatch(plannerLoginSql, /6288/);
+
+const portalUpgradeSql = read("supabase/migrations/20260701_portal_upgrade.sql");
+assert.match(portalUpgradeSql, /create table if not exists public\.honeymoon_items/);
+assert.match(portalUpgradeSql, /p_expected_updated_at timestamptz default null/, "saves must support optimistic concurrency");
+assert.match(portalUpgradeSql, /PLANNER_CONFLICT/);
+assert.match(portalUpgradeSql, /PLANNER_SESSION_EXPIRED/);
+assert.match(portalUpgradeSql, /greatest\(expires_at, now\(\) \+ interval '12 hours'\)/, "sessions must renew on use");
+assert.match(portalUpgradeSql, /revoke all on public\.honeymoon_items from public, anon/);
 assert.match(config, /supabaseUrl:\s*"https:\/\/uwupepywyldwmsktvxdt\.supabase\.co"/);
 assert.match(config, /supabaseAnonKey:\s*"sb_publishable_[A-Za-z0-9_-]+"/);
 assert.doesNotMatch(config, /service_role|SUPABASE_SERVICE_ROLE|sb_secret_/i);

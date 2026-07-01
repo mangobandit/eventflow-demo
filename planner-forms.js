@@ -53,13 +53,15 @@
     setSync("Saving…", true);
     let saved;
     try {
-      saved = await plannerRpc("planner_save_entity", {
-        p_session_token: state.session?.token || "",
-        p_table: table,
-        p_record_id: record?.id || null,
-        p_payload: payload
-      });
+      saved = await saveEntityRpc(table, record?.id || null, payload, record?.updated_at || null);
     } catch (error) {
+      if (error.plannerCode === "PLANNER_CONFLICT") {
+        // Someone else saved this record first. Refresh, keep the modal open
+        // with the user's values, and let them re-apply against the new state.
+        await loadAll();
+        const latest = state.data[table].find((item) => item.id === record.id);
+        if (latest) state.editing = { table, record: latest };
+      }
       toast(error.message, true);
       setSync("Save failed", false);
       return;
@@ -71,6 +73,58 @@
     renderAll();
     setSync("Securely synced", false);
     toast(`${definitions[table].title} saved.`);
+  }
+
+  /* Save with optimistic concurrency; falls back to the pre-migration RPC
+     signature so the site keeps working until 20260701_portal_upgrade.sql
+     is applied. */
+  async function saveEntityRpc(table, recordId, payload, expectedUpdatedAt) {
+    const params = {
+      p_session_token: state.session?.token || "",
+      p_table: table,
+      p_record_id: recordId,
+      p_payload: payload
+    };
+    if (recordId && expectedUpdatedAt) {
+      try {
+        return await plannerRpc("planner_save_entity", { ...params, p_expected_updated_at: expectedUpdatedAt });
+      } catch (error) {
+        const signatureMismatch = /planner_save_entity/i.test(error.rawMessage || "") && /could not find|schema cache/i.test(error.rawMessage || "");
+        if (!signatureMismatch) throw error;
+      }
+    }
+    return plannerRpc("planner_save_entity", params);
+  }
+
+  /* Quick partial save used by inline controls (e.g. kanban status buttons).
+     Falls back to browser-local persistence when the demo PIN gate is active
+     (no session token), matching planner-access.js behaviour. */
+  async function savePatch(table, record, patch) {
+    const index = state.data[table].findIndex((item) => item.id === record.id);
+    if (index < 0) return;
+    if (state.session?.token) {
+      const payload = {};
+      definitions[table].fields.forEach((spec) => { payload[spec.name] = record[spec.name] ?? null; });
+      Object.assign(payload, patch);
+      setSync("Saving…", true);
+      try {
+        state.data[table][index] = await saveEntityRpc(table, record.id, payload, record.updated_at || null);
+      } catch (error) {
+        if (error.plannerCode === "PLANNER_CONFLICT") await loadAll();
+        toast(error.message, true);
+        setSync("Save failed", false);
+        return;
+      }
+      setSync("Securely synced", false);
+    } else {
+      state.data[table][index] = { ...record, ...patch, updated_at: new Date().toISOString() };
+      try {
+        localStorage.setItem("mxc-planner-browser-v3", JSON.stringify(state.data));
+      } catch (_error) {
+        // Browser storage can be unavailable in private windows; keep going.
+      }
+    }
+    renderAll();
   }
 
   async function deleteEntity() {
@@ -117,7 +171,7 @@
   }
 
   function tableForView(view) {
-    return ({ budget: "budget_items", guests: "guests", checkin: "guests", vendors: "vendors", timeline: "timeline_items", publishing: "content_blocks" })[view] || "tasks";
+    return ({ budget: "budget_items", guests: "guests", checkin: "guests", vendors: "vendors", timeline: "timeline_items", publishing: "content_blocks", honeymoon: "honeymoon_items" })[view] || "tasks";
   }
 
   function countStatuses(rows) {

@@ -1,3 +1,48 @@
+  const tableSort = {};
+
+  function applySort(rows, view) {
+    const sort = tableSort[view];
+    if (!sort) return rows;
+    const factor = sort.dir === "desc" ? -1 : 1;
+    const valueOf = (row) => (sort.key === "balance" ? balance(row) : row[sort.key]);
+    return [...rows].sort((a, b) => {
+      const aValue = valueOf(a);
+      const bValue = valueOf(b);
+      if (sort.type === "number") return factor * ((Number(aValue) || 0) - (Number(bValue) || 0));
+      if (sort.type === "date") return factor * compareDates(aValue, bValue);
+      return factor * String(aValue ?? "").localeCompare(String(bValue ?? ""), "en", { sensitivity: "base" });
+    });
+  }
+
+  function currentSearch(view) {
+    return document.querySelector(`[data-search-table="${view}"]`)?.value || "";
+  }
+
+  function bindSortHeaders() {
+    document.querySelectorAll("[data-sort-view] th[data-sort-key]").forEach((header) => {
+      header.addEventListener("click", () => {
+        const view = header.closest("[data-sort-view]").dataset.sortView;
+        const key = header.dataset.sortKey;
+        const previous = tableSort[view];
+        tableSort[view] = {
+          key,
+          type: header.dataset.sortType || "text",
+          dir: previous?.key === key && previous.dir === "asc" ? "desc" : "asc"
+        };
+        updateSortIndicators(view);
+        renderTableBySearch(view, currentSearch(view));
+      });
+    });
+  }
+
+  function updateSortIndicators(view) {
+    document.querySelector(`[data-sort-view="${view}"]`)?.querySelectorAll("th[data-sort-key]").forEach((header) => {
+      const active = tableSort[view]?.key === header.dataset.sortKey;
+      header.classList.toggle("sorted-asc", active && tableSort[view].dir === "asc");
+      header.classList.toggle("sorted-desc", active && tableSort[view].dir === "desc");
+    });
+  }
+
   function filtered(table, { ignoreOwner = false, ignoreCelebration = false } = {}) {
     return (state.data[table] || []).filter((row) => {
       const ownerMatch = ignoreOwner || !row.owner || row.owner === state.owner;
@@ -58,11 +103,30 @@
       container.innerHTML = rows.length ? rows.map(taskCard).join("") : empty(`Nothing ${status} here.`);
     });
     bindRowEditors(".task-card[data-id]", "tasks");
+    document.querySelectorAll(".task-quick button[data-quick-status]").forEach((button) => {
+      button.addEventListener("click", (event) => {
+        event.stopPropagation();
+        const record = state.data.tasks.find((task) => task.id === button.closest("[data-id]").dataset.id);
+        if (record) savePatch("tasks", record, { status: button.dataset.quickStatus });
+      });
+    });
+  }
+
+  const QUICK_STATUS_ACTIONS = {
+    outstanding: [["pending", "→ Pending"], ["approved", "✓ Approve"]],
+    pending: [["outstanding", "↩ Reopen"], ["approved", "✓ Approve"]],
+    approved: [["outstanding", "↩ Reopen"]]
+  };
+
+  function quickStatusButtons(task) {
+    const actions = QUICK_STATUS_ACTIONS[task.status] || [];
+    return `<div class="task-quick">${actions.map(([status, label]) => `<button type="button" data-quick-status="${escapeHtml(status)}">${escapeHtml(label)}</button>`).join("")}</div>`;
   }
 
   function renderBudget(search = "") {
     let rows = filtered("budget_items");
     rows = searchRows(rows, search, ["title", "category", "notes", "celebration"]);
+    rows = applySort(rows, "budget");
     const body = document.getElementById("budget-table-body");
     body.innerHTML = rows.length ? rows.map((item) => {
       const total = Number(item.estimated || 0);
@@ -79,16 +143,28 @@
   function renderGuests(search = "") {
     let rows = filtered("guests");
     rows = searchRows(rows, search, ["name", "party_name", "dietary", "transport", "accommodation", "notes"]);
+    rows = applySort(rows, "guests");
     const body = document.getElementById("guests-table-body");
-    body.innerHTML = rows.length ? rows.map((guest) => `<tr data-id="${guest.id}"><td><b>${escapeHtml(guest.name)}</b></td><td>${escapeHtml(guest.party_name || "—")}</td><td>${labelCelebration(guest.celebration)}</td><td><span class="status-badge ${guest.rsvp_status === "yes" ? "status-approved" : guest.rsvp_status === "no" ? "status-outstanding" : "status-pending"}">${escapeHtml(labelRsvp(guest.rsvp_status))}</span></td><td>${escapeHtml(guest.dietary || "—")}</td><td>${escapeHtml(guest.transport || "—")}</td><td>${escapeHtml(guest.accommodation || "—")}</td><td><span class="private-chip">${escapeHtml(guest.notes || "—")}</span></td></tr>`).join("") : tableEmpty(8, "No guest records in this planner lens.");
-    const yes = filtered("guests").filter((guest) => guest.rsvp_status === "yes").length;
-    text("guest-summary", `${filtered("guests").length} guests · ${yes} yes`);
+    body.innerHTML = rows.length ? rows.map((guest) => `<tr data-id="${guest.id}"><td><b>${escapeHtml(guest.name)}</b></td><td>${escapeHtml(guest.party_name || "—")}</td><td>${labelCelebration(guest.celebration)}</td><td><span class="status-badge ${guest.rsvp_status === "yes" ? "status-approved" : guest.rsvp_status === "no" ? "status-outstanding" : "status-pending"}">${escapeHtml(labelRsvp(guest.rsvp_status))}</span></td><td>${checkinBadge(guest)}</td><td>${escapeHtml(guest.dietary || "—")}</td><td>${escapeHtml(guest.transport || "—")}</td><td>${escapeHtml(guest.accommodation || "—")}</td><td><span class="private-chip">${escapeHtml(guest.notes || "—")}</span></td></tr>`).join("") : tableEmpty(9, "No guest records in this planner lens.");
+    const all = filtered("guests");
+    const yes = all.filter((guest) => guest.rsvp_status === "yes").length;
+    const checkedIn = all.filter((guest) => guest.check_in_status === "checked_in").length;
+    const dietary = all.filter((guest) => guest.dietary).length;
+    const transport = all.filter((guest) => guest.transport).length;
+    text("guest-summary", `${all.length} guests · ${yes} yes · ${checkedIn} checked in · ${dietary} dietary · ${transport} transport`);
     bindTableRows(body, "guests");
+  }
+
+  function checkinBadge(guest) {
+    if (guest.check_in_status === "checked_in") return '<span class="status-badge status-approved">Checked in</span>';
+    if (guest.check_in_status === "cant_make_it") return '<span class="status-badge status-outstanding">Can&#039;t make it</span>';
+    return '<span class="status-badge status-pending">Not yet</span>';
   }
 
   function renderVendors(search = "") {
     let rows = filtered("vendors");
     rows = searchRows(rows, search, ["name", "category", "contact_name", "email", "phone", "next_action", "notes"]);
+    rows = applySort(rows, "vendors");
     const body = document.getElementById("vendors-table-body");
     body.innerHTML = rows.length ? rows.map((vendor) => `<tr data-id="${vendor.id}"><td><b>${escapeHtml(vendor.name)}</b></td><td>${labelCelebration(vendor.celebration)}</td><td>${escapeHtml(vendor.category || "—")}</td><td>${escapeHtml(vendor.contact_name || "")}${vendor.email ? `<br><small>${escapeHtml(vendor.email)}</small>` : ""}${vendor.phone ? `<br><small>${escapeHtml(vendor.phone)}</small>` : ""}</td><td class="money">${vendor.quote_amount ? formatMoney(vendor.quote_amount, vendor.currency) : "—"}</td><td>${escapeHtml(vendor.next_action || "—")}</td><td>${formatDate(vendor.due_date)}</td><td>${statusBadge(vendor.status)}</td></tr>`).join("") : tableEmpty(8, "No suppliers in this planner lens.");
     text("vendor-summary", `${filtered("vendors").length} suppliers`);
@@ -99,6 +175,7 @@
     let rows = filtered("timeline_items");
     rows = searchRows(rows, search, ["title", "location", "notes", "audience"]);
     rows.sort(sortByDate("item_date"));
+    rows = applySort(rows, "timeline");
     const body = document.getElementById("timeline-table-body");
     body.innerHTML = rows.length ? rows.map((item) => `<tr data-id="${item.id}"><td><b>${formatDate(item.item_date, { short: false })}</b></td><td>${escapeHtml(item.item_time?.slice(0, 5) || "—")}</td><td><b>${escapeHtml(item.title)}</b><br><small>${escapeHtml(item.notes || "")}</small></td><td>${labelCelebration(item.celebration)}</td><td>${ownerTag(item.owner)}</td><td>${escapeHtml(item.audience === "guest" ? "Guest-facing" : "Private")}</td><td>${escapeHtml(item.location || "—")}</td><td>${statusBadge(item.status)}</td></tr>`).join("") : tableEmpty(8, "No timeline items in this planner lens.");
     text("timeline-summary", `${filtered("timeline_items").length} milestones`);
@@ -115,7 +192,7 @@
   }
 
   function taskCard(task) {
-    return `<article class="task-card" data-id="${task.id}"><div class="task-card-meta">${ownerTag(task.owner)}<span class="mini-tag ${task.celebration}">${escapeHtml(labelCelebration(task.celebration))}</span>${task.priority === "high" ? '<span class="mini-tag" style="background:#f6e0db;color:#8d463b">High priority</span>' : ""}</div><h4>${escapeHtml(task.title)}</h4>${task.description ? `<p>${escapeHtml(truncate(task.description, 150))}</p>` : ""}<div class="task-card-foot"><span>${escapeHtml(task.category || "General")}</span><span>${task.due_date ? formatDate(task.due_date) : "No date"}</span></div></article>`;
+    return `<article class="task-card" data-id="${task.id}"><div class="task-card-meta">${ownerTag(task.owner)}<span class="mini-tag ${task.celebration}">${escapeHtml(labelCelebration(task.celebration))}</span>${task.priority === "high" ? '<span class="mini-tag" style="background:#f6e0db;color:#8d463b">High priority</span>' : ""}</div><h4>${escapeHtml(task.title)}</h4>${task.description ? `<p>${escapeHtml(truncate(task.description, 150))}</p>` : ""}<div class="task-card-foot"><span>${escapeHtml(task.category || "General")}</span><span>${task.due_date ? formatDate(task.due_date) : "No date"}</span></div>${quickStatusButtons(task)}</article>`;
   }
 
   function actionRow(task) {
@@ -131,7 +208,7 @@
     if (history.replaceState) history.replaceState(null, "", `#${state.view}`);
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === state.view));
-    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", checkin: "Guest Check-In", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing" }[state.view] || "Planner";
+    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", checkin: "Guest Check-In", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing", honeymoon: "Honeymoon" }[state.view] || "Planner";
     els.topbarTitle.textContent = label;
     els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner · ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
     const addButton = document.getElementById("global-add");
@@ -158,4 +235,43 @@
     if (key === "vendors") renderVendors(value);
     if (key === "timeline") renderTimeline(value);
   }
+
+  const CSV_EXPORTS = {
+    budget_items: { view: "budget", file: "budget", columns: ["title", "celebration", "category", "currency", "estimated", "deposit", "paid", "balance", "due_date", "status", "notes"] },
+    guests: { view: "guests", file: "guest-register", columns: ["name", "party_name", "celebration", "rsvp_status", "check_in_status", "checked_in_at", "dietary", "transport", "accommodation", "contact", "notes"] },
+    vendors: { view: "vendors", file: "suppliers", columns: ["name", "celebration", "category", "contact_name", "email", "phone", "currency", "quote_amount", "next_action", "due_date", "status", "notes"] },
+    timeline_items: { view: "timeline", file: "timeline", columns: ["item_date", "item_time", "title", "celebration", "owner", "audience", "location", "sort_order", "status", "notes"] }
+  };
+
+  function exportCsv(table) {
+    const spec = CSV_EXPORTS[table];
+    if (!spec) return;
+    const rows = applySort(filtered(table), spec.view);
+    const cell = (value) => {
+      let text = String(value ?? "");
+      // Free-text fields come from guest check-ins; neutralise formula prefixes.
+      if (/^[=+\-@\t\r]/.test(text)) text = `'${text}`;
+      return `"${text.replaceAll('"', '""')}"`;
+    };
+    const lines = [
+      spec.columns.map(cell).join(","),
+      ...rows.map((row) => spec.columns.map((column) => cell(column === "balance" ? balance(row) : row[column])).join(","))
+    ];
+    const blob = new Blob([`﻿${lines.join("\r\n")}`], { type: "text/csv;charset=utf-8" });
+    const link = document.createElement("a");
+    link.href = URL.createObjectURL(blob);
+    link.download = `mxc-${spec.file}-${new Date().toISOString().slice(0, 10)}.csv`;
+    document.body.appendChild(link);
+    link.click();
+    link.remove();
+    URL.revokeObjectURL(link.href);
+    toast(`${rows.length} rows exported. Keep this file private.`);
+  }
+
+  /* Static header/toolbar controls exist in planner.html before any script
+     runs (all scripts are deferred), so they are bound once at load. */
+  document.querySelectorAll("[data-export-csv]").forEach((button) => {
+    button.addEventListener("click", () => exportCsv(button.dataset.exportCsv));
+  });
+  bindSortHeaders();
 

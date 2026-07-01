@@ -1,8 +1,26 @@
   const PLANNER_SESSION_KEY = "mxc-planner-session-v1";
+  const REFRESH_MIN_INTERVAL_MS = 60_000;
+  const REFRESH_PERIOD_MS = 5 * 60_000;
+  let lastLoadedAt = 0;
+
+  /* The database raises structured PLANNER_* codes (20260701 migration); the
+     legacy message strings are still matched so either side can deploy first. */
+  const PLANNER_ERROR_COPY = {
+    PLANNER_SESSION_EXPIRED: "Your planner session expired. Please sign in again.",
+    PLANNER_INVALID_CREDENTIALS: "That username or password is not right.",
+    PLANNER_LOCKED: "Too many attempts. Try again in a few minutes.",
+    PLANNER_CONFLICT: "This record changed since you opened it. The planner has refreshed — please re-apply your edit.",
+    PLANNER_RECORD_NOT_FOUND: "That record no longer exists.",
+    PLANNER_UNSUPPORTED_TABLE: "That planner section is not supported yet."
+  };
+
+  function plannerErrorCode(error) {
+    return (error?.message || "").match(/^PLANNER_[A-Z_]+/)?.[0] || null;
+  }
 
   async function init() {
     const requestedView = location.hash.replace(/^#/, "");
-    if (["overview", "tasks", "budget", "guests", "checkin", "vendors", "timeline", "publishing"].includes(requestedView)) state.view = requestedView;
+    if (PLANNER_VIEWS.includes(requestedView)) state.view = requestedView;
     bindUi();
     if (!configured) {
       els.setupCard.hidden = false;
@@ -15,6 +33,7 @@
       auth: { persistSession: false, autoRefreshToken: false, detectSessionInUrl: false }
     });
 
+    bindFreshness();
     await restorePlannerSession();
   }
 
@@ -70,7 +89,7 @@
         p_username: username,
         p_password: password
       }, { allowExpired: true });
-      storePlannerSession(response);
+      storePlannerSession(response, document.getElementById("login-remember")?.checked ?? true);
       els.loginPassword.value = "";
       state.session = { token: response.session_token, expires_at: response.expires_at, user: { username: response.identity.username } };
       state.identity = response.identity;
@@ -124,6 +143,7 @@
     setSync("Syncing...", true);
     try {
       const data = await plannerRpc("planner_load_all", { p_session_token: state.session.token });
+      lastLoadedAt = Date.now();
       Object.keys(state.data).forEach((table) => {
         state.data[table] = Array.isArray(data?.[table]) ? data[table] : [];
       });
@@ -135,6 +155,7 @@
       switchView(state.view, false);
       renderAll();
       setSync("Securely synced", false);
+      announcePlannerReady();
     } catch (error) {
       toast(error.message || "Could not load planner data.", true);
       setSync("Sync problem", false);
@@ -144,30 +165,54 @@
   async function plannerRpc(name, payload = {}, options = {}) {
     const { data, error } = await state.client.rpc(name, payload);
     if (error) {
-      const expired = /session expired|invalid username|password|too many attempts/i.test(error.message || "");
+      const code = plannerErrorCode(error);
+      const expired = code === "PLANNER_SESSION_EXPIRED"
+        || (!code && /session expired|invalid username|password|too many attempts/i.test(error.message || ""));
       if (expired && !options.allowExpired) {
         clearStoredSession();
         state.session = null;
         state.identity = null;
-        setAuthStatus("Your planner session expired. Please sign in again.", true);
+        setAuthStatus(PLANNER_ERROR_COPY.PLANNER_SESSION_EXPIRED, true);
         showAuth();
       }
-      throw new Error(error.message || "Planner request failed.");
+      const friendly = new Error(PLANNER_ERROR_COPY[code] || error.message || "Planner request failed.");
+      friendly.plannerCode = code;
+      friendly.rawMessage = error.message || "";
+      throw friendly;
     }
     return data;
   }
 
-  function storePlannerSession(response) {
-    localStorage.setItem(PLANNER_SESSION_KEY, JSON.stringify({
+  /* Two people share this planner. Re-fetch when the window regains focus and
+     on a slow heartbeat so neither of them works from stale records. */
+  async function refreshPlanner() {
+    if (!state.session?.token || document.hidden || state.editing) return;
+    if (Date.now() - lastLoadedAt < REFRESH_MIN_INTERVAL_MS) return;
+    await loadAll();
+  }
+
+  function bindFreshness() {
+    window.addEventListener("focus", () => { refreshPlanner(); });
+    document.addEventListener("visibilitychange", () => { if (!document.hidden) refreshPlanner(); });
+    window.setInterval(() => { refreshPlanner(); }, REFRESH_PERIOD_MS);
+  }
+
+  /* "Keep me signed in" controls which storage holds the token: localStorage
+     survives closing the browser, sessionStorage ends with the tab. Sessions
+     also renew server-side on every authenticated call. */
+  function storePlannerSession(response, remember = true) {
+    const record = JSON.stringify({
       token: response.session_token,
       expires_at: response.expires_at,
       username: response.identity?.username || ""
-    }));
+    });
+    clearStoredSession();
+    (remember ? localStorage : sessionStorage).setItem(PLANNER_SESSION_KEY, record);
   }
 
   function readStoredSession() {
     try {
-      return JSON.parse(localStorage.getItem(PLANNER_SESSION_KEY) || "null");
+      return JSON.parse(localStorage.getItem(PLANNER_SESSION_KEY) || sessionStorage.getItem(PLANNER_SESSION_KEY) || "null");
     } catch (_error) {
       clearStoredSession();
       return null;
@@ -176,6 +221,7 @@
 
   function clearStoredSession() {
     localStorage.removeItem(PLANNER_SESSION_KEY);
+    sessionStorage.removeItem(PLANNER_SESSION_KEY);
   }
 
   function renderAll() {
@@ -183,8 +229,10 @@
     renderTasks();
     renderBudget();
     renderGuests();
+    renderCheckin();
     renderVendors();
     renderTimeline();
     renderPublishing();
+    renderHoneymoon();
   }
 
