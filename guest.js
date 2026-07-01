@@ -8,26 +8,14 @@
   const menuButton = document.querySelector(".menu-button");
   const publicNav = document.querySelector(".public-nav");
 
-  const BUILT_IN_FAQS = [
-    { title: "What is the wedding theme?", body: "Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged. Don't have a cowboy hat? We'll provide one for you." },
-    { title: "What can I expect on the day?", body: "Food, drinks, laughs and a relaxed Rodeo-style celebration. Depending on which wedding you are attending, there will be small Western-inspired games and entertainment, such as horseshoe toss and other fun touches to keep the day moving." },
-    { title: "What kind of food will there be?", body: "Expect a Western-inspired feast: BBQ and braai-style meats, with much of the food cooked over open fire. There will be options for lighter grazers as well as those who want something more hearty." },
-    { title: "What should we wear?", body: "The dress feel is Rodeo Western. Cowboy boots, hats, leather, denim, belts, bolo ties, fringe, country shirts and country-style dresses are welcome and encouraged. Choose shoes that work on gardens, lawns and a dancefloor." },
-    { title: "Is everything in the same location?", body: "Yes. The ceremony, food, drinks and celebration are all planned around the same venue, so once you arrive you can settle in and enjoy the day without moving between locations." },
-    { title: "Is the wedding indoors or outdoors?", body: "The wedding has a country/Rodeo feel and is planned as an outdoor celebration. If the weather turns, there will be cover under a tent or suitable shelter so the day can keep flowing comfortably." },
-    { title: "How early can I arrive?", body: "You may arrive up to two hours before the official start time if you need to. Please note that the bar will remain closed until the official kick-off time, so arriving early is mainly for settling in and avoiding a rush." },
-    { title: "What are the timings for the day?", body: "We will keep the day running with clear start and stop times, so please arrive promptly and avoid being late. If you want a drink before the ceremony, please grab it before the bar closes for the ceremony start. Final timings will be shared closer to the day." },
-    { title: "Will there be wedding-day transport?", body: "We are planning route groups for Spain and South Africa. Final pickup locations depend on where guests stay, so please answer the check-in transport questions promptly when they are sent." },
-    { title: "Is there parking at the venue?", body: "Yes, there will be parking available at the venue. We will share any final parking or arrival notes closer to the wedding date." },
-    { title: "Can children come?", body: "Children are very welcome. We will provide things to help keep them entertained, and there will be people nearby to keep a friendly eye on them, but parents and guardians remain responsible for their children throughout the celebration." },
-    { title: "What gifts should I bring?", body: "Your presence is the main thing. If you would like to give a gift, a cash or EFT contribution is most helpful and very appreciated. We can accept EUR or ZAR; please message Matt or Cara privately for the right banking details." },
-    { title: "Can I take photos or post online?", body: "You are welcome to take a few personal photos, but please do not post the day publicly online without our permission. This is a private, intimate celebration and we have invested in a professional photography team. We will also use a private social wall, Walls.io, so guests can share moments in a more controlled and private way." },
-    { title: "What is Walls.io?", body: "Walls.io is a private social media wall for the wedding. Instead of everyone posting publicly, guests can share selected photos and messages into one private wedding feed. It lets us collect the fun moments while keeping the day more intimate and controlled. We will share the details closer to the time." },
-    { title: "When should we book flights?", body: "Once your attendance is confirmed, begin tracking routes and book when the itinerary and price feel right. Prefer flexible fares where possible because regional routes and timings can change." }
-  ];
+  /* index.html is the single source of the built-in guest FAQs. They are read
+     from the markup once, then live FAQs published from the couple portal are
+     merged in by topic so duplicated questions cannot appear. */
+  const STATIC_FAQS = [...document.querySelectorAll("#faq-list details")].map((entry) => ({
+    title: entry.querySelector("summary")?.textContent.trim() || "",
+    body: entry.querySelector("p")?.textContent.trim() || ""
+  }));
 
-  installRodeoTheme();
-  renderFaqList();
   installCheckInLinks();
 
   menuButton?.addEventListener("click", () => {
@@ -124,54 +112,12 @@
     }
   };
 
-  function installRodeoTheme() {
-    const heroDeck = document.querySelector(".hero-deck");
-    if (heroDeck) heroDeck.textContent = "We're embracing our love of Western music and great BBQ food with Rodeo-style wedding celebrations in Spain and South Africa.";
-    const introHeading = document.querySelector(".intro-section h2");
-    if (introHeading) introHeading.innerHTML = "Western music, great BBQ,<br>and the people we love.";
-    const introCopy = document.querySelector(".intro-copy");
-    if (introCopy) introCopy.textContent = "Both celebrations will carry the same Rodeo-style spirit: relaxed Western energy, good food, good music, cowboy boots, hats, leather and denim welcome.";
-
-    const liveUpdates = document.getElementById("live-updates");
-    if (liveUpdates && !document.getElementById("rodeo-theme-note")) {
-      const theme = document.createElement("div");
-      theme.id = "rodeo-theme-note";
-      theme.className = "live-note-grid live-note-grid-dark";
-      theme.innerHTML = `
-        <article class="live-note-card"><span>Wedding theme</span><h3>Rodeo-style celebration</h3><p>We're embracing our love of Western music and great BBQ food by hosting Rodeo-style weddings. Cowboy boots, hats, leather and denim are welcome, and encouraged.</p></article>
-        <article class="live-note-card"><span>What to wear</span><h3>Western, comfortable, celebration-ready</h3><p>Think boots, hats, denim, leather, belts, bolo ties, fringe, country shirts and dresses that can handle gardens, lawns and a dancefloor.</p></article>`;
-      liveUpdates.appendChild(theme);
-    }
-
-    [
-      { selector: "#spain", copy: "Spain will bring the Rodeo spirit to the Andalusian countryside: Western music, BBQ food, boots, hats, denim and leather against a finca backdrop." },
-      { selector: "#south-africa", copy: "South Africa will carry the same Rodeo-style energy in the KZN Midlands: great BBQ food, Western music, cowboy boots, hats, leather and denim encouraged." }
-    ].forEach(({ selector, copy }) => {
-      const block = document.querySelector(selector);
-      if (!block) return;
-      const lead = block.querySelector(".event-lead");
-      if (lead) lead.textContent = copy;
-      const dress = [...block.querySelectorAll("dt")].find((item) => item.textContent.trim().toLowerCase() === "dress feel");
-      if (dress?.nextElementSibling) dress.nextElementSibling.textContent = "Rodeo Western";
-      const note = block.querySelector(".note-box");
-      if (note) note.innerHTML = "<b>Rodeo-style dress code.</b> Cowboy boots, hats, leather and denim are welcome, and encouraged. Dress for good BBQ, Western music, outdoor spaces and a proper dancefloor.";
-    });
-
-    const practicalIntro = document.querySelector(".practical-intro h2");
-    if (practicalIntro) practicalIntro.innerHTML = "Pack for the Rodeo,<br>not just the photograph.";
-    const practicalCards = [...document.querySelectorAll(".practical-grid article")];
-    if (practicalCards[2]) {
-      practicalCards[2].querySelector("h3").textContent = "Boots, hats, denim";
-      practicalCards[2].querySelector("p").textContent = "Cowboy boots, hats, leather and denim are welcome and encouraged. Choose shoes that work on gardens, lawns and country surfaces.";
-    }
-  }
-
   function renderFaqList(liveFaqs = []) {
     const faqList = document.getElementById("faq-list");
-    if (!faqList) return;
+    if (!faqList || !liveFaqs.length) return;
     const seen = new Set();
     const finalFaqs = [];
-    [...BUILT_IN_FAQS, ...liveFaqs.map((faq) => ({ title: faq.title, body: faq.body }))].forEach((faq) => {
+    [...STATIC_FAQS, ...liveFaqs.map((faq) => ({ title: faq.title, body: faq.body }))].forEach((faq) => {
       const key = normalizeFaqTitle(faq.title);
       if (!faq.title || !faq.body || seen.has(key)) return;
       seen.add(key);

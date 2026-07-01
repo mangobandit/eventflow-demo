@@ -4,7 +4,7 @@
   "version": "1.4.1",
   "description": "Matt and Cara wedding guest guide, couple planner, honeymoon portal, chat concierge and guest check-in control centre.",
   "scripts": {
-    "check:js": "node --check guest.js && node --check rsvp.js && node --check planner-core.js && node --check planner-auth.js && node --check planner-views.js && node --check planner-forms.js && node --check planner-rsvp.js && node --check planner-access.js && node --check planner-extra-tasks.js && node --check planner-checkin.js && node --check planner-honeymoon.js && node --check wedding-chat.js && node --check guest-children-note.js && node --check wedding-chat-family.js && node --check wedding-chat-checkin.js && node --check sw.js",
+    "check:js": "node --check guest.js && node --check rsvp.js && node --check planner-core.js && node --check planner-auth.js && node --check planner-views.js && node --check planner-forms.js && node --check planner-rsvp.js && node --check planner-access.js && node --check planner-extra-tasks.js && node --check planner-checkin.js && node --check planner-honeymoon.js && node --check wedding-chat.js && node --check wedding-chat-family.js && node --check wedding-chat-checkin.js && node --check sw.js",
     "test:contracts": "node tests/rsvp-contract.mjs",
     "test": "npm run check:js && npm run test:contracts"
   }

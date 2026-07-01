@@ -161,11 +161,11 @@
     if (document.querySelector('script[data-mxc-rsvp-admin]')) return;
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
-    stylesheet.href = "planner-rsvp.css?v=20260630-user-login";
+    stylesheet.href = "planner-rsvp.css?v=20260701-guest-portal-upgrade";
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20260630-user-login";
+    script.src = "planner-rsvp.js?v=20260701-guest-portal-upgrade";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

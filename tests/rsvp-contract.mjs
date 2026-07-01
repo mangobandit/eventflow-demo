@@ -6,6 +6,7 @@ const root = resolve(import.meta.dirname, "..");
 const read = (file) => readFileSync(resolve(root, file), "utf8");
 
 const checkinPage = read("rsvp.html");
+const guestPage = read("index.html");
 const guest = read("guest.js");
 const checkinScript = read("rsvp.js");
 const planner = read("planner.html");
@@ -69,14 +70,17 @@ const expectedFaqs = [
   "When should we book flights?"
 ];
 
-expectedFaqs.forEach((title) => assert.match(guest, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
-assert.match(guest, /const BUILT_IN_FAQS = \[/);
-assert.match(guest, /Don't have a cowboy hat\? We'll provide one for you\./);
+// index.html is the single source of built-in FAQ and Rodeo theme copy.
+expectedFaqs.forEach((title) => assert.match(guestPage, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
+assert.match(guestPage, /Don't have a cowboy hat\? We'll provide one for you\./);
+assert.match(guestPage, /Rodeo Western/, "the Rodeo dress feel must be baked into the markup, not patched by JS");
+assert.doesNotMatch(guestPage, /Elegant finca|Country summer|Can children attend/, "stale pre-Rodeo copy must not reappear in the markup");
+assert.match(guest, /const STATIC_FAQS = /, "guest.js must read built-in FAQs from the markup");
+assert.doesNotMatch(guest, /BUILT_IN_FAQS|installRodeoTheme/, "the runtime theme/FAQ patch layer must stay deleted");
 assert.match(guest, /const CHECK_IN_ENABLED = true;/, "guest check-in must stay visible after RSVP is archived");
 assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visibility must be controlled separately from archived RSVP");
 assert.match(guest, /function normalizeFaqTitle/);
 assert.match(guest, /renderFaqList\(faqs\)/);
-assert.doesNotMatch(guest, /Can children attend/);
 assert.match(guest, /Guest Check-In/);
 assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"/);
 
