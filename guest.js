@@ -17,6 +17,7 @@
   }));
 
   installCheckInLinks();
+  installFinalWeekBanner();
 
   menuButton?.addEventListener("click", () => {
     const open = document.body.classList.toggle("menu-open");
@@ -54,7 +55,27 @@
     });
   };
   updateCountdowns();
-  window.setInterval(updateCountdowns, 60_000);
+  window.setInterval(() => {
+    updateCountdowns();
+    installFinalWeekBanner();
+  }, 60_000);
+
+  function installFinalWeekBanner() {
+    if (document.querySelector(".final-week-banner")) return;
+    const now = Date.now();
+    const upcoming = [...document.querySelectorAll("[data-countdown]")]
+      .map((card) => ({
+        label: card.querySelector("span")?.textContent || "The",
+        days: Math.ceil((Date.parse(card.dataset.countdown || "") - now) / 86_400_000)
+      }))
+      .find((wedding) => wedding.days >= 0 && wedding.days <= 7);
+    if (!upcoming) return;
+    const banner = document.createElement("aside");
+    banner.className = "final-week-banner";
+    const countdown = upcoming.days === 0 ? "It's today!" : `${upcoming.days} day${upcoming.days === 1 ? "" : "s"} to go.`;
+    banner.innerHTML = `<p><b>${escapeHtml(upcoming.label)} wedding week.</b> ${countdown} Please confirm your household and watch Live updates for final transport and timing notes.</p><a class="button button-light" href="${getCheckInHref()}">Open Guest Check-In</a>`;
+    document.querySelector(".public-header")?.insertAdjacentElement("afterend", banner);
+  }
 
   const tabButtons = [...document.querySelectorAll("[data-tab]")];
   tabButtons.forEach((button) => {

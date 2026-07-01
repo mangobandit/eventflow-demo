@@ -27,8 +27,4 @@ window.addEventListener("load", () => {
   }
 
   addScript("wedding-chat.js", "mxc-chat");
-  if (isGuest) {
-    addScript("wedding-chat-family.js", "mxc-family-chat");
-    addScript("wedding-chat-checkin.js", "mxc-checkin-chat");
-  }
 });

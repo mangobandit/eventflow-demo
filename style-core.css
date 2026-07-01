@@ -113,3 +113,6 @@ img { max-width: 100%; }
 .announcement-history span { color: #c8d0c2; font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
 .announcement-history h3 { margin: 8px 0 6px; font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.2; }
 .announcement-history p { margin: 0; color: #dbe0d7; font-size: 12px; line-height: 1.65; }
+.final-week-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 22px; padding: 14px 4vw; background: var(--clay, #a3552f); color: #fff; text-align: center; }
+.final-week-banner p { margin: 0; font-size: 13px; line-height: 1.55; }
+.final-week-banner .button { min-height: 38px; padding: 0 18px; font-size: 11px; }

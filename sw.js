@@ -15,7 +15,11 @@ self.addEventListener("fetch", (event) => {
   if (request.method !== "GET") return;
   const url = new URL(request.url);
   const privatePath = url.pathname.includes("planner") || url.pathname.includes("rsvp") || url.pathname.includes("check-in") || url.pathname.endsWith("config.js");
-  if (url.origin !== self.location.origin || privatePath || url.search) return;
+  if (url.origin !== self.location.origin || privatePath) return;
+  // Version-tagged requests are handled only when precached, so the offline
+  // shell keeps its styles and scripts without caching arbitrary query URLs.
+  const precached = PUBLIC_ASSETS.includes(`${url.pathname}${url.search}`);
+  if (url.search && !precached) return;
   event.respondWith(fetch(request).then((response) => {
     if (response.ok) caches.open(CACHE).then((cache) => cache.put(request, response.clone()));
     return response;
