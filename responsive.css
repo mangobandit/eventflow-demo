@@ -70,6 +70,7 @@
   .event-content h2 { font-size: 54px; }
   .event-lead { font-size: 19px; }
   .detail-grid { grid-template-columns: 1fr 1fr; }
+  .run-sheet { grid-template-columns: 1fr; }
   .detail-grid > div { padding: 16px 12px; }
   .countdown-section { padding: 70px 20px; }
   .countdown-grid { grid-template-columns: 1fr 1fr; gap: 8px; }

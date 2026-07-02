@@ -72,6 +72,21 @@ const expectedFaqs = [
   "When should we book flights?"
 ];
 
+// Content cross-checked against the original mxcwedding.squarespace.com
+// pages (July 2026): gifts wording, run sheets and shuttle details must
+// keep matching what guests were originally told.
+assert.match(guestPage, /No need for gifts! Just grab your boots and join us\. Your presence is the greatest gift we could ask for\./);
+assert.doesNotMatch(guestPage, /cash or EFT|banking details/i, "the original site asks for no gifts; money-gift copy must not return");
+assert.match(guestPage, /Join us for our first celebration in this Spanish finca surrounded by gardens with views over Sierra de Grazalema\./);
+assert.match(guestPage, /Join us for our second celebration in the Midlands Meander of KwaZulu-Natal\./);
+["17:30", "18:00", "18:30", "19:30", "20:30", "21:00", "23:30"].forEach((time) => assert.match(guestPage, new RegExp(`<li><b>${time}</b>`)));
+["16:30", "19:00", "20:00", "23:00"].forEach((time) => assert.match(guestPage, new RegExp(`<li><b>${time}</b>`)));
+assert.match(guestPage, /shuttle bus runs from Chiclana to the venue \(departing 16:45\)/i);
+assert.match(guestPage, /Durban \(via Howick\) to the venue departing 15:30/);
+assert.match(guestPage, /Istanbul \(Turkish Airlines\) or Dubai \(Emirates\)/);
+assert.match(guestPage, /we recommend Safair/);
+assert.match(guestPage, /uMhlanga and Ballito/);
+
 // index.html is the single source of built-in FAQ and Rodeo theme copy.
 expectedFaqs.forEach((title) => assert.match(guestPage, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
 assert.match(guestPage, /Don't have a cowboy hat\? We'll provide one for you\./);
