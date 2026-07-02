@@ -1,0 +1,37 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Matt & Cara Wedding House//Guest Guide//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VTIMEZONE
+TZID:Africa/Johannesburg
+BEGIN:STANDARD
+DTSTART:19700101T000000
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0200
+TZNAME:SAST
+END:STANDARD
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:mxc-wedding-south-africa-2026@mxcwedding.com
+DTSTAMP:20260701T090000Z
+DTSTART;TZID=Africa/Johannesburg:20261219T163000
+DTEND;TZID=Africa/Johannesburg:20261219T233000
+SUMMARY:Matt & Cara · South Africa Wedding
+LOCATION:Mission House\, Curry's Post\, KwaZulu-Natal Midlands\, South Af
+ rica
+DESCRIPTION:Rodeo-style wedding celebration.\nGuest arrival 16:30 · Cerem
+ ony 17:30 · Celebration ends 23:30.\nShuttle bus from Durban (via Howick
+ ) departs 15:30; return shuttle from the venue departs 23:00. Parking at
+  the venue.\nDress feel: Rodeo Western — cowboy boots\, hats\, leather a
+ nd denim welcome and encouraged.\nGuest guide: https://mxcwedding.com
+URL:https://mxcwedding.com
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Matt & Cara · South Africa Wedding tomorrow
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

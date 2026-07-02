@@ -78,3 +78,83 @@
 .loading-shell { display: grid; min-height: 60vh; place-items: center; color: var(--ink-soft); text-align: center; }
 .spinner { width: 34px; height: 34px; margin: 0 auto 14px; border: 3px solid rgba(77,90,67,.18); border-top-color: var(--olive); border-radius: 50%; animation: spin .8s linear infinite; }
 @keyframes spin { to { transform: rotate(360deg); } }
+
+.table-toolbar-side { display: flex; align-items: center; gap: 12px; }
+.data-table th[data-sort-key] { cursor: pointer; user-select: none; }
+.data-table th[data-sort-key]:hover { color: var(--ink); }
+.data-table th.sorted-asc:after { content: " ↑"; }
+.data-table th.sorted-desc:after { content: " ↓"; }
+.task-quick { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.task-quick button { min-height: 26px; padding: 0 9px; border: 1px solid var(--line); border-radius: 999px; background: rgba(255,255,255,.72); cursor: pointer; color: var(--ink-soft); font-size: 8px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+.task-quick button:hover { color: #fff; border-color: var(--olive); background: var(--olive); }
+
+/* Guest Check-In view */
+.checkin-kpis{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:10px;margin-bottom:14px}
+.checkin-kpi{padding:16px;border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.74);box-shadow:var(--shadow-sm)}
+.checkin-kpi span{display:block;color:var(--ink-soft);font-size:8px;font-weight:850;letter-spacing:.11em;text-transform:uppercase}
+.checkin-kpi b{display:block;margin-top:12px;font-family:var(--serif);font-size:31px;font-weight:500;line-height:1}
+.checkin-kpi small{display:block;margin-top:8px;color:var(--ink-soft);font-size:9px;line-height:1.4}
+.checkin-grid{display:grid;grid-template-columns:1.2fr .8fr;gap:14px;margin-bottom:14px}
+.checkin-venue-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.checkin-venue-block{padding:15px;border:1px solid var(--line);border-radius:14px;background:#fffefa}
+.checkin-venue-block h4{margin:0;font-family:var(--serif);font-size:24px;font-weight:500}
+.checkin-venue-block p{margin:5px 0 14px;color:var(--ink-soft);font-size:10px}
+.checkin-meter{height:8px;overflow:hidden;border-radius:999px;background:#eee5d8}
+.checkin-meter i{display:block;height:100%;background:var(--olive);border-radius:inherit}
+.checkin-stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.checkin-stat{padding:10px;border:1px solid rgba(48,54,44,.11);border-radius:10px;background:rgba(255,255,255,.64)}
+.checkin-stat span{display:block;color:var(--ink-soft);font-size:7px;font-weight:850;letter-spacing:.1em;text-transform:uppercase}
+.checkin-stat b{display:block;margin-top:5px;font-size:17px}
+.checkin-copy textarea{width:100%;min-height:112px;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;font-size:12px;line-height:1.5}
+.checkin-copy button{margin-top:10px}
+.checkin-attention{display:grid;gap:8px;margin-top:14px}
+.guest-list-tracker{overflow:hidden}
+.guest-list-tracker .panel-head{align-items:flex-start;gap:14px}
+.checkin-filters{display:flex;flex-wrap:wrap;gap:7px;justify-content:flex-end}
+.checkin-filter{min-height:30px;padding:0 10px;border:1px solid var(--line);border-radius:999px;background:transparent;cursor:pointer;color:var(--ink);font-size:8px;font-weight:850;letter-spacing:.07em;text-transform:uppercase}
+.checkin-filter.active{color:#fff;background:var(--olive-dark);border-color:var(--olive-dark)}
+.checkin-list-section{padding:0 18px 18px}
+.checkin-list-section h4{margin:4px 0 10px;color:var(--ink-soft);font-size:8px;font-weight:850;letter-spacing:.13em;text-transform:uppercase}
+.checkin-list{display:grid;gap:8px}
+.checkin-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center;padding:13px;border:1px solid var(--line);border-radius:12px;background:#fffefa;cursor:pointer;transition:transform .16s ease,box-shadow .16s ease}
+.checkin-row:hover{transform:translateY(-1px);box-shadow:var(--shadow-sm)}
+.checkin-row b{display:block;font-family:var(--serif);font-size:18px;font-weight:500}
+.checkin-row small{display:block;margin-top:4px;color:var(--ink-soft);font-size:9px;line-height:1.5}
+.checkin-row-states{display:flex;flex-wrap:wrap;gap:6px;justify-content:flex-end}
+.checkin-pill{display:inline-flex;min-height:24px;align-items:center;padding:0 8px;border-radius:999px;font-size:7px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.checkin-pill.good{color:#376047;background:#e0eee5}
+.checkin-pill.warn{color:#815d28;background:#f6ecd6}
+.checkin-pill.bad{color:#8b493e;background:#f7e5e1}
+.checkin-pill.muted{color:#5e6658;background:#edf0e9}
+@media(max-width:1180px){.checkin-kpis{grid-template-columns:repeat(3,1fr)}.checkin-grid,.checkin-venue-grid{grid-template-columns:1fr}}
+@media(max-width:720px){.checkin-kpis{grid-template-columns:repeat(2,1fr)}.guest-list-tracker .panel-head,.checkin-row{grid-template-columns:1fr}.checkin-filters,.checkin-row-states{justify-content:flex-start}}
+
+/* Honeymoon view */
+.honeymoon-hero{position:relative;overflow:hidden;border:1px solid var(--line);border-radius:var(--radius);padding:30px;background:linear-gradient(135deg,#fffefa,#efe4d8);box-shadow:var(--shadow-sm)}
+.honeymoon-hero:after{content:"";position:absolute;right:-46px;bottom:-46px;width:190px;height:150px;opacity:.08;background:var(--olive-dark);-webkit-mask:url('assets/mxc-logo.svg') center/contain no-repeat;mask:url('assets/mxc-logo.svg') center/contain no-repeat}
+.honeymoon-hero h2{margin:0;font-family:var(--serif);font-size:clamp(40px,5vw,74px);font-weight:400;line-height:.95}
+.honeymoon-hero p{max-width:760px;color:var(--ink-soft);line-height:1.65}
+.honeymoon-tabs{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0}
+.honeymoon-tabs button{min-height:38px;border:1px solid var(--line);border-radius:999px;background:#fff;cursor:pointer;padding:0 13px;font-size:9px;font-weight:850;letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.honeymoon-tabs button.active{background:var(--olive-dark);border-color:var(--olive-dark);color:#fff}
+.honeymoon-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.honeymoon-two{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.hm-card{border:1px solid var(--line);border-radius:var(--radius);background:rgba(255,255,255,.75);box-shadow:var(--shadow-sm);padding:20px}
+.hm-card h3{margin:0 0 12px;font-family:var(--serif);font-size:25px;font-weight:500}
+.hm-card p,.hm-card li{color:var(--ink-soft);font-size:12px;line-height:1.65}
+.hm-list{display:grid;gap:8px}
+.hm-item{display:grid;grid-template-columns:auto 1fr auto;gap:10px;align-items:start;padding:12px;border:1px solid var(--line);border-radius:12px;background:#fffefa;cursor:pointer}
+.hm-item input{margin-top:3px}
+.hm-item b{display:block;font-family:var(--serif);font-size:17px;font-weight:500}
+.hm-item small{display:block;margin-top:3px;color:var(--ink-soft);font-size:9px;line-height:1.5}
+.hm-tag{display:inline-flex;align-items:center;min-height:22px;padding:0 8px;border-radius:999px;background:#edf0e9;color:var(--olive-dark);font-size:7px;font-weight:850;letter-spacing:.08em;text-transform:uppercase}
+.hm-row{display:grid;grid-template-columns:76px 1fr auto;gap:12px;align-items:center;padding:13px 0;border-bottom:1px solid var(--line);cursor:pointer}
+.hm-row:last-child{border-bottom:0}
+.hm-day{font-family:var(--serif);font-size:22px;color:var(--clay)}
+.hm-place-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.hm-place{padding:14px;border:1px solid var(--line);border-radius:12px;background:#fffefa;cursor:pointer}
+.hm-place b{font-family:var(--serif);font-size:18px;font-weight:500}
+.hm-place span{display:block;margin-top:5px;color:var(--ink-soft);font-size:10px;line-height:1.45}
+.hm-money{font-family:var(--serif);font-size:30px}
+.hm-note{border-left:3px solid var(--clay);padding:12px 14px;background:#fff8ea;border-radius:10px;color:var(--ink-soft);font-size:11px;line-height:1.6}
+@media(max-width:900px){.honeymoon-grid,.honeymoon-two,.hm-place-grid{grid-template-columns:1fr}.hm-row{grid-template-columns:1fr}.hm-tag{width:max-content}}

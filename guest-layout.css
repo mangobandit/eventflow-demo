@@ -116,3 +116,14 @@
 .public-footer b { font-family: var(--serif); font-size: 20px; font-weight: 500; }
 .public-footer span, .public-footer a { color: var(--ink-soft); font-size: 11px; text-decoration: none; }
 .footer-meta { display: flex; justify-content: flex-end; gap: 22px; text-align: right; }
+
+.event-actions { display: flex; flex-wrap: wrap; align-items: center; column-gap: 30px; }
+.gifts-section { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; padding: clamp(70px, 9vw, 130px) 7vw; background: var(--paper); border-top: 1px solid var(--line); }
+.gifts-intro h2 { margin: 0; font-family: var(--serif); font-size: clamp(40px, 4.8vw, 72px); font-weight: 400; line-height: 1; }
+.gifts-grid { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.gifts-grid article { padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.gifts-grid h3 { margin: 30px 0 10px; font-family: var(--serif); font-size: 24px; font-weight: 500; }
+.gifts-grid p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.68; }
+.run-sheet { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 26px; margin: 24px 0 0; padding: 18px 0 0; border-top: 1px solid var(--line); list-style: none; }
+.run-sheet li { display: flex; align-items: baseline; gap: 12px; color: var(--ink-soft); font-size: 13px; line-height: 1.5; }
+.run-sheet b { min-width: 44px; color: var(--ink); font-size: 11px; font-weight: 800; letter-spacing: .05em; }

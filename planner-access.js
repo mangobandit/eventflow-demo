@@ -18,19 +18,21 @@
     const card = document.querySelector(".auth-card");
     const title = card?.querySelector("h2");
     const intro = card?.querySelector("h2 + p");
-    const label = els.loginForm.querySelector("label");
+    const passwordLabel = els.loginPassword.closest("label");
+    const usernameLabel = els.loginUsername.closest("label");
     const button = els.loginForm.querySelector("button");
 
     if (card?.querySelector(".eyebrow")) card.querySelector(".eyebrow").textContent = "Couple access";
     if (title) title.textContent = "Enter the planner";
     if (intro) intro.textContent = "Enter the four-digit PIN to open Matt and Cara's planning dashboard.";
-    if (label) label.firstChild.textContent = "PIN code";
-    els.loginEmail.type = "password";
-    els.loginEmail.inputMode = "numeric";
-    els.loginEmail.autocomplete = "current-password";
-    els.loginEmail.maxLength = 4;
-    els.loginEmail.pattern = "[0-9]{4}";
-    els.loginEmail.placeholder = "••••";
+    if (usernameLabel) {
+      usernameLabel.hidden = true;
+      els.loginUsername.required = false;
+    }
+    if (passwordLabel) passwordLabel.firstChild.textContent = "PIN code";
+    els.loginPassword.maxLength = 4;
+    els.loginPassword.pattern = "[0-9]{4}";
+    els.loginPassword.placeholder = "••••";
     button.disabled = false;
     button.textContent = "Open planner";
     els.setupCard.hidden = true;
@@ -42,10 +44,10 @@
     els.loginForm.addEventListener("submit", async (event) => {
       event.preventDefault();
       event.stopImmediatePropagation();
-      const digest = await hash(els.loginEmail.value.trim());
+      const digest = await hash(els.loginPassword.value.trim());
       if (digest !== ACCESS_DIGEST) {
         setAuthStatus("That PIN is not correct.", true);
-        els.loginEmail.select();
+        els.loginPassword.select();
         return;
       }
       sessionStorage.setItem(SESSION_KEY, "yes");
@@ -77,10 +79,11 @@
     els.accountAvatar.textContent = "M";
 
     const requested = location.hash.replace(/^#/, "");
-    state.view = ["overview", "tasks", "budget", "guests", "checkin", "vendors", "timeline", "publishing"].includes(requested) ? requested : "overview";
+    state.view = PLANNER_VIEWS.includes(requested) ? requested : "overview";
     switchView(state.view, false);
     renderAll();
     setSync("Saved on this browser", false);
+    announcePlannerReady();
   }
 
   function bindPlanner() {
@@ -103,7 +106,6 @@
     document.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => openEntity(button.dataset.add)));
     document.getElementById("global-add")?.addEventListener("click", () => openEntity(tableForView(state.view)));
     document.querySelectorAll("[data-search-table]").forEach((input) => input.addEventListener("input", () => renderTableBySearch(input.dataset.searchTable, input.value)));
-    new MutationObserver(() => document.querySelector('[data-view="invitations"]')?.setAttribute("hidden", "")).observe(document.querySelector(".planner-nav"), { childList: true });
   }
 
   async function saveLocalEntity(event) {
@@ -202,7 +204,8 @@
       guests: [],
       vendors: [],
       timeline_items: [],
-      content_blocks: []
+      content_blocks: [],
+      honeymoon_items: []
     };
   }
 

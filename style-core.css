@@ -108,3 +108,11 @@ img { max-width: 100%; }
 .event-image { min-height: 620px; background-size: cover; background-position: center; }
 .finca-main { background-image: linear-gradient(180deg, rgba(39,30,21,.02), rgba(39,30,21,.22)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardi%CC%81n-8872-1024x682.jpg'); }
 .mission-main { background-image: linear-gradient(180deg, rgba(30,48,29,.02), rgba(30,48,29,.22)), url('https://cdn.prod.website-files.com/685aacf16261e83391c243e8/69847affe9fb3bc0ebce860d_Tab%20Pane%206.avif'); }
+.announcement-history { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; max-width: 1500px; margin: 26px auto 0; }
+.announcement-history article { padding: 18px 20px; border: 1px solid rgba(255,255,255,.16); border-radius: 14px; background: rgba(255,255,255,.05); }
+.announcement-history span { color: #c8d0c2; font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
+.announcement-history h3 { margin: 8px 0 6px; font-family: var(--serif); font-size: 21px; font-weight: 500; line-height: 1.2; }
+.announcement-history p { margin: 0; color: #dbe0d7; font-size: 12px; line-height: 1.65; }
+.final-week-banner { display: flex; flex-wrap: wrap; align-items: center; justify-content: center; gap: 12px 22px; padding: 14px 4vw; background: var(--clay, #a3552f); color: #fff; text-align: center; }
+.final-week-banner p { margin: 0; font-size: 13px; line-height: 1.55; }
+.final-week-banner .button { min-height: 38px; padding: 0 18px; font-size: 11px; }

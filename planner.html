@@ -6,15 +6,18 @@
   <meta name="theme-color" content="#303a2d">
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>Matt & Cara · Private Wedding Planner</title>
-  <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="planner.css">
-  <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="style.css?v=20260701-guest-portal-upgrade">
+  <link rel="stylesheet" href="planner.css?v=20260701-guest-portal-upgrade">
+  <link rel="stylesheet" href="responsive.css?v=20260701-guest-portal-upgrade">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="config.js?v=20260630-user-login"></script>
-  <script defer src="planner-core.js?v=20260630-user-login"></script>
-  <script defer src="planner-auth.js?v=20260630-user-login"></script>
-  <script defer src="planner-views.js?v=20260630-user-login"></script>
-  <script defer src="planner-forms.js?v=20260630-user-login"></script>
+  <script defer src="config.js?v=20260701-guest-portal-upgrade"></script>
+  <script defer src="planner-core.js?v=20260701-guest-portal-upgrade"></script>
+  <script defer src="planner-auth.js?v=20260701-guest-portal-upgrade"></script>
+  <script defer src="planner-views.js?v=20260701-guest-portal-upgrade"></script>
+  <script defer src="planner-checkin.js?v=20260701-guest-portal-upgrade"></script>
+  <script defer src="planner-honeymoon.js?v=20260701-guest-portal-upgrade"></script>
+  <script defer src="planner-forms.js?v=20260701-guest-portal-upgrade"></script>
+  <script defer src="planner-extra-tasks.js?v=20260701-guest-portal-upgrade"></script>
 </head>
 <body class="planner-site">
   <section class="auth-screen" id="auth-screen">
@@ -48,6 +51,7 @@
           <label class="form-label">Password
             <input id="login-password" type="password" autocomplete="current-password" inputmode="numeric" required>
           </label>
+          <label class="form-remember"><input id="login-remember" type="checkbox" checked> Keep me signed in on this device</label>
           <button class="button button-dark" type="submit">Enter planner</button>
           <div class="auth-status" id="auth-status" role="status" aria-live="polite"></div>
         </form>
@@ -69,9 +73,11 @@
         <button type="button" data-view="tasks"><span>✓</span>Tasks</button>
         <button type="button" data-view="budget"><span>€</span>Budget</button>
         <button type="button" data-view="guests"><span>◎</span>Guests</button>
+        <button type="button" data-view="checkin"><span>◯</span>Guest Check-In</button>
         <button type="button" data-view="vendors"><span>◇</span>Vendors</button>
         <button type="button" data-view="timeline"><span>◷</span>Timeline</button>
         <button type="button" data-view="publishing"><span>↗</span>Guest publishing</button>
+        <button type="button" data-view="honeymoon"><span>✈</span>Honeymoon</button>
       </nav>
 
       <div class="owner-switch">
@@ -157,8 +163,8 @@
             <div class="view-tools"><button class="primary-action" type="button" data-add="budget_items">+ Add cost</button></div>
           </div>
           <div class="table-panel">
-            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="budget" placeholder="Search budget items"></div><div id="budget-summary" class="money">€0 · R0</div></div>
-            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Item</th><th>Wedding</th><th>Category</th><th>Estimated</th><th>Paid</th><th>Balance</th><th>Due</th><th>Status</th></tr></thead><tbody id="budget-table-body"></tbody></table></div>
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="budget" placeholder="Search budget items"></div><div class="table-toolbar-side"><button class="filter-button" type="button" data-export-csv="budget_items">Export CSV</button><div id="budget-summary" class="money">€0 · R0</div></div></div>
+            <div class="data-table-wrap"><table class="data-table" data-sort-view="budget"><thead><tr><th data-sort-key="title">Item</th><th data-sort-key="celebration">Wedding</th><th data-sort-key="category">Category</th><th data-sort-key="estimated" data-sort-type="number">Estimated</th><th data-sort-key="paid" data-sort-type="number">Paid</th><th data-sort-key="balance" data-sort-type="number">Balance</th><th data-sort-key="due_date" data-sort-type="date">Due</th><th data-sort-key="status">Status</th></tr></thead><tbody id="budget-table-body"></tbody></table></div>
           </div>
         </section>
 
@@ -168,9 +174,17 @@
             <div class="view-tools"><button class="primary-action" type="button" data-add="guests">+ Add guest</button></div>
           </div>
           <div class="table-panel">
-            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="guests" placeholder="Search guests or parties"></div><div id="guest-summary">0 guests</div></div>
-            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Guest</th><th>Party</th><th>Wedding</th><th>RSVP</th><th>Dietary</th><th>Transport</th><th>Accommodation</th><th>Private notes</th></tr></thead><tbody id="guests-table-body"></tbody></table></div>
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="guests" placeholder="Search guests or parties"></div><div class="table-toolbar-side"><button class="filter-button" type="button" data-export-csv="guests">Export CSV</button><div id="guest-summary">0 guests</div></div></div>
+            <div class="data-table-wrap"><table class="data-table" data-sort-view="guests"><thead><tr><th data-sort-key="name">Guest</th><th data-sort-key="party_name">Party</th><th data-sort-key="celebration">Wedding</th><th data-sort-key="rsvp_status">RSVP</th><th data-sort-key="check_in_status">Check-in</th><th data-sort-key="dietary">Dietary</th><th data-sort-key="transport">Transport</th><th data-sort-key="accommodation">Accommodation</th><th>Private notes</th></tr></thead><tbody id="guests-table-body"></tbody></table></div>
           </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="checkin">
+          <div class="view-intro">
+            <div><p class="eyebrow">Private head count</p><h2>Guest Check-In.</h2><p>Use this in the few days before each celebration for final head count, transport and food planning.</p></div>
+            <div class="view-tools"><button class="primary-action" id="copy-checkin-message" type="button">Copy check-in message</button></div>
+          </div>
+          <div id="checkin-root" class="guest-list-tracker"></div>
         </section>
 
         <section class="planner-view" data-view-panel="vendors">
@@ -179,8 +193,8 @@
             <div class="view-tools"><button class="primary-action" type="button" data-add="vendors">+ Add vendor</button></div>
           </div>
           <div class="table-panel">
-            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="vendors" placeholder="Search suppliers"></div><div id="vendor-summary">0 suppliers</div></div>
-            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Supplier</th><th>Wedding</th><th>Category</th><th>Contact</th><th>Quote</th><th>Next action</th><th>Due</th><th>Status</th></tr></thead><tbody id="vendors-table-body"></tbody></table></div>
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="vendors" placeholder="Search suppliers"></div><div class="table-toolbar-side"><button class="filter-button" type="button" data-export-csv="vendors">Export CSV</button><div id="vendor-summary">0 suppliers</div></div></div>
+            <div class="data-table-wrap"><table class="data-table" data-sort-view="vendors"><thead><tr><th data-sort-key="name">Supplier</th><th data-sort-key="celebration">Wedding</th><th data-sort-key="category">Category</th><th data-sort-key="contact_name">Contact</th><th data-sort-key="quote_amount" data-sort-type="number">Quote</th><th data-sort-key="next_action">Next action</th><th data-sort-key="due_date" data-sort-type="date">Due</th><th data-sort-key="status">Status</th></tr></thead><tbody id="vendors-table-body"></tbody></table></div>
           </div>
         </section>
 
@@ -190,8 +204,8 @@
             <div class="view-tools"><button class="primary-action" type="button" data-add="timeline_items">+ Add milestone</button></div>
           </div>
           <div class="table-panel">
-            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="timeline" placeholder="Search timeline"></div><div id="timeline-summary">0 milestones</div></div>
-            <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>Time</th><th>Milestone</th><th>Wedding</th><th>Owner</th><th>Audience</th><th>Location</th><th>Status</th></tr></thead><tbody id="timeline-table-body"></tbody></table></div>
+            <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="timeline" placeholder="Search timeline"></div><div class="table-toolbar-side"><button class="filter-button" type="button" data-export-csv="timeline_items">Export CSV</button><div id="timeline-summary">0 milestones</div></div></div>
+            <div class="data-table-wrap"><table class="data-table" data-sort-view="timeline"><thead><tr><th data-sort-key="item_date" data-sort-type="date">Date</th><th data-sort-key="item_time">Time</th><th data-sort-key="title">Milestone</th><th data-sort-key="celebration">Wedding</th><th data-sort-key="owner">Owner</th><th data-sort-key="audience">Audience</th><th data-sort-key="location">Location</th><th data-sort-key="status">Status</th></tr></thead><tbody id="timeline-table-body"></tbody></table></div>
           </div>
         </section>
 
@@ -204,6 +218,23 @@
             <article class="panel"><div class="panel-head"><h3>Published content</h3><button type="button" data-add="content_blocks">Add</button></div><div class="publish-list" id="publish-list"><div class="empty-state">No live updates yet.</div></div></article>
             <article class="panel"><div class="panel-head"><h3>Guest preview</h3><a href="index.html" target="_blank" rel="noopener">Open live</a></div><div class="preview-phone"><div class="preview-screen"><div class="preview-hero"><small>Matt & Cara · Guest guide</small><h3>Two celebrations,<br>one story.</h3></div><div class="preview-content"><div class="preview-update"><small>Latest update</small><b id="preview-update-title">No published updates yet.</b></div></div></div></div></article>
           </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="honeymoon">
+          <div class="honeymoon-hero">
+            <p class="eyebrow">Japan honeymoon portal</p>
+            <h2>Japan, shaped into a plan.</h2>
+            <p>A command centre for flights, itinerary, hotels, budget, saved places and booking tasks. Everything here is stored in the same secure planner database as the rest of the portal.</p>
+            <div class="honeymoon-tabs" role="tablist">
+              <button class="active" type="button" data-hm-tab="overview">Overview</button>
+              <button type="button" data-hm-tab="itinerary">Itinerary</button>
+              <button type="button" data-hm-tab="flights">Flights & transport</button>
+              <button type="button" data-hm-tab="places">Saved places</button>
+              <button type="button" data-hm-tab="budget">Budget</button>
+              <button type="button" data-hm-tab="tasks">Tasks</button>
+            </div>
+          </div>
+          <div id="honeymoon-root" style="margin-top:14px"></div>
         </section>
       </div>
     </main>

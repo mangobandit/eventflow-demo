@@ -1,0 +1,44 @@
+BEGIN:VCALENDAR
+VERSION:2.0
+PRODID:-//Matt & Cara Wedding House//Guest Guide//EN
+CALSCALE:GREGORIAN
+METHOD:PUBLISH
+BEGIN:VTIMEZONE
+TZID:Europe/Madrid
+BEGIN:STANDARD
+DTSTART:19701025T030000
+RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU
+TZOFFSETFROM:+0200
+TZOFFSETTO:+0100
+TZNAME:CET
+END:STANDARD
+BEGIN:DAYLIGHT
+DTSTART:19700329T020000
+RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU
+TZOFFSETFROM:+0100
+TZOFFSETTO:+0200
+TZNAME:CEST
+END:DAYLIGHT
+END:VTIMEZONE
+BEGIN:VEVENT
+UID:mxc-wedding-spain-2026@mxcwedding.com
+DTSTAMP:20260701T090000Z
+DTSTART;TZID=Europe/Madrid:20261010T173000
+DTEND;TZID=Europe/Madrid:20261011T000000
+SUMMARY:Matt & Cara · Spain Wedding
+LOCATION:Finca Mesa Jardín\, Arcos de la Frontera\, Cádiz\, Spain
+DESCRIPTION:Rodeo-style wedding celebration.\nGuest arrival 17:30 · Cerem
+ ony 18:00 · Celebration ends 00:00.\nShuttle bus from Chiclana departs 1
+ 6:45; return shuttle from the venue departs midnight. Parking at the ven
+ ue.\nDress feel: Rodeo Western — cowboy boots\, hats\, leather and denim
+  welcome and encouraged.\nGuest guide: https://mxcwedding.com
+URL:https://mxcwedding.com
+STATUS:CONFIRMED
+TRANSP:OPAQUE
+BEGIN:VALARM
+ACTION:DISPLAY
+DESCRIPTION:Matt & Cara · Spain Wedding tomorrow
+TRIGGER:-P1D
+END:VALARM
+END:VEVENT
+END:VCALENDAR

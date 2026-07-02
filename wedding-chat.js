@@ -5,7 +5,6 @@
   const isGuest = document.body.classList.contains("guest-site");
   const CHAT_ENDPOINT = window.MXC_CONFIG?.chatEndpoint || "";
   const PLANNER_STORE = "mxc-planner-browser-v3";
-  const HONEYMOON_STORE = "mxc-honeymoon-japan-v1";
 
   if (!isPlanner && !isGuest) return;
   if (document.querySelector(".chat-launcher")) return;
@@ -19,11 +18,11 @@
   panel.className = "chat-panel";
   panel.hidden = true;
   panel.innerHTML = `
-    <div class="chat-head"><div><b>${isPlanner ? "Planning assistant" : "Guest concierge"}</b><small>${isPlanner ? "Tasks · honeymoon · wedding planner" : "Wedding questions · travel · RSVP"}</small></div><button class="chat-close" type="button" aria-label="Close chat">×</button></div>
+    <div class="chat-head"><div><b>${isPlanner ? "Planning assistant" : "Guest concierge"}</b><small>${isPlanner ? "Tasks · honeymoon · wedding planner" : "Wedding questions · travel · check-in"}</small></div><button class="chat-close" type="button" aria-label="Close chat">×</button></div>
     <div class="chat-log" aria-live="polite"></div>
     <div class="chat-chips"></div>
-    <form class="chat-form"><textarea rows="1" placeholder="${isPlanner ? "Try: add task book flights due 2026-08-15" : "Ask about dress code, dates, travel, RSVP…"}"></textarea><button type="submit">Send</button></form>
-    <div class="chat-note">${isPlanner ? "Works on mobile. Commands save into this browser's planner." : "Answers are based on the wedding guide. Final updates will appear on this site."}</div>`;
+    <form class="chat-form"><textarea rows="1" placeholder="${isPlanner ? "Try: add task book flights due 2026-08-15" : "Ask about dress code, dates, travel, check-in…"}"></textarea><button type="submit">Send</button></form>
+    <div class="chat-note">${isPlanner ? "Works on mobile. Commands save into the secure shared planner." : "Answers are based on the wedding guide. Final updates will appear on this site."}</div>`;
 
   document.body.append(launcher, panel);
 
@@ -88,12 +87,12 @@
     const faq = guestFaqAnswer(q);
     if (faq) return faq;
     if (has(q, ["date", "when", "day"])) return "Spain is Saturday 10 October 2026 at Finca Mesa Jardín near Arcos de la Frontera. South Africa is Saturday 19 December 2026 at Mission House in the KZN Midlands.";
-    if (has(q, ["rsvp", "respond", "invite"])) return "Use the RSVP button on the site. If you have a private RSVP link, open it and answer for each person in your household. Final transport and dietaries depend on RSVP answers.";
-    if (has(q, ["travel", "airport", "flight", "fly"])) return "For Spain: Jerez is closest, Seville is the best all-round option, and Málaga has the most flight choice. For South Africa: fly into Durban/King Shaka, then transfer or drive to the KZN Midlands.";
+    if (has(q, ["rsvp", "check-in", "check in", "checkin", "confirm", "confirmation", "respond", "invite"])) return "Use the Guest Check-In button on the site. It opens in the few days before each celebration so we can finalise who is still coming, transport, food and any last-minute notes for your household.";
+    if (has(q, ["travel", "airport", "flight", "fly"])) return "For Spain: Jerez is closest, Seville is the best all-round option, and Málaga has the most flight choice. For South Africa: fly into Durban/King Shaka (about 1hr 50min from the venue) — from overseas connect via Istanbul or Dubai, or fly to Cape Town and take a domestic flight to Durban (we recommend Safair). Rent a car at Durban Airport; Uber is not available near the venue.";
     if (has(q, ["stay", "hotel", "accommodation", "lodging", "sleep"])) return "For Spain, Arcos is closest to the venue and Jerez is better for restaurants and transport. For South Africa, Howick is practical and the Midlands Meander gives the best country-weekend feel.";
     if (has(q, ["weather", "temperature"])) return "Spain in October should be mild with cooler evenings. South Africa in December is warm summer weather with a real chance of afternoon storms. Final forecasts will be updated closer to each week.";
     if (has(q, ["things", "do", "visit", "activities"])) return "Spain ideas: Arcos, Jerez, Cádiz, Chiclana, Vejer, Grazalema and Seville. South Africa ideas: Midlands Meander, Howick Falls, Mandela Capture Site, Drakensberg, Durban/Umhlanga, safari or Cape Town add-on.";
-    if (has(q, ["transport", "bus", "pickup", "shuttle"])) return "Transport routes are still being grouped. Spain likely needs Chiclana/Jerez-style pickup clusters. South Africa likely needs Durban/Howick/Midlands clusters. Answer RSVP transport questions early.";
+    if (has(q, ["transport", "bus", "pickup", "shuttle"])) return "Shuttle buses run for both weddings. Spain: Chiclana to the venue at 16:45, returning at midnight, plus venue parking and pre-booked taxis to Arcos or Jerez. South Africa: Durban (via Howick) to the venue at 15:30, returning at 23:00, plus venue parking.";
     return "I can help with dates, locations, Rodeo dress code, children, parking, open bar, gifts, food, photos, RSVP, travel, accommodation, weather, transport and things to do. Ask me one of those and I’ll answer from the wedding guide.";
   }
 
@@ -104,8 +103,8 @@
     if (has(q, ["how early", "arrive early", "early can", "early arrive", "arrival time"])) return "You may arrive up to two hours before the official start time if you need to. The bar will remain closed until the official kick-off time, so early arrival is mainly for settling in and avoiding a rush.";
     if (has(q, ["open bar", "bar", "drinks", "paid bar", "cash bar", "alcohol"])) return "Yes, the bar will be hosted up to a certain time. After that point, any extra drinks will be for guests’ own account. We’ll make the final bar timing clear on the day.";
     if (has(q, ["indoors", "outdoors", "inside", "outside", "tent", "rain", "inclement"])) return "The wedding has a country/Rodeo feel and is planned as an outdoor celebration. If the weather turns, there will be cover under a tent or suitable shelter so the day can keep flowing comfortably.";
-    if (has(q, ["gift", "gifts", "cash", "eft", "bank", "banking", "present", "registry"])) return "Your presence is the main thing. If you would like to give a gift, a cash or EFT contribution is most helpful and very appreciated. We can accept EUR or ZAR; please message Matt or Cara privately for banking details.";
-    if (has(q, ["timing", "times", "schedule", "late", "start", "ceremony time", "what time"])) return "We’ll keep the day running with clear start and stop times, so please arrive promptly and avoid being late. If you want a drink before the ceremony, please grab it before the bar closes for the ceremony start. Final timings will be shared closer to the day.";
+    if (has(q, ["gift", "gifts", "cash", "eft", "bank", "banking", "present", "registry"])) return "No need for gifts! Just grab your boots and join us. Your presence is the greatest gift we could ask for.";
+    if (has(q, ["timing", "times", "schedule", "late", "start", "ceremony time", "what time"])) return "Spain: arrive 17:30, ceremony 18:00, drinks 18:30, feast 19:30, cake 20:30, dancefloor 21:00, last rounds 23:30, goodbye at midnight. South Africa: arrive 16:30, ceremony 17:30, drinks 18:00, feast 19:00, cake 20:00, dancefloor 20:30, last rounds 23:00, goodbye 23:30. Please arrive promptly.";
     if (has(q, ["food", "eat", "meal", "bbq", "braai", "meat", "vegetarian", "grazer", "grazers"])) return "Expect a Western-inspired feast: BBQ and braai-style meats, with much of the food cooked over open fire. There will be options for lighter grazers as well as those who want something more hearty.";
     if (has(q, ["expect", "what happens", "on the day", "games", "entertainment", "horseshoe", "horse shoe"])) return "Expect food, drinks, laughs and a relaxed Rodeo-style celebration. Depending on which wedding you’re attending, there will be small Western-inspired games and entertainment, such as horseshoe toss and other fun touches to keep the day moving.";
     if (has(q, ["photo", "photos", "picture", "pictures", "post", "instagram", "online", "social", "video", "walls", "walls.io"])) return "You’re welcome to take a few personal photos, but please don’t post the day publicly online without our permission. This is a private, intimate celebration and we’ve invested in a professional photography team. We’ll also use Walls.io, a private wedding social wall where guests can share selected photos and messages into one private feed instead of posting everything publicly.";
@@ -125,65 +124,90 @@
     return "I can add tasks and budget placeholders. Try: add task Book Matt flights due 2026-08-15 for Matt SA, add budget Extra baggage 300 EUR, add honeymoon task Book ryokan, or add Japan place Tokyo: Golden Gai.";
   }
 
-  function addPlannerTask(text) {
-    if (!window.state && typeof state === "undefined") return "Open the Couple Portal first, then I can add tasks.";
+  function plannerOpen() {
+    return typeof state !== "undefined" && Boolean(state.session);
+  }
+
+  /* Chat-created rows go through the same secure save path as the forms, so
+     they persist and sync for both of you (or the browser store in demo mode). */
+  async function persistNewRow(table, payload) {
+    if (state.session?.token) {
+      const saved = await plannerRpc("planner_save_entity", {
+        p_session_token: state.session.token,
+        p_table: table,
+        p_record_id: null,
+        p_payload: payload
+      });
+      state.data[table].unshift(saved);
+    } else {
+      const now = new Date().toISOString();
+      state.data[table].unshift({ id: crypto.randomUUID(), ...payload, created_at: now, updated_at: now });
+      try {
+        localStorage.setItem(PLANNER_STORE, JSON.stringify(state.data));
+      } catch (_error) {
+        // Browser storage may be unavailable; the row still renders.
+      }
+    }
+    if (typeof renderAll === "function") renderAll();
+  }
+
+  async function addPlannerTask(text) {
+    if (!plannerOpen()) return "Open the Couple Portal first, then I can add tasks.";
     const title = cleanCommand(text, ["add task", "new task", "remind me to", "remind me", "todo", "to do"]);
     const due = findDate(text);
     const owner = /\bcara\b/i.test(text) ? "cara" : /\bmatt\b/i.test(text) ? "matt" : "shared";
     const celebration = /south africa|\bsa\b/i.test(text) ? "south_africa" : /spain/i.test(text) ? "spain" : "shared";
     const category = /flight|travel|airport|luggage|passport/i.test(text) ? "Travel" : /dress|suit|boots|outfit/i.test(text) ? "Attire" : /budget|pay|deposit|invoice/i.test(text) ? "Budget" : "General";
-    const now = new Date().toISOString();
-    state.data.tasks.unshift({ id: crypto.randomUUID(), title: title || "New task", description: "Added from chat.", owner, celebration, category, priority: /urgent|important|high/i.test(text) ? "high" : "normal", status: "outstanding", due_date: due, notes: "Added from chatbot.", created_at: now, updated_at: now });
-    savePlanner();
+    try {
+      await persistNewRow("tasks", { title: title || "New task", description: "Added from chat.", owner, celebration, category, priority: /urgent|important|high/i.test(text) ? "high" : "normal", status: "outstanding", due_date: due, notes: "Added from chatbot." });
+    } catch (error) {
+      return error.message || "Could not save that task.";
+    }
     return `Added task: ${title || "New task"}${due ? `, due ${due}` : ""}.`;
   }
 
-  function addBudget(text) {
-    if (typeof state === "undefined") return "Open the Couple Portal first, then I can add budget items.";
+  async function addBudget(text) {
+    if (!plannerOpen()) return "Open the Couple Portal first, then I can add budget items.";
     const amount = Number((text.match(/(?:€|eur|r|zar)?\s*(\d+(?:\.\d+)?)/i) || [])[1] || 0);
     const currency = /\bzar\b|\br\s*\d/i.test(text) ? "ZAR" : "EUR";
     const title = cleanCommand(text.replace(String(amount), ""), ["add budget", "budget item", "add cost"]);
-    const now = new Date().toISOString();
-    state.data.budget_items.unshift({ id: crypto.randomUUID(), title: title || "New budget item", owner: "shared", celebration: /south africa|\bsa\b/i.test(text) ? "south_africa" : /spain/i.test(text) ? "spain" : "shared", category: "Budget", currency, estimated: amount, deposit: 0, paid: 0, due_date: findDate(text), status: "outstanding", notes: "Added from chatbot.", created_at: now, updated_at: now });
-    savePlanner();
+    try {
+      await persistNewRow("budget_items", { title: title || "New budget item", owner: "shared", celebration: /south africa|\bsa\b/i.test(text) ? "south_africa" : /spain/i.test(text) ? "spain" : "shared", category: "Budget", currency, estimated: amount, deposit: 0, paid: 0, due_date: findDate(text), status: "outstanding", notes: "Added from chatbot." });
+    } catch (error) {
+      return error.message || "Could not save that budget item.";
+    }
     return `Added budget item: ${title || "New budget item"} (${currency} ${amount || 0}).`;
   }
 
-  function addHoneymoonTask(text) {
-    const data = loadHoneymoon();
+  async function addHoneymoonTask(text) {
+    if (!plannerOpen()) return "Open the Couple Portal first, then I can add honeymoon tasks.";
     const title = cleanCommand(text, ["add honeymoon task", "honeymoon task", "add japan task", "japan task", "add task"]);
-    data.tasks = data.tasks || [];
-    data.tasks.push({ id: crypto.randomUUID(), title: title || "New honeymoon task", notes: "Added from chatbot.", priority: /urgent|important|high/i.test(text) ? "high" : "normal", done: false });
-    localStorage.setItem(HONEYMOON_STORE, JSON.stringify(data));
+    try {
+      await persistNewRow("honeymoon_items", { kind: "task", title: title || "New honeymoon task", notes: "Added from chatbot.", priority: /urgent|important|high/i.test(text) ? "high" : "normal", done: false });
+    } catch (error) {
+      return error.message || "Could not save that honeymoon task.";
+    }
     return `Added honeymoon task: ${title || "New honeymoon task"}. Open the Honeymoon tab to see it.`;
   }
 
-  function addJapanPlace(text) {
-    const data = loadHoneymoon();
+  async function addJapanPlace(text) {
+    if (!plannerOpen()) return "Open the Couple Portal first, then I can save Japan places.";
     const raw = cleanCommand(text, ["add japan place", "add place", "save place", "add honeymoon place"]);
     const [area, ...rest] = raw.split(":");
-    data.places = data.places || [];
-    data.places.push({ area: (rest.length ? area : "Japan").trim() || "Japan", notes: (rest.length ? rest.join(":") : raw).trim() || "Saved from chat." });
-    localStorage.setItem(HONEYMOON_STORE, JSON.stringify(data));
-    return `Saved Japan place: ${raw || "new place"}.`;
+    try {
+      await persistNewRow("honeymoon_items", { kind: "place", title: (rest.length ? area : "Japan").trim() || "Japan", notes: (rest.length ? rest.join(":") : raw).trim() || "Saved from chat." });
+    } catch (error) {
+      return error.message || "Could not save that place.";
+    }
+    return `Saved Japan place: ${raw || "new place"}. It is in the Honeymoon tab under Saved places.`;
   }
 
   function summarizePlanner(q) {
-    if (typeof state === "undefined") return "Open the Couple Portal first and I can read the task list.";
+    if (!plannerOpen()) return "Open the Couple Portal first and I can read the task list.";
     const rows = state.data.tasks || [];
     const subset = /pending/.test(q) ? rows.filter((t) => t.status === "pending") : rows.filter((t) => t.status === "outstanding");
     const top = subset.slice(0, 6).map((task) => `• ${task.title}${task.due_date ? ` (${task.due_date})` : ""}`).join("\n");
     return subset.length ? `${subset.length} ${/pending/.test(q) ? "pending" : "outstanding"} tasks.\n${top}` : "Nothing matching that status right now.";
-  }
-
-  function savePlanner() {
-    localStorage.setItem(PLANNER_STORE, JSON.stringify(state.data));
-    if (typeof renderAll === "function") renderAll();
-    if (typeof toast === "function") toast("Chat update saved.");
-  }
-
-  function loadHoneymoon() {
-    try { return JSON.parse(localStorage.getItem(HONEYMOON_STORE) || "{}") || {}; } catch (_error) { return {}; }
   }
 
   function cleanCommand(text, commands) {

@@ -1,33 +1,26 @@
+/* One-time starter checklist for the two-wedding plan. Runs after the planner
+   is ready and writes through the normal save path, so seeded rows persist in
+   the secure database (or the browser store in demo mode) instead of living
+   only in memory. Rows are deduplicated by title against loaded data. */
 (() => {
   "use strict";
 
-  const STORAGE_KEY = "mxc-planner-browser-v3";
   const APPLIED_KEY = "mxc-extra-planning-checklist-2026-06-26";
+  let applying = false;
 
-  function waitForPlanner() {
-    if (typeof state === "undefined" || typeof renderAll !== "function" || !state?.data?.tasks || !state.session) {
-      window.setTimeout(waitForPlanner, 250);
-      return;
-    }
-    applyExtras();
-  }
-
-  function applyExtras() {
-    if (localStorage.getItem(APPLIED_KEY) === "yes") return;
-    const now = new Date().toISOString();
-    const id = () => crypto.randomUUID();
-    const exists = (table, key, value) => state.data[table].some((item) => String(item[key] || "").toLowerCase() === String(value || "").toLowerCase());
+  async function applyExtras() {
+    if (applying || localStorage.getItem(APPLIED_KEY) === "yes") return;
+    applying = true;
+    const pending = [];
+    const exists = (table, value) => state.data[table].some((item) => String(item.title || "").toLowerCase() === String(value || "").toLowerCase());
     const addTask = (title, owner, celebration, category, priority, status, due_date, description, notes = "") => {
-      if (exists("tasks", "title", title)) return;
-      state.data.tasks.push({ id: id(), title, owner, celebration, category, priority, status, due_date, description, notes, created_at: now, updated_at: now });
+      if (!exists("tasks", title)) pending.push(["tasks", { title, owner, celebration, category, priority, status, due_date, description, notes }]);
     };
     const addBudget = (title, owner, celebration, category, currency, estimated, status, notes = "") => {
-      if (exists("budget_items", "title", title)) return;
-      state.data.budget_items.push({ id: id(), title, owner, celebration, category, currency, estimated, deposit: 0, paid: 0, due_date: null, status, notes, created_at: now, updated_at: now });
+      if (!exists("budget_items", title)) pending.push(["budget_items", { title, owner, celebration, category, currency, estimated, deposit: 0, paid: 0, due_date: null, status, notes }]);
     };
     const addTimeline = (title, celebration, item_date, item_time, location, notes = "") => {
-      if (exists("timeline_items", "title", title)) return;
-      state.data.timeline_items.push({ id: id(), title, owner: "shared", celebration, item_date, item_time, audience: "private", location, sort_order: 0, status: "outstanding", notes, created_at: now, updated_at: now });
+      if (!exists("timeline_items", title)) pending.push(["timeline_items", { title, owner: "shared", celebration, item_date, item_time, audience: "private", location, sort_order: 0, status: "outstanding", notes }]);
     };
 
     addTask("Decide South Africa travel dates", "shared", "south_africa", "Travel", "high", "outstanding", "2026-07-31", "Agree Matt and Cara's separate outbound dates and shared/individual return window.");
@@ -107,11 +100,43 @@
     addTimeline("Matt South Africa setup week", "south_africa", "2026-12-10", "09:00", "KZN / Mission House", "Supplier visits, venue setup, transport checks and errands." );
     addTimeline("Post-wedding return flight window", "south_africa", "2026-12-23", "12:00", "South Africa to Spain", "Placeholder return window; update after booking." );
 
-    localStorage.setItem(STORAGE_KEY, JSON.stringify(state.data));
-    localStorage.setItem(APPLIED_KEY, "yes");
-    renderAll();
-    if (typeof toast === "function") toast("Extra two-wedding planning tasks added.");
+    if (!pending.length) {
+      localStorage.setItem(APPLIED_KEY, "yes");
+      applying = false;
+      return;
+    }
+
+    try {
+      for (const [table, payload] of pending) {
+        if (state.session?.token) {
+          const saved = await plannerRpc("planner_save_entity", {
+            p_session_token: state.session.token,
+            p_table: table,
+            p_record_id: null,
+            p_payload: payload
+          });
+          state.data[table].push(saved);
+        } else {
+          const now = new Date().toISOString();
+          state.data[table].push({ id: crypto.randomUUID(), ...payload, created_at: now, updated_at: now });
+        }
+      }
+      if (!state.session?.token) {
+        try {
+          localStorage.setItem("mxc-planner-browser-v3", JSON.stringify(state.data));
+        } catch (_error) {
+          // Browser storage may be unavailable; the seeded rows still render.
+        }
+      }
+      localStorage.setItem(APPLIED_KEY, "yes");
+      renderAll();
+      toast(`${pending.length} starter planning items added.`);
+    } catch (error) {
+      toast(error.message || "Could not add the starter checklist.", true);
+    } finally {
+      applying = false;
+    }
   }
 
-  waitForPlanner();
+  document.addEventListener("mxc:planner-ready", applyExtras);
 })();

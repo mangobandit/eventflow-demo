@@ -17,9 +17,20 @@
       guests: [],
       vendors: [],
       timeline_items: [],
-      content_blocks: []
+      content_blocks: [],
+      honeymoon_items: []
     }
   };
+
+  const PLANNER_VIEWS = ["overview", "tasks", "budget", "guests", "checkin", "vendors", "timeline", "publishing", "honeymoon"];
+  const LOCAL_PLANNER_STORE = "mxc-planner-browser-v3";
+
+  /* Fired once the planner shell is open and data is loaded (both the secure
+     Supabase mode and the browser demo mode). Optional modules listen for it
+     instead of polling for globals. */
+  function announcePlannerReady() {
+    document.dispatchEvent(new CustomEvent("mxc:planner-ready"));
+  }
 
   const els = {
     authScreen: document.getElementById("auth-screen"),
@@ -93,6 +104,7 @@
         field("owner", "Planner owner", "select", { options: OWNER_OPTIONS, default: "shared" }),
         field("celebration", "Wedding", "select", { options: [["spain", "Spain"], ["south_africa", "South Africa"]], default: "spain" }),
         field("rsvp_status", "RSVP", "select", { options: [["yes", "Yes"], ["no", "No"], ["tbc", "TBC"], ["no_response", "No response"]], default: "no_response" }),
+        field("check_in_status", "Check-in", "select", { options: [["not_checked_in", "Not checked in"], ["checked_in", "Checked in"], ["cant_make_it", "Can't make it"]], default: "not_checked_in" }),
         field("dietary", "Dietary notes", "textarea", { full: true }),
         field("transport", "Transport", "text", { placeholder: "Required, not required, TBC…" }),
         field("accommodation", "Accommodation", "text"),
@@ -135,6 +147,22 @@
         field("notes", "Notes", "textarea", { full: true })
       ]
     },
+    honeymoon_items: {
+      singular: "honeymoon item",
+      title: "Honeymoon item",
+      fields: [
+        field("title", "Title", "text", { required: true, full: true, placeholder: "Task, place, flight leg, budget line…" }),
+        field("kind", "Type", "select", { options: [["task", "Task"], ["place", "Saved place"], ["itinerary", "Itinerary stop"], ["flight", "Flight / transport"], ["budget", "Budget line"]], default: "task" }),
+        field("detail", "Detail", "text", { placeholder: "City, area, route or day range" }),
+        field("priority", "Priority", "select", { options: [["normal", "Normal"], ["high", "High"], ["low", "Low"]], default: "normal" }),
+        field("status", "Status note", "text", { placeholder: "TBC, booked, shortlisted…" }),
+        field("currency", "Currency", "select", { options: [["EUR", "Euro (€)"], ["ZAR", "South African rand (R)"], ["JPY", "Japanese yen (¥)"]], default: "EUR" }),
+        field("amount", "Amount", "number", { step: "0.01" }),
+        field("sort_order", "Order", "number", { step: "1", default: 0 }),
+        field("done", "Done / booked", "checkbox", { full: true, default: false }),
+        field("notes", "Notes", "textarea", { full: true })
+      ]
+    },
     content_blocks: {
       singular: "guest update",
       title: "Guest update",
@@ -154,18 +182,14 @@
 
   function field(name, label, type, options = {}) { return { name, label, type, ...options }; }
 
-  /* The RSVP control centre is isolated from the core planner and loaded only
-     after every existing planner module has finished. This keeps the base
-     planner usable even before the RSVP database migration is installed. */
-  window.addEventListener("load", () => {
-    if (document.querySelector('script[data-mxc-rsvp-admin]')) return;
-    const stylesheet = document.createElement("link");
-    stylesheet.rel = "stylesheet";
-    stylesheet.href = "planner-rsvp.css?v=20260630-user-login";
-    document.head.appendChild(stylesheet);
-
-    const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20260630-user-login";
-    script.dataset.mxcRsvpAdmin = "true";
-    document.body.appendChild(script);
-  });
+  /* The browser demo gate is only ever loaded when Supabase is intentionally
+     unconfigured, so a public deployment cannot fall back to local access. */
+  if (!config.supabaseUrl && !config.supabaseAnonKey) {
+    window.addEventListener("load", () => {
+      if (document.querySelector("script[data-mxc-access]")) return;
+      const script = document.createElement("script");
+      script.src = "planner-access.js?v=20260701-guest-portal-upgrade";
+      script.dataset.mxcAccess = "true";
+      document.body.appendChild(script);
+    });
+  }

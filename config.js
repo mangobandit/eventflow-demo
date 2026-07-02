@@ -11,7 +11,7 @@ window.addEventListener("load", () => {
   const isPlanner = document.body.classList.contains("planner-site");
   if (!isGuest && !isPlanner) return;
 
-  const ASSET_VERSION = "20260630-user-login";
+  const ASSET_VERSION = "20260701-guest-portal-upgrade";
 
   function versioned(src) {
     if (/^https?:\/\//i.test(src)) return src;
@@ -27,9 +27,4 @@ window.addEventListener("load", () => {
   }
 
   addScript("wedding-chat.js", "mxc-chat");
-  if (isGuest) {
-    addScript("guest-children-note.js", "mxc-children-note");
-    addScript("wedding-chat-family.js", "mxc-family-chat");
-    addScript("wedding-chat-checkin.js", "mxc-checkin-chat");
-  }
 });
