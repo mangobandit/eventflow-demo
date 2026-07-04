@@ -29,12 +29,13 @@ const config = read("config.js");
 assert.match(homepage, /Below you'll find guidance for both of our weddings\./);
 assert.match(homepage, /we'll keep adding friendlier, more detailed updates as we get closer to each celebration/);
 assert.match(homepage, /guest\.js\?v=20260704-homepage-copy/);
-assert.match(homepage, /style\.css\?v=20260704-mission-house-photo/);
+assert.match(homepage, /style\.css\?v=20260704-mission-house-gallery/);
+assert.match(homepage, /Mission House reception tables overlooking the KZN Midlands/);
 assert.doesNotMatch(homepage, /Save both dates\. South Africa accommodation options are below/);
-assert.match(style, /style-core\.css\?v=20260704-mission-house-photo/);
+assert.match(style, /style-core\.css\?v=20260704-mission-house-gallery/);
 assert.match(style, /guest-layout\.css\?v=20260704-mission-house-photo/);
 assert.match(styleCore, /hero-photo-sa[\s\S]*assets\/mission-house-hero\.webp/);
-assert.match(styleCore, /mission-main[\s\S]*assets\/mission-house-hero\.webp/);
+assert.match(styleCore, /mission-main[\s\S]*assets\/mission-house-reception\.webp/);
 assert.match(guestLayout, /mission-stay[\s\S]*assets\/mission-house-hero\.webp/);
 assert.doesNotMatch(`${styleCore}\n${guestLayout}`, /69847affe9fb3bc0ebce860d_Tab%20Pane%206\.avif/);
 

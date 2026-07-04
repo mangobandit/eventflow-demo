@@ -109,4 +109,4 @@ img { max-width: 100%; }
 .event-feature:nth-of-type(even) { background: #e5dbcd; }
 .event-image { min-height: 620px; background-size: cover; background-position: center; }
 .finca-main { background-image: linear-gradient(180deg, rgba(39,30,21,.02), rgba(39,30,21,.22)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardi%CC%81n-8872-1024x682.jpg'); }
-.mission-main { background-image: linear-gradient(180deg, rgba(30,48,29,.02), rgba(30,48,29,.22)), url('assets/mission-house-hero.webp'); }
+.mission-main { background-image: linear-gradient(180deg, rgba(30,48,29,.02), rgba(30,48,29,.22)), url('assets/mission-house-reception.webp'); }
