@@ -162,8 +162,18 @@
     if (practicalIntro) practicalIntro.innerHTML = "Pack for the Rodeo,<br>not just the photograph.";
     const practicalCards = [...document.querySelectorAll(".practical-grid article")];
     if (practicalCards[2]) {
-      practicalCards[2].querySelector("h3").textContent = "Boots, hats, denim";
-      practicalCards[2].querySelector("p").textContent = "Cowboy boots, hats, leather and denim are welcome and encouraged. Choose shoes that work on gardens, lawns and country surfaces.";
+      const rodeoCard = practicalCards[2];
+      rodeoCard.querySelector("h3").textContent = "Boots, hats, denim";
+      rodeoCard.querySelector("p").textContent = "Cowboy boots, hats, leather and denim are welcome and encouraged. Choose shoes that work on gardens, lawns and country surfaces. If you don't have a cowboy hat, we'll have one for you if you'd like one.";
+      if (!rodeoCard.querySelector(".practical-outfit-link")) {
+        const link = document.createElement("a");
+        link.className = "text-link practical-outfit-link";
+        link.href = "https://za.pinterest.com/carakenny/mxc-wedding-outfit-inspo/";
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+        link.innerHTML = "Outfit inspo board <span>→</span>";
+        rodeoCard.appendChild(link);
+      }
     }
   }
 
