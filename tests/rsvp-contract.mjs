@@ -17,6 +17,9 @@ const plannerAuth = read("planner-auth.js");
 const plannerForms = read("planner-forms.js");
 const plannerLoader = read("planner-rsvp.js");
 const plannerCheckin = read("planner-checkin.js");
+const chat = read("wedding-chat.js");
+const familyChat = read("wedding-chat-family.js");
+const checkinChat = read("wedding-chat-checkin.js");
 const access = read("planner-access.js");
 const sw = read("sw.js");
 const checkinSql = read("supabase/migrations/20260626_guest_checkin_fields.sql");
@@ -30,7 +33,7 @@ assert.match(homepage, /Below you'll find guidance for both of our weddings\./);
 assert.match(homepage, /we'll keep adding friendlier, more detailed updates as we get closer to each celebration/);
 assert.match(homepage, /See our suggested Spain travel plan/);
 assert.match(homepage, /See our suggested South Africa travel plan/);
-assert.match(homepage, /Suggested wedding-weekend route/);
+assert.match(homepage, /Suggested wedding weekend route/);
 assert.match(homepage, /Suggested Andalusian celebration/);
 assert.match(homepage, /Suggested KZN celebration/);
 assert.match(homepage, /AGP \/ GIB/);
@@ -40,7 +43,7 @@ assert.match(homepage, /https:\/\/www\.midlandsreservations\.co\.za\/za\/lions-r
 assert.match(homepage, /Boots, hats, denim/);
 assert.match(homepage, /If you don't have a cowboy hat, we'll have one for you if you'd like one\./);
 assert.match(homepage, /https:\/\/za\.pinterest\.com\/carakenny\/mxc-wedding-outfit-inspo\//);
-assert.match(homepage, /guest\.js\?v=20260704-drinks-note/);
+assert.match(homepage, /guest\.js\?v=20260704-coherence-pass/);
 assert.match(homepage, /style\.css\?v=20260704-mission-house-gallery/);
 assert.match(homepage, /Mission House reception tables overlooking the KZN Midlands/);
 assert.doesNotMatch(homepage, /Save both dates\. South Africa accommodation options are below/);
@@ -51,7 +54,7 @@ assert.match(styleCore, /mission-main[\s\S]*assets\/mission-house-reception\.web
 assert.match(guestLayout, /mission-stay[\s\S]*assets\/mission-house-hero\.webp/);
 assert.doesNotMatch(`${styleCore}\n${guestLayout}`, /69847affe9fb3bc0ebce860d_Tab%20Pane%206\.avif/);
 
-assert.match(checkinPage, /Matt & Cara · Guest Check-In/);
+assert.match(checkinPage, /Matt & Cara · Guest Check In/);
 assert.match(checkinPage, /Confirm your household before the celebration/);
 assert.match(checkinPage, /few days before the celebration/);
 assert.match(checkinPage, /Are you still<br>joining us\?/);
@@ -59,9 +62,10 @@ assert.match(checkinPage, /id="rsvp-select-form"/);
 assert.match(checkinPage, /id="rsvp-guest-select"/);
 assert.match(checkinPage, /Your name or household/);
 assert.match(checkinPage, /Or use a code/);
-assert.match(checkinPage, /Send check-in/);
-assert.match(checkinPage, /Check-in received/);
+assert.match(checkinPage, /Send check in/);
+assert.match(checkinPage, /Check in received/);
 assert.doesNotMatch(checkinPage, /Private RSVP|Send RSVP|Open your RSVP|Will you<br>join us\?/);
+assert.doesNotMatch(checkinPage, /Check-In|check-in|Last-minute/);
 assert.doesNotMatch(checkinPage, /24 hours before/);
 
 assert.match(checkinScript, /get_rsvp_invitation/);
@@ -74,10 +78,11 @@ assert.match(checkinScript, /DEMO_LOOKUP_KEY/);
 assert.match(checkinScript, /isLocalDemoEnabled/);
 assert.match(checkinScript, /createDemoClient/);
 assert.match(checkinScript, /few days before the celebration/);
-assert.match(checkinScript, /Checked in — still coming/);
+assert.match(checkinScript, /Checked in and still coming/);
 assert.match(checkinScript, /Can't make it/);
-assert.match(checkinScript, /Last-minute note for Matt & Cara/);
+assert.match(checkinScript, /Last minute note for Matt & Cara/);
 assert.doesNotMatch(checkinScript, /Joyfully yes|Sadly no|Saving your response|Your RSVP/);
+assert.doesNotMatch(checkinScript, /Check-In|check-in|Wedding-day|Last-minute|—|…/);
 assert.doesNotMatch(checkinScript, /24 hours before the celebration/);
 
 const expectedFaqs = [
@@ -89,7 +94,7 @@ const expectedFaqs = [
   "Is the wedding indoors or outdoors?",
   "How early can I arrive?",
   "What are the timings for the day?",
-  "Will there be wedding-day transport?",
+  "Will there be wedding day transport?",
   "Is there parking at the venue?",
   "Can children come?",
   "What gifts should I bring?",
@@ -113,7 +118,18 @@ assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visi
 assert.match(guest, /function normalizeFaqTitle/);
 assert.match(guest, /renderFaqList\(faqs\)/);
 assert.doesNotMatch(guest, /Can children attend/);
-assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"/);
+assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"|Rodeo-style|Western-inspired|braai-style|wedding-day|check-in|Check-In/);
+
+assert.match(chat, /guest check in/);
+assert.match(chat, /How do drinks work\?/);
+assert.match(chat, /Welcome drinks and soft drinks will be available before the reception/);
+assert.match(chat, /the bar will open fully afterwards/);
+assert.doesNotMatch(chat, /Use the RSVP button|Wedding questions .* RSVP|bar will remain closed|kick-off|grab it before the bar closes|Rodeo-style|Western-inspired|braai-style|Jerez-style|all-round|country-weekend|add-on/);
+assert.match(familyChat, /How do drinks work\?/);
+assert.match(familyChat, /Welcome drinks and soft drinks will be available before the reception/);
+assert.doesNotMatch(familyChat, /bar will remain closed|kick-off|grab it before the bar closes|Rodeo-style|Western-inspired|braai-style/);
+assert.match(checkinChat, /guest check in/);
+assert.doesNotMatch(checkinChat, /Guest Check-In|check-in|last-minute/);
 
 assert.match(plannerLoader, /hasSupabaseSettings/, "simple couple access must detect configured Supabase settings");
 assert.match(plannerLoader, /hasSupabaseSettings\s*\?\s*null\s*:\s*addScript\("planner-access\.js"/, "simple couple access must not override configured Supabase auth");
@@ -129,7 +145,7 @@ assert.match(plannerAuth, /planner_logout/);
 assert.doesNotMatch(plannerAuth, /signInWithOtp|auth\.getSession|allowed_users/);
 assert.match(plannerForms, /planner_save_entity/);
 assert.match(plannerForms, /planner_delete_entity/);
-assert.match(plannerCheckin, /Guest Check-In/);
+assert.match(plannerCheckin, /Guest Check In/);
 assert.match(plannerCheckin, /Total invited/);
 assert.match(plannerCheckin, /Guests by venue/);
 assert.match(plannerCheckin, /Still attending/);
@@ -137,7 +153,8 @@ assert.match(plannerCheckin, /Still to check in/);
 assert.match(plannerCheckin, /few days before/);
 assert.doesNotMatch(plannerCheckin, /24-hour|24h/);
 assert.match(plannerCheckin, /guest-list-tracker/);
-assert.match(plannerCheckin, /Copy check-in message/);
+assert.match(plannerCheckin, /Copy check in message/);
+assert.doesNotMatch(plannerCheckin, /Guest Check-In|check-in|RSVP yes|Need RSVP|pre-wedding/);
 assert.match(access, /ACCESS_DIGEST/);
 assert.match(access, /crypto\.subtle\.digest\("SHA-256"/, "the entered code must be hashed in the browser");
 assert.match(access, /localStorage\.setItem/);
@@ -169,4 +186,4 @@ assert.match(config, /supabaseUrl:\s*"https:\/\/uwupepywyldwmsktvxdt\.supabase\.
 assert.match(config, /supabaseAnonKey:\s*"sb_publishable_[A-Za-z0-9_-]+"/);
 assert.doesNotMatch(config, /service_role|SUPABASE_SERVICE_ROLE|sb_secret_/i);
 
-console.log("FAQ dedupe and Guest Check-In contracts passed.");
+console.log("FAQ dedupe and Guest Check In contracts passed.");

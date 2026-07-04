@@ -15,7 +15,7 @@
   const access = hasSupabaseSettings ? null : addScript("planner-access.js", "mxc-access");
   const loadPlannerExtras = () => {
     addScript("planner-extra-tasks.js?v=20260630-user-login", "mxc-extra-tasks");
-    addScript("planner-checkin.js?v=20260630-user-login", "mxc-checkin");
+    addScript("planner-checkin.js?v=20260704-coherence-pass", "mxc-checkin");
     addScript("planner-honeymoon.js?v=20260630-user-login", "mxc-honeymoon");
   };
 

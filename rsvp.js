@@ -83,7 +83,7 @@
     if (demoMode) {
       client = createDemoClient();
     } else if (!config.supabaseUrl || !config.supabaseAnonKey || !window.supabase?.createClient) {
-      showError("The check-in service is not connected yet. Please contact Matt or Cara directly for now.");
+      showError("The check in service is not connected yet. Please contact Matt or Cara directly for now.");
       return;
     } else {
       client = window.supabase.createClient(config.supabaseUrl, config.supabaseAnonKey, {
@@ -114,7 +114,7 @@
         }).map((request) => cache.delete(request)));
       }));
     } catch (error) {
-      console.warn("Could not inspect old check-in cache entries", error);
+      console.warn("Could not inspect old check in cache entries", error);
     }
   }
 
@@ -178,13 +178,13 @@
         elements.selectStatus,
         checkinOptions.length
           ? "Pick your name, then review each person before sending."
-          : "No guest check-ins are available yet. You can still use a code if Matt and Cara sent one."
+          : "No guest check ins are available yet. You can still use a code if Matt and Cara sent one."
       );
     } catch (error) {
       console.warn("Guest list could not be loaded", error);
       checkinOptions = [];
       renderGuestOptions();
-      setStatus(elements.selectStatus, "We could not load the guest list. You can still paste a check-in code below.", true);
+      setStatus(elements.selectStatus, "We could not load the guest list. You can still paste a check in code below.", true);
     } finally {
       elements.guestSelect.disabled = false;
     }
@@ -220,20 +220,20 @@
       renderInvitation();
       show(elements.formState);
     } catch (error) {
-      console.warn("Guest check-in could not be opened", error);
+      console.warn("Guest check in could not be opened", error);
       sessionStorage.removeItem(TOKEN_KEY);
       sessionStorage.removeItem(LOOKUP_KEY);
       token = "";
       lookupKey = "";
-      showError("The check-in service is not connected yet. Please contact Matt or Cara directly for now.");
+      showError("The check in service is not connected yet. Please contact Matt or Cara directly for now.");
     }
   }
 
   function renderInvitation() {
     elements.household.textContent = invitation.label || "Your household";
-    elements.celebration.textContent = invitation.celebration === "spain" ? "Spain guest check-in" : "South Africa guest check-in";
+    elements.celebration.textContent = invitation.celebration === "spain" ? "Spain guest check in" : "South Africa guest check in";
     elements.deadline.textContent = invitation.deadline
-      ? `Please confirm by ${formatDate(invitation.deadline)}. You can reopen this link to update your check-in.`
+      ? `Please confirm by ${formatDate(invitation.deadline)}. You can reopen this link to update your check in.`
       : CHECK_IN_WINDOW_COPY;
     elements.people.innerHTML = invitation.people.map(renderPerson).join("");
     elements.email.value = invitation.contact_email || "";
@@ -248,7 +248,7 @@
       <div class="guest-response-head">
         <h3>${escapeHtml(person.name)}</h3>
         <div class="attendance-choice" role="radiogroup" aria-label="Attendance for ${escapeHtml(person.name)}">
-          <label><input type="radio" name="attendance-${index}" value="yes" ${attending === true ? "checked" : ""} required><span>Checked in — still coming</span></label>
+          <label><input type="radio" name="attendance-${index}" value="yes" ${attending === true ? "checked" : ""} required><span>Checked in and still coming</span></label>
           <label><input type="radio" name="attendance-${index}" value="no" ${attending === false ? "checked" : ""} required><span>Can't make it</span></label>
         </div>
       </div>
@@ -256,7 +256,7 @@
         <label>Dietary or allergy notes
           <textarea data-field="dietary" maxlength="800" placeholder="Leave blank when none">${escapeHtml(person.dietary || "")}</textarea>
         </label>
-        <label>Wedding-day transport
+        <label>Wedding day transport
           <select data-field="transport_needed">
             <option value="tbc" ${transportValue === "tbc" ? "selected" : ""}>Not sure yet</option>
             <option value="yes" ${transportValue === "yes" ? "selected" : ""}>Yes, transport needed</option>
@@ -269,7 +269,7 @@
         <label>Where are you staying?
           <input data-field="accommodation" maxlength="300" value="${escapeHtml(person.accommodation || "")}" placeholder="Optional or TBC">
         </label>
-        <label class="full">Last-minute note for Matt & Cara
+        <label class="full">Last minute note for Matt & Cara
           <textarea data-field="notes" maxlength="800" placeholder="Arrival timing, transport change, child note, accessibility need or anything useful.">${escapeHtml(person.notes || "")}</textarea>
         </label>
       </div>
@@ -283,7 +283,7 @@
     try {
       people = [...elements.people.querySelectorAll(".guest-response")].map((card, index) => {
         const attendance = card.querySelector(`input[name="attendance-${index}"]:checked`)?.value;
-        if (!attendance) throw new Error("Please choose a check-in answer for every guest.");
+        if (!attendance) throw new Error("Please choose a check in answer for every guest.");
         const transport = card.querySelector('[data-field="transport_needed"]').value;
         return {
           id: card.dataset.personId,
@@ -301,7 +301,7 @@
     }
 
     elements.submit.disabled = true;
-    setStatus(elements.submitStatus, "Saving your check-in securely…");
+    setStatus(elements.submitStatus, "Saving your check in securely...");
     try {
       const payload = {
         p_contact_email: elements.email.value.trim() || null,
@@ -320,7 +320,7 @@
       window.scrollTo({ top: 0, behavior: "smooth" });
     } catch (error) {
       console.error(error);
-      setStatus(elements.submitStatus, error.message || "We could not save the check-in. Please try again.", true);
+      setStatus(elements.submitStatus, error.message || "We could not save the check in. Please try again.", true);
     } finally {
       elements.submit.disabled = false;
     }
@@ -329,7 +329,7 @@
   function renderSuccess(summary) {
     const yes = Number(summary?.attending || 0);
     const no = Number(summary?.declined || 0);
-    elements.successCopy.textContent = `Your check-in for ${invitation.label || "your household"} has been saved securely.`;
+    elements.successCopy.textContent = `Your check in for ${invitation.label || "your household"} has been saved securely.`;
     elements.successSummary.innerHTML = `
       <div><span>Still coming</span><b>${yes}</b></div>
       <div><span>Can't make it</span><b>${no}</b></div>
@@ -477,6 +477,6 @@
 
   start().catch((error) => {
     console.error(error);
-    showError("The check-in page could not start. Please contact Matt or Cara directly.");
+    showError("The check in page could not start. Please contact Matt or Cara directly.");
   });
 })();

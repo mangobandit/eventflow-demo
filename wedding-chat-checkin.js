@@ -3,7 +3,7 @@
 
   if (!document.body.classList.contains("guest-site")) return;
 
-  const ANSWER = "Use the Guest Check-In button on the site. It opens in the few days before each celebration so we can finalise who is still coming, transport, food and any last-minute notes for your household.";
+  const ANSWER = "Use the guest check in page in the few days before each celebration so we can finalise who is still coming, transport, food and any last minute notes for your household.";
 
   function replaceVisibleText(root) {
     if (!root) return;
@@ -11,7 +11,7 @@
     const nodes = [];
     while (walker.nextNode()) nodes.push(walker.currentNode);
     nodes.forEach((node) => {
-      const next = node.nodeValue.replace(/RSVP/g, "Guest Check-In").replace(/rsvp/g, "check-in");
+      const next = node.nodeValue.replace(/RSVP/g, "Guest Check In").replace(/rsvp/g, "check in");
       if (next !== node.nodeValue) node.nodeValue = next;
     });
   }
@@ -33,7 +33,7 @@
     const input = panel.querySelector("textarea");
     const log = panel.querySelector(".chat-log");
     if (!form || !input || !log) return;
-    input.placeholder = input.placeholder.replace(/RSVP/g, "check-in");
+    input.placeholder = input.placeholder.replace(/RSVP/g, "guest check in");
     form.addEventListener("submit", (event) => {
       const text = input.value.trim();
       if (!/\b(rsvp|check\s*-?\s*in|confirm|confirmation)\b/i.test(text)) return;

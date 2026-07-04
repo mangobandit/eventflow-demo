@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const COPY_MESSAGE = "Hi, quick wedding check-in for Matt & Cara - please confirm your household here in the few days before the celebration so we can finalise numbers, transport and food: [link]";
+  const COPY_MESSAGE = "Hi, quick wedding check in for Matt & Cara. Please confirm your household here in the few days before the celebration so we can finalise numbers, transport and food: [link]";
   const VENUES = [
     ["spain", "Spain", "Finca Mesa Jardin"],
     ["south_africa", "South Africa", "Mission House"]
@@ -75,7 +75,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.view = "checkin";
-    button.innerHTML = "<span>&#9675;</span>Guest Check-In";
+    button.innerHTML = "<span>&#9675;</span>Guest Check In";
     const guests = nav.querySelector('[data-view="guests"]');
     if (guests) guests.insertAdjacentElement("afterend", button);
     else nav.appendChild(button);
@@ -89,8 +89,8 @@
     panel.dataset.viewPanel = "checkin";
     panel.innerHTML = `
       <div class="view-intro">
-        <div><p class="eyebrow">Private head count</p><h2>Guest Check-In.</h2><p>Use this in the few days before each celebration for final head count, transport and food planning.</p></div>
-        <div class="view-tools"><button class="primary-action" id="copy-checkin-message" type="button">Copy check-in message</button></div>
+        <div><p class="eyebrow">Private head count</p><h2>Guest Check In.</h2><p>Use this in the few days before each celebration for final head count, transport and food planning.</p></div>
+        <div class="view-tools"><button class="primary-action" id="copy-checkin-message" type="button">Copy check in message</button></div>
       </div>
       <div id="checkin-root" class="guest-list-tracker"></div>`;
     content.appendChild(panel);
@@ -106,8 +106,8 @@
     if (history.replaceState) history.replaceState(null, "", "#checkin");
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === "checkin"));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === "checkin"));
-    els.topbarTitle.textContent = "Guest Check-In";
-    els.topbarSubtitle.textContent = "Private guest tracker - Spain and South Africa";
+    els.topbarTitle.textContent = "Guest Check In";
+    els.topbarSubtitle.textContent = "Private guest tracker for Spain and South Africa";
     document.getElementById("global-add").textContent = "+ Add guest";
     document.body.classList.remove("sidebar-open");
     if (rerender && originalRenderAll) originalRenderAll();
@@ -125,10 +125,10 @@
     root.innerHTML = `
       <div class="checkin-kpis">
         ${kpi("Total invited", counts.total, "secure guest rows")}
-        ${kpi("Still attending", counts.attending, "RSVP yes or checked in")}
+        ${kpi("Still attending", counts.attending, "confirmed yes or checked in")}
         ${kpi("Can't make it", counts.declined, "declined or updated")}
-        ${kpi("Need RSVP/check-in", counts.pending, "no response or TBC")}
-        ${kpi("Check-ins received", counts.confirmed, "few-day confirmations")}
+        ${kpi("Need confirmation", counts.pending, "no response or TBC")}
+        ${kpi("Check ins received", counts.confirmed, "few day confirmations")}
         ${kpi("Still to check in", counts.stillToCheckIn, "action list")}
       </div>
       <div class="checkin-grid">
@@ -137,10 +137,10 @@
           <div class="checkin-venue-grid">${VENUES.map(([key, label, venue]) => venueBlock(key, label, venue, summarize(guests.filter((guest) => guest.celebration === key)))).join("")}</div>
         </article>
         <article class="panel checkin-copy">
-          <div class="panel-head"><h3>Manual check-in nudge</h3></div>
+          <div class="panel-head"><h3>Manual check in nudge</h3></div>
           <textarea readonly>${COPY_MESSAGE}</textarea>
           <button class="primary-action" id="copy-checkin-message-inline" type="button">Copy message</button>
-          <div class="checkin-attention">${attention.length ? attention.map(row).join("") : '<div class="empty-state">No guests currently need a pre-wedding check-in.</div>'}</div>
+          <div class="checkin-attention">${attention.length ? attention.map(row).join("") : '<div class="empty-state">No guests currently need a check in before the wedding.</div>'}</div>
         </article>
       </div>
       <article class="panel guest-list-tracker">
@@ -206,7 +206,7 @@
     return `<section class="checkin-venue-block">
       <h4>${escapeHtml(label)}</h4>
       <p>${escapeHtml(venue)} - ${counts.total} guest rows</p>
-      <div class="checkin-meter" aria-label="${escapeHtml(label)} check-in progress"><i style="width:${progress}%"></i></div>
+      <div class="checkin-meter" aria-label="${escapeHtml(label)} check in progress"><i style="width:${progress}%"></i></div>
       <div class="checkin-stat-grid">
         ${stat("Still attending", counts.attending)}
         ${stat("Still to check in", counts.stillToCheckIn)}
@@ -228,7 +228,7 @@
   function row(guest) {
     const attendance = attendanceStatus(guest);
     const confirmed = guestConfirmed(guest);
-    const checkinLabel = confirmed ? (guest.check_in_status === "cant_make_it" ? "Confirmed out" : "Checked in") : "Needs check-in";
+    const checkinLabel = confirmed ? (guest.check_in_status === "cant_make_it" ? "Confirmed out" : "Checked in") : "Needs check in";
     const detail = [
       guest.party_name || "No party label",
       guest.transport ? `Transport: ${guest.transport}` : "Transport TBC",
@@ -280,9 +280,9 @@
   async function copyMessage() {
     try {
       await navigator.clipboard.writeText(COPY_MESSAGE);
-      if (typeof toast === "function") toast("Check-in message copied.");
+      if (typeof toast === "function") toast("Check in message copied.");
     } catch (_error) {
-      window.prompt("Copy check-in message", COPY_MESSAGE);
+      window.prompt("Copy check in message", COPY_MESSAGE);
     }
   }
 

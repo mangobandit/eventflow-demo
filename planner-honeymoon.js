@@ -1,4 +1,4 @@
-(() => {
+﻿(() => {
   "use strict";
 
   const STORE = "mxc-honeymoon-japan-v1";
@@ -38,7 +38,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.view = "honeymoon";
-    button.innerHTML = "<span>✈</span>Honeymoon";
+    button.innerHTML = "<span>âœˆ</span>Honeymoon";
     nav.appendChild(button);
   }
 
@@ -91,7 +91,7 @@
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === "honeymoon"));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === "honeymoon"));
     els.topbarTitle.textContent = "Honeymoon";
-    els.topbarSubtitle.textContent = "Japan planner · draft itinerary and booking tracker";
+    els.topbarSubtitle.textContent = "Japan planner Â· draft itinerary and booking tracker";
     document.getElementById("global-add").textContent = "+ Add honeymoon task";
     document.body.classList.remove("sidebar-open");
     render();
@@ -114,40 +114,40 @@
   function seed() {
     return {
       tab: "overview",
-      route: "Spain → Japan → Spain",
+      route: "Spain â†’ Japan â†’ Spain",
       dates: "TBC after South Africa wedding planning is locked",
-      nights: "14–18 nights draft",
+      nights: "14â€“18 nights draft",
       tasks: [
         item("Decide honeymoon dates", "Choose departure and return windows around wedding recovery, work and family time.", "high"),
-        item("Check Spain to Japan flight routes", "Compare Málaga, Madrid, Seville or Lisbon departures with Tokyo/Osaka arrivals.", "high"),
+        item("Check Spain to Japan flight routes", "Compare MÃ¡laga, Madrid, Seville or Lisbon departures with Tokyo/Osaka arrivals.", "high"),
         item("Book outbound flights", "Decide if arriving Tokyo or Osaka makes the route easier.", "high"),
-        item("Book return flights", "Consider open-jaw return if route ends in a different city.", "high"),
+        item("Book return flights", "Consider open jaw return if route ends in a different city.", "high"),
         item("Passport and travel document check", "Confirm passport validity and any entry requirements before booking.", "high"),
-        item("Build Google Maps saved-place import list", "Export or manually copy the places already saved on your map into this tab.", "normal"),
-        item("Choose hotel areas", "Tokyo, Kyoto and final-night airport hotel if needed.", "normal"),
+        item("Build Google Maps saved place import list", "Export or manually copy the places already saved on your map into this tab.", "normal"),
+        item("Choose hotel areas", "Tokyo, Kyoto and final night airport hotel if needed.", "normal"),
         item("Book first two hotels", "Lock Tokyo and Kyoto bases first; add ryokan or countryside stay after.", "normal"),
         item("Research luggage forwarding", "Decide if large bags should be sent between hotels while moving cities.", "normal"),
         item("Book key restaurants", "Prioritise special meals, BBQ/izakaya, sushi, ramen and any honeymoon dinner.", "normal"),
         item("Book one premium ryokan / onsen stay", "Potential Hakone, Kawaguchiko, Izu or Kyoto countryside option.", "normal"),
-        item("Create rainy-day alternatives", "Museums, shopping streets, food halls, indoor experiences.", "low")
+        item("Create rainy day alternatives", "Museums, shopping streets, food halls, indoor experiences.", "low")
       ],
       itinerary: [
-        day("1–4", "Tokyo", "Arrive, recover, food neighbourhoods, Shibuya/Shinjuku, coffee, shopping, one special dinner."),
+        day("1â€“4", "Tokyo", "Arrive, recover, food neighbourhoods, Shibuya/Shinjuku, coffee, shopping, one special dinner."),
         day("5", "Hakone or Fuji area", "Ryokan, onsen, mountain views, slower honeymoon reset."),
-        day("6–9", "Kyoto", "Temples, old streets, tea, gardens, day trip options and a slower romantic base."),
+        day("6â€“9", "Kyoto", "Temples, old streets, tea, gardens, day trip options and a slower romantic base."),
         day("10", "Nara or Uji", "Deer park / temples or matcha-focused day trip."),
-        day("11–13", "Osaka", "Street food, nightlife, markets, baseball/arcade energy, easy Kyoto access if needed."),
-        day("14–15", "Hiroshima / Miyajima or Kanazawa", "Choose one deeper culture/nature extension, not both unless the trip is longer."),
-        day("Final night", "Tokyo or Osaka airport side", "Easy final shopping, bags packed, low-stress departure.")
+        day("11â€“13", "Osaka", "Street food, nightlife, markets, baseball/arcade energy, easy Kyoto access if needed."),
+        day("14â€“15", "Hiroshima / Miyajima or Kanazawa", "Choose one deeper culture/nature extension, not both unless the trip is longer."),
+        day("Final night", "Tokyo or Osaka airport side", "Easy final shopping, bags packed, low stress departure.")
       ],
       flights: [
-        row("Outbound", "Spain to Japan", "TBC", "Compare Madrid/Málaga/Seville/Lisbon routes; decide Tokyo vs Osaka arrival."),
-        row("Return", "Japan to Spain", "TBC", "Check open-jaw pricing if route ends away from arrival city."),
-        row("Internal rail", "Tokyo · Kyoto · Osaka", "TBC", "Research whether individual tickets or a pass works better for the final route."),
-        row("Luggage", "Hotel-to-hotel forwarding", "TBC", "Useful if carrying wedding/honeymoon bags across multiple cities.")
+        row("Outbound", "Spain to Japan", "TBC", "Compare Madrid/MÃ¡laga/Seville/Lisbon routes; decide Tokyo vs Osaka arrival."),
+        row("Return", "Japan to Spain", "TBC", "Check open jaw pricing if route ends away from arrival city."),
+        row("Internal rail", "Tokyo Â· Kyoto Â· Osaka", "TBC", "Research whether individual tickets or a pass works better for the final route."),
+        row("Luggage", "Hotel to hotel forwarding", "TBC", "Useful if carrying wedding/honeymoon bags across multiple cities.")
       ],
       places: [
-        place("Tokyo", "Shibuya, Shinjuku, Ginza, Daikanyama, Nakameguro, TeamLab-style digital art, food halls, cocktail bars."),
+        place("Tokyo", "Shibuya, Shinjuku, Ginza, Daikanyama, Nakameguro, TeamLab style digital art, food halls, cocktail bars."),
         place("Kyoto", "Gion, Higashiyama, Arashiyama, Kiyomizu area, Nishiki Market, tea houses, gardens."),
         place("Osaka", "Dotonbori, Namba, Shinsekai, Kuromon Market, food crawl and nightlife."),
         place("Hakone / Fuji", "Ryokan, onsen, lake views, slower romantic reset."),

@@ -60,7 +60,7 @@
         field("description", "Description", "textarea", { full: true }),
         field("owner", "Owner", "select", { options: OWNER_OPTIONS, default: () => state.owner }),
         field("celebration", "Wedding", "select", { options: CELEBRATION_OPTIONS, default: "shared" }),
-        field("category", "Category", "text", { placeholder: "Venue, attire, legal…" }),
+        field("category", "Category", "text", { placeholder: "Venue, attire, legal..." }),
         field("priority", "Priority", "select", { options: [["normal", "Normal"], ["high", "High"], ["low", "Low"]], default: "normal" }),
         field("due_date", "Due date", "date"),
         field("status", "Status", "select", { options: STATUS_OPTIONS, default: "outstanding" }),
@@ -92,9 +92,9 @@
         field("party_name", "Invitation / party", "text"),
         field("owner", "Planner owner", "select", { options: OWNER_OPTIONS, default: "shared" }),
         field("celebration", "Wedding", "select", { options: [["spain", "Spain"], ["south_africa", "South Africa"]], default: "spain" }),
-        field("rsvp_status", "RSVP", "select", { options: [["yes", "Yes"], ["no", "No"], ["tbc", "TBC"], ["no_response", "No response"]], default: "no_response" }),
+        field("rsvp_status", "Attendance", "select", { options: [["yes", "Yes"], ["no", "No"], ["tbc", "TBC"], ["no_response", "No response"]], default: "no_response" }),
         field("dietary", "Dietary notes", "textarea", { full: true }),
-        field("transport", "Transport", "text", { placeholder: "Required, not required, TBC…" }),
+        field("transport", "Transport", "text", { placeholder: "Required, not required, TBC..." }),
         field("accommodation", "Accommodation", "text"),
         field("contact", "Contact details", "text", { full: true }),
         field("notes", "Private notes", "textarea", { full: true })
@@ -128,7 +128,7 @@
         field("celebration", "Wedding", "select", { options: CELEBRATION_OPTIONS, default: "shared" }),
         field("item_date", "Date", "date", { required: true }),
         field("item_time", "Time", "time"),
-        field("audience", "Audience", "select", { options: [["private", "Private planner"], ["guest", "Can be guest-facing"]], default: "private" }),
+        field("audience", "Audience", "select", { options: [["private", "Private planner"], ["guest", "Can be guest facing"]], default: "private" }),
         field("location", "Location", "text"),
         field("sort_order", "Order", "number", { step: "1", default: 0 }),
         field("status", "Status", "select", { options: STATUS_OPTIONS, default: "outstanding" }),
@@ -140,7 +140,7 @@
       title: "Guest update",
       fields: [
         field("title", "Headline / question", "text", { required: true, full: true }),
-        field("body", "Guest-facing answer", "textarea", { required: true, full: true }),
+        field("body", "Guest facing answer", "textarea", { required: true, full: true }),
         field("slug", "Unique slug", "text", { placeholder: "Generated from title when blank" }),
         field("section", "Type", "select", { options: [["announcement", "Announcement"], ["faq", "FAQ"], ["travel", "Travel note"], ["stay", "Accommodation note"], ["general", "General"]], default: "announcement" }),
         field("country", "Applies to", "select", { options: [["both", "Both weddings"], ["spain", "Spain"], ["south_africa", "South Africa"]], default: "both" }),
@@ -154,18 +154,18 @@
 
   function field(name, label, type, options = {}) { return { name, label, type, ...options }; }
 
-  /* The RSVP control centre is isolated from the core planner and loaded only
+  /* The guest confirmation centre is isolated from the core planner and loaded only
      after every existing planner module has finished. This keeps the base
-     planner usable even before the RSVP database migration is installed. */
+     planner usable even before the guest database migration is installed. */
   window.addEventListener("load", () => {
     if (document.querySelector('script[data-mxc-rsvp-admin]')) return;
     const stylesheet = document.createElement("link");
     stylesheet.rel = "stylesheet";
-    stylesheet.href = "planner-rsvp.css?v=20260630-user-login";
+    stylesheet.href = "planner-rsvp.css?v=20260704-coherence-pass";
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20260630-user-login";
+    script.src = "planner-rsvp.js?v=20260704-coherence-pass";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

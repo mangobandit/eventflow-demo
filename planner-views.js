@@ -1,4 +1,4 @@
-  function filtered(table, { ignoreOwner = false, ignoreCelebration = false } = {}) {
+﻿  function filtered(table, { ignoreOwner = false, ignoreCelebration = false } = {}) {
     return (state.data[table] || []).filter((row) => {
       const ownerMatch = ignoreOwner || !row.owner || row.owner === state.owner;
       const celebrationMatch = ignoreCelebration || state.celebration === "all" || row.celebration === state.celebration || row.celebration === "shared";
@@ -25,7 +25,7 @@
       text("kpi-next-due", days < 0 ? `${Math.abs(days)}d` : days === 0 ? "Today" : `${days}d`);
       text("kpi-next-due-label", dated[0].title);
     } else {
-      text("kpi-next-due", "—");
+      text("kpi-next-due", "Not set");
       text("kpi-next-due-label", "no dated actions yet");
     }
 
@@ -46,7 +46,7 @@
     const next = timeline[0];
     const nextCard = document.getElementById("next-event-card");
     if (!next) nextCard.outerHTML = `<div id="next-event-card" class="empty-state">Add dated timeline items to see the next milestone.</div>`;
-    else nextCard.outerHTML = `<div id="next-event-card" class="action-list"><div class="action-row ${escapeHtml(next.status)}"><i class="action-dot"></i><div><b>${escapeHtml(next.title)}</b><small>${labelCelebration(next.celebration)}${next.location ? ` · ${escapeHtml(next.location)}` : ""}</small></div><time>${formatDate(next.item_date, { short: false })}${next.item_time ? ` · ${escapeHtml(next.item_time.slice(0, 5))}` : ""}</time></div></div>`;
+    else nextCard.outerHTML = `<div id="next-event-card" class="action-list"><div class="action-row ${escapeHtml(next.status)}"><i class="action-dot"></i><div><b>${escapeHtml(next.title)}</b><small>${labelCelebration(next.celebration)}${next.location ? ` Â· ${escapeHtml(next.location)}` : ""}</small></div><time>${formatDate(next.item_date, { short: false })}${next.item_time ? ` Â· ${escapeHtml(next.item_time.slice(0, 5))}` : ""}</time></div></div>`;
   }
 
   function renderTasks() {
@@ -67,12 +67,12 @@
     body.innerHTML = rows.length ? rows.map((item) => {
       const total = Number(item.estimated || 0);
       const paid = Number(item.paid || item.deposit || 0);
-      return `<tr data-id="${item.id}"><td><b>${escapeHtml(item.title)}</b><br><small>${escapeHtml(item.notes || "")}</small></td><td>${labelCelebration(item.celebration)}</td><td>${escapeHtml(item.category || "—")}</td><td class="money">${formatMoney(total, item.currency)}</td><td class="money">${formatMoney(paid, item.currency)}</td><td class="money">${formatMoney(Math.max(total - paid, 0), item.currency)}</td><td>${formatDate(item.due_date)}</td><td>${statusBadge(item.status)}</td></tr>`;
+      return `<tr data-id="${item.id}"><td><b>${escapeHtml(item.title)}</b><br><small>${escapeHtml(item.notes || "")}</small></td><td>${labelCelebration(item.celebration)}</td><td>${escapeHtml(item.category || "Not set")}</td><td class="money">${formatMoney(total, item.currency)}</td><td class="money">${formatMoney(paid, item.currency)}</td><td class="money">${formatMoney(Math.max(total - paid, 0), item.currency)}</td><td>${formatDate(item.due_date)}</td><td>${statusBadge(item.status)}</td></tr>`;
     }).join("") : tableEmpty(8, "No budget items in this planner lens.");
     const all = filtered("budget_items");
     const eur = all.filter((item) => item.currency === "EUR").reduce((sum, item) => sum + Number(item.estimated || 0), 0);
     const zar = all.filter((item) => item.currency === "ZAR").reduce((sum, item) => sum + Number(item.estimated || 0), 0);
-    text("budget-summary", `${formatMoney(eur, "EUR")} · ${formatMoney(zar, "ZAR")}`);
+    text("budget-summary", `${formatMoney(eur, "EUR")} Â· ${formatMoney(zar, "ZAR")}`);
     bindTableRows(body, "budget_items");
   }
 
@@ -80,9 +80,9 @@
     let rows = filtered("guests");
     rows = searchRows(rows, search, ["name", "party_name", "dietary", "transport", "accommodation", "notes"]);
     const body = document.getElementById("guests-table-body");
-    body.innerHTML = rows.length ? rows.map((guest) => `<tr data-id="${guest.id}"><td><b>${escapeHtml(guest.name)}</b></td><td>${escapeHtml(guest.party_name || "—")}</td><td>${labelCelebration(guest.celebration)}</td><td><span class="status-badge ${guest.rsvp_status === "yes" ? "status-approved" : guest.rsvp_status === "no" ? "status-outstanding" : "status-pending"}">${escapeHtml(labelRsvp(guest.rsvp_status))}</span></td><td>${escapeHtml(guest.dietary || "—")}</td><td>${escapeHtml(guest.transport || "—")}</td><td>${escapeHtml(guest.accommodation || "—")}</td><td><span class="private-chip">${escapeHtml(guest.notes || "—")}</span></td></tr>`).join("") : tableEmpty(8, "No guest records in this planner lens.");
+    body.innerHTML = rows.length ? rows.map((guest) => `<tr data-id="${guest.id}"><td><b>${escapeHtml(guest.name)}</b></td><td>${escapeHtml(guest.party_name || "Not set")}</td><td>${labelCelebration(guest.celebration)}</td><td><span class="status-badge ${guest.rsvp_status === "yes" ? "status-approved" : guest.rsvp_status === "no" ? "status-outstanding" : "status-pending"}">${escapeHtml(labelRsvp(guest.rsvp_status))}</span></td><td>${escapeHtml(guest.dietary || "Not set")}</td><td>${escapeHtml(guest.transport || "Not set")}</td><td>${escapeHtml(guest.accommodation || "Not set")}</td><td><span class="private-chip">${escapeHtml(guest.notes || "Not set")}</span></td></tr>`).join("") : tableEmpty(8, "No guest records in this planner lens.");
     const yes = filtered("guests").filter((guest) => guest.rsvp_status === "yes").length;
-    text("guest-summary", `${filtered("guests").length} guests · ${yes} yes`);
+    text("guest-summary", `${filtered("guests").length} guests Â· ${yes} yes`);
     bindTableRows(body, "guests");
   }
 
@@ -90,7 +90,7 @@
     let rows = filtered("vendors");
     rows = searchRows(rows, search, ["name", "category", "contact_name", "email", "phone", "next_action", "notes"]);
     const body = document.getElementById("vendors-table-body");
-    body.innerHTML = rows.length ? rows.map((vendor) => `<tr data-id="${vendor.id}"><td><b>${escapeHtml(vendor.name)}</b></td><td>${labelCelebration(vendor.celebration)}</td><td>${escapeHtml(vendor.category || "—")}</td><td>${escapeHtml(vendor.contact_name || "")}${vendor.email ? `<br><small>${escapeHtml(vendor.email)}</small>` : ""}${vendor.phone ? `<br><small>${escapeHtml(vendor.phone)}</small>` : ""}</td><td class="money">${vendor.quote_amount ? formatMoney(vendor.quote_amount, vendor.currency) : "—"}</td><td>${escapeHtml(vendor.next_action || "—")}</td><td>${formatDate(vendor.due_date)}</td><td>${statusBadge(vendor.status)}</td></tr>`).join("") : tableEmpty(8, "No suppliers in this planner lens.");
+    body.innerHTML = rows.length ? rows.map((vendor) => `<tr data-id="${vendor.id}"><td><b>${escapeHtml(vendor.name)}</b></td><td>${labelCelebration(vendor.celebration)}</td><td>${escapeHtml(vendor.category || "Not set")}</td><td>${escapeHtml(vendor.contact_name || "")}${vendor.email ? `<br><small>${escapeHtml(vendor.email)}</small>` : ""}${vendor.phone ? `<br><small>${escapeHtml(vendor.phone)}</small>` : ""}</td><td class="money">${vendor.quote_amount ? formatMoney(vendor.quote_amount, vendor.currency) : "Not set"}</td><td>${escapeHtml(vendor.next_action || "Not set")}</td><td>${formatDate(vendor.due_date)}</td><td>${statusBadge(vendor.status)}</td></tr>`).join("") : tableEmpty(8, "No suppliers in this planner lens.");
     text("vendor-summary", `${filtered("vendors").length} suppliers`);
     bindTableRows(body, "vendors");
   }
@@ -100,7 +100,7 @@
     rows = searchRows(rows, search, ["title", "location", "notes", "audience"]);
     rows.sort(sortByDate("item_date"));
     const body = document.getElementById("timeline-table-body");
-    body.innerHTML = rows.length ? rows.map((item) => `<tr data-id="${item.id}"><td><b>${formatDate(item.item_date, { short: false })}</b></td><td>${escapeHtml(item.item_time?.slice(0, 5) || "—")}</td><td><b>${escapeHtml(item.title)}</b><br><small>${escapeHtml(item.notes || "")}</small></td><td>${labelCelebration(item.celebration)}</td><td>${ownerTag(item.owner)}</td><td>${escapeHtml(item.audience === "guest" ? "Guest-facing" : "Private")}</td><td>${escapeHtml(item.location || "—")}</td><td>${statusBadge(item.status)}</td></tr>`).join("") : tableEmpty(8, "No timeline items in this planner lens.");
+    body.innerHTML = rows.length ? rows.map((item) => `<tr data-id="${item.id}"><td><b>${formatDate(item.item_date, { short: false })}</b></td><td>${escapeHtml(item.item_time?.slice(0, 5) || "Not set")}</td><td><b>${escapeHtml(item.title)}</b><br><small>${escapeHtml(item.notes || "")}</small></td><td>${labelCelebration(item.celebration)}</td><td>${ownerTag(item.owner)}</td><td>${escapeHtml(item.audience === "guest" ? "Guest facing" : "Private")}</td><td>${escapeHtml(item.location || "Not set")}</td><td>${statusBadge(item.status)}</td></tr>`).join("") : tableEmpty(8, "No timeline items in this planner lens.");
     text("timeline-summary", `${filtered("timeline_items").length} milestones`);
     bindTableRows(body, "timeline_items");
   }
@@ -119,11 +119,11 @@
   }
 
   function actionRow(task) {
-    return `<div class="action-row ${escapeHtml(task.status)}"><i class="action-dot"></i><div><b>${escapeHtml(task.title)}</b><small>${ownerLabel(task.owner)} · ${labelCelebration(task.celebration)}</small></div><time>${task.due_date ? formatDate(task.due_date) : escapeHtml(titleCase(task.priority || "normal"))}</time></div>`;
+    return `<div class="action-row ${escapeHtml(task.status)}"><i class="action-dot"></i><div><b>${escapeHtml(task.title)}</b><small>${ownerLabel(task.owner)} Â· ${labelCelebration(task.celebration)}</small></div><time>${task.due_date ? formatDate(task.due_date) : escapeHtml(titleCase(task.priority || "normal"))}</time></div>`;
   }
 
   function paymentRow(item) {
-    return `<div class="action-row ${escapeHtml(item.status)}"><i class="action-dot"></i><div><b>${escapeHtml(item.title)}</b><small>${labelCelebration(item.celebration)} · ${formatMoney(balance(item), item.currency)} balance</small></div><time>${formatDate(item.due_date)}</time></div>`;
+    return `<div class="action-row ${escapeHtml(item.status)}"><i class="action-dot"></i><div><b>${escapeHtml(item.title)}</b><small>${labelCelebration(item.celebration)} Â· ${formatMoney(balance(item), item.currency)} balance</small></div><time>${formatDate(item.due_date)}</time></div>`;
   }
 
   function switchView(view, rerender = true) {
@@ -131,9 +131,9 @@
     if (history.replaceState) history.replaceState(null, "", `#${state.view}`);
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === state.view));
-    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", checkin: "Guest Check-In", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing" }[state.view] || "Planner";
+    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", checkin: "Guest Check In", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing" }[state.view] || "Planner";
     els.topbarTitle.textContent = label;
-    els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner · ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
+    els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner Â· ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
     const addButton = document.getElementById("global-add");
     addButton.textContent = state.view === "publishing" ? "+ Add update" : state.view === "overview" ? "+ Add task" : `+ Add ${definitions[tableForView(state.view)]?.singular || "item"}`;
     document.body.classList.remove("sidebar-open");

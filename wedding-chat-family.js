@@ -18,11 +18,11 @@
     },
     {
       test: /how early|arrive early|arrival time|early can i arrive/i,
-      answer: "You may arrive up to two hours before the official start time if you need to. The bar will remain closed until the official kick-off time, so early arrival is mainly for settling in and avoiding a rush."
+      answer: "You may arrive up to two hours before the official start time if you need to. Welcome drinks and soft drinks will be available before the reception, and the bar will open fully afterwards. We will do our best to make sure everyone gets a drink swiftly once the bar opens."
     },
     {
       test: /open bar|bar|drinks|paid bar|cash bar/i,
-      answer: "Yes, the bar will be hosted up to a certain time. After that point, any extra drinks will be for guests’ own account. We’ll make the final bar timing clear on the day."
+      answer: "Welcome drinks and soft drinks will be available before the reception. The bar will open fully after the reception, and we will do our best to make sure guests get their drinks swiftly once it opens."
     },
     {
       test: /indoors|outdoors|inside|outside|tent|rain|weather/i,
@@ -34,15 +34,15 @@
     },
     {
       test: /timing|times|schedule|late|start|ceremony time|what time/i,
-      answer: "We’ll keep the day running with clear start and stop times, so please arrive promptly and avoid being late. If you want a drink before the ceremony, please grab it before the bar closes for the ceremony start. Final timings will be shared closer to the day."
+      answer: "We will keep the day running with clear start and stop times, so please arrive promptly and avoid being late. Welcome drinks and soft drinks will be available before the reception, and the bar will open fully afterwards. Final timings will be shared closer to the day."
     },
     {
       test: /food|eat|meal|bbq|braai|meat|vegetarian|graz/i,
-      answer: "Expect a Western-inspired feast: BBQ and braai-style meats, with much of the food cooked over open fire. There will be options for lighter grazers as well as those who want something more hearty."
+      answer: "Expect a Western inspired feast: BBQ and braai style meats, with much of the food cooked over open fire. There will be options for lighter grazers as well as those who want something more hearty."
     },
     {
       test: /expect|what happens|on the day|games|entertainment|horseshoe|horse shoe/i,
-      answer: "Expect food, drinks, laughs and a relaxed Rodeo-style celebration. Depending on which wedding you’re attending, there will be small Western-inspired games and entertainment, such as horseshoe toss and other fun touches to keep the day moving."
+      answer: "Expect food, drinks, laughs and a relaxed Rodeo style celebration. Depending on which wedding you are attending, there will be small Western inspired games and entertainment, such as horseshoe toss and other fun touches to keep the day moving."
     },
     {
       test: /photo|photos|post|instagram|online|social|video|walls|walls\.io/i,
@@ -83,7 +83,7 @@
     }, true);
 
     if (chips && !chips.querySelector('[data-extra-faq-chip="true"]')) {
-      ["Can children come?", "Is there parking?", "Will there be an open bar?", "Can I post photos online?"].forEach((label) => {
+      ["Can children come?", "Is there parking?", "How do drinks work?", "Can I post photos online?"].forEach((label) => {
         const button = document.createElement("button");
         button.className = "chat-chip";
         button.type = "button";

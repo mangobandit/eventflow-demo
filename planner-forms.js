@@ -50,7 +50,7 @@
     });
     if (table === "content_blocks" && !payload.slug) payload.slug = slugify(payload.title);
 
-    setSync("Saving…", true);
+    setSync("Saving...", true);
     let saved;
     try {
       saved = await plannerRpc("planner_save_entity", {
@@ -76,7 +76,7 @@
   async function deleteEntity() {
     const { table, record } = state.editing;
     if (!record || !window.confirm(`Delete this ${definitions[table].singular}? This cannot be undone.`)) return;
-    setSync("Deleting…", true);
+    setSync("Deleting...", true);
     try {
       await plannerRpc("planner_delete_entity", {
         p_session_token: state.session?.token || "",
@@ -136,9 +136,9 @@
     return new Intl.NumberFormat(currency === "ZAR" ? "en-ZA" : "en-IE", { style: "currency", currency, maximumFractionDigits: amount % 1 ? 2 : 0 }).format(amount);
   }
   function formatDate(value, { short = true } = {}) {
-    if (!value) return "—";
+    if (!value) return "Not set";
     const date = new Date(`${String(value).slice(0, 10)}T12:00:00`);
-    if (Number.isNaN(date.getTime())) return "—";
+    if (Number.isNaN(date.getTime())) return "Not set";
     return new Intl.DateTimeFormat("en-GB", short ? { day: "numeric", month: "short", year: "2-digit" } : { weekday: "short", day: "numeric", month: "long", year: "numeric" }).format(date);
   }
   function balance(item) { return Math.max(Number(item.estimated || 0) - Number(item.paid || item.deposit || 0), 0); }
@@ -156,7 +156,7 @@
     if (!needle) return rows;
     return rows.filter((row) => fields.some((key) => String(row[key] || "").toLowerCase().includes(needle)));
   }
-  function truncate(value, length) { const textValue = String(value || ""); return textValue.length > length ? `${textValue.slice(0, length - 1)}…` : textValue; }
+  function truncate(value, length) { const textValue = String(value || ""); return textValue.length > length ? `${textValue.slice(0, length - 3)}...` : textValue; }
   function slugify(value) { return String(value || "update").toLowerCase().normalize("NFKD").replace(/[\u0300-\u036f]/g, "").replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 80) || `update-${Date.now()}`; }
   function titleCase(value) { return String(value || "").replaceAll("_", " ").replace(/\b\w/g, (char) => char.toUpperCase()); }
   function escapeHtml(value) { return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;"); }
