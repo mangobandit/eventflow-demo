@@ -33,6 +33,7 @@ assert.match(homepage, /See our suggested South Africa travel plan/);
 assert.match(homepage, /AGP \/ GIB/);
 assert.match(homepage, /Málaga or Gibraltar Airport/);
 assert.match(homepage, /Málaga\/Gibraltar is best for guests prioritising route choice/);
+assert.match(homepage, /https:\/\/www\.midlandsreservations\.co\.za\/za\/lions-river-cottages\//);
 assert.match(homepage, /guest\.js\?v=20260704-homepage-copy/);
 assert.match(homepage, /style\.css\?v=20260704-mission-house-gallery/);
 assert.match(homepage, /Mission House reception tables overlooking the KZN Midlands/);
