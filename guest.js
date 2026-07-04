@@ -4,12 +4,12 @@
   stripTrackingParams();
 
   const config = window.MXC_CONFIG || {};
-  const CHECK_IN_ENABLED = true;
+  const CHECK_IN_ENABLED = false;
   const menuButton = document.querySelector(".menu-button");
   const publicNav = document.querySelector(".public-nav");
 
   const BUILT_IN_FAQS = [
-    { title: "What is the wedding theme?", body: "Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged. Don't have a cowboy hat? We'll provide one for you." },
+    { title: "What is the wedding theme?", body: "Rodeo-style wedding celebrations built around Western music and great BBQ food. Cowboy boots, hats, leather and denim are welcome, and encouraged. Don't have a cowboy hat? We'll provide one for you if you'd like one." },
     { title: "What can I expect on the day?", body: "Food, drinks, laughs and a relaxed Rodeo-style celebration. Depending on which wedding you are attending, there will be small Western-inspired games and entertainment, such as horseshoe toss and other fun touches to keep the day moving." },
     { title: "What kind of food will there be?", body: "Expect a Western-inspired feast: BBQ and braai-style meats, with much of the food cooked over open fire. There will be options for lighter grazers as well as those who want something more hearty." },
     { title: "What should we wear?", body: "The dress feel is Rodeo Western. Cowboy boots, hats, leather, denim, belts, bolo ties, fringe, country shirts and country-style dresses are welcome and encouraged. Choose shoes that work on gardens, lawns and a dancefloor." },
@@ -138,8 +138,9 @@
       theme.id = "rodeo-theme-note";
       theme.className = "live-note-grid live-note-grid-dark";
       theme.innerHTML = `
-        <article class="live-note-card"><span>Wedding theme</span><h3>Rodeo-style celebration</h3><p>We're embracing our love of Western music and great BBQ food by hosting Rodeo-style weddings. Cowboy boots, hats, leather and denim are welcome, and encouraged.</p></article>
-        <article class="live-note-card"><span>What to wear</span><h3>Western, comfortable, celebration-ready</h3><p>Think boots, hats, denim, leather, belts, bolo ties, fringe, country shirts and dresses that can handle gardens, lawns and a dancefloor.</p></article>`;
+        <article class="live-note-card"><span>Wedding theme</span><h3>Rodeo-style celebration</h3><p>We're embracing our love of Western music and great BBQ food by hosting Rodeo-style weddings. Cowboy boots, hats, leather and denim are welcome, and encouraged. If you don't have a cowboy hat, we'll have one for you if you'd like one.</p></article>
+        <article class="live-note-card"><span>What to wear</span><h3>Western, comfortable, celebration-ready</h3><p>Think boots, hats, denim, leather, belts, bolo ties, fringe, country shirts and dresses that can handle gardens, lawns and a dancefloor.</p></article>
+        <div class="live-note-actions"><a class="button button-light" href="https://za.pinterest.com/carakenny/mxc-wedding-outfit-inspo/" target="_blank" rel="noopener noreferrer">Outfit inspo board</a></div>`;
       liveUpdates.appendChild(theme);
     }
 

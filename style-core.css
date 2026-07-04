@@ -97,6 +97,8 @@ img { max-width: 100%; }
 .live-note-grid-dark .live-note-card span { color: #c8d0c2; }
 .live-note-grid-dark .live-note-card h3 { color: #fff; }
 .live-note-grid-dark .live-note-card p { color: #dbe0d7; }
+.live-note-actions { grid-column: 1 / -1; display: flex; justify-content: center; padding-top: 8px; }
+.live-note-actions .button { border-color: rgba(255,255,255,.28); }
 
 .intro-section, .section-heading { display: grid; grid-template-columns: 86px minmax(360px, 1fr) minmax(280px, .65fr); gap: clamp(20px, 5vw, 80px); align-items: end; padding: clamp(74px, 9vw, 140px) 6vw; }
 .intro-number { color: var(--clay); font-family: var(--serif); font-size: 28px; }

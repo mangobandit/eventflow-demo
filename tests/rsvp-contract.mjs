@@ -5,6 +5,7 @@ import { resolve } from "node:path";
 const root = resolve(import.meta.dirname, "..");
 const read = (file) => readFileSync(resolve(root, file), "utf8");
 
+const homepage = read("index.html");
 const checkinPage = read("rsvp.html");
 const guest = read("guest.js");
 const checkinScript = read("rsvp.js");
@@ -21,6 +22,11 @@ const checkinDropdownSql = read("supabase/migrations/20260630_guest_checkin_drop
 const checkinDropdownLockdownSql = read("supabase/migrations/20260630_guest_checkin_dropdown_lockdown.sql");
 const plannerLoginSql = read("supabase/migrations/20260630_planner_username_login.sql");
 const config = read("config.js");
+
+assert.match(homepage, /Below you'll find guidance for both of our weddings\./);
+assert.match(homepage, /we'll keep adding friendlier, more detailed updates as we get closer to each celebration/);
+assert.match(homepage, /guest\.js\?v=20260704-homepage-copy/);
+assert.doesNotMatch(homepage, /Save both dates\. South Africa accommodation options are below/);
 
 assert.match(checkinPage, /Matt & Cara · Guest Check-In/);
 assert.match(checkinPage, /Confirm your household before the celebration/);
@@ -71,13 +77,15 @@ const expectedFaqs = [
 
 expectedFaqs.forEach((title) => assert.match(guest, new RegExp(title.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"))));
 assert.match(guest, /const BUILT_IN_FAQS = \[/);
-assert.match(guest, /Don't have a cowboy hat\? We'll provide one for you\./);
-assert.match(guest, /const CHECK_IN_ENABLED = true;/, "guest check-in must stay visible after RSVP is archived");
-assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visibility must be controlled separately from archived RSVP");
+assert.match(guest, /Don't have a cowboy hat\? We'll provide one for you if you'd like one\./);
+assert.match(guest, /If you don't have a cowboy hat, we'll have one for you if you'd like one\./);
+assert.match(guest, /https:\/\/za\.pinterest\.com\/carakenny\/mxc-wedding-outfit-inspo\//);
+assert.match(guest, /Outfit inspo board/);
+assert.match(guest, /const CHECK_IN_ENABLED = false;/, "homepage guest check-in entry points must stay archived");
+assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visibility must be controlled separately from the live RSVP backend");
 assert.match(guest, /function normalizeFaqTitle/);
 assert.match(guest, /renderFaqList\(faqs\)/);
 assert.doesNotMatch(guest, /Can children attend/);
-assert.match(guest, /Guest Check-In/);
 assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"/);
 
 assert.match(plannerLoader, /hasSupabaseSettings/, "simple couple access must detect configured Supabase settings");
