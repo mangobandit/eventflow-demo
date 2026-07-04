@@ -101,6 +101,15 @@
 .practical-grid h3 { margin: 30px 0 10px; font-family: var(--serif); font-size: 24px; font-weight: 500; }
 .practical-grid p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.68; }
 
+.gift-section { display: grid; grid-template-columns: .72fr 1.28fr; gap: 80px; padding: clamp(70px, 9vw, 120px) 7vw; border-top: 1px solid rgba(48,58,45,.12); background: #f7f1e8; }
+.gift-copy h2 { margin: 0; font-family: var(--serif); font-size: clamp(44px, 5vw, 74px); font-weight: 400; line-height: .98; }
+.gift-copy > p:last-child { max-width: 520px; color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
+.gift-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); border-top: 1px solid var(--line); border-left: 1px solid var(--line); }
+.gift-grid article { min-height: 230px; padding: 28px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); background: rgba(255,255,255,.38); }
+.gift-grid span { color: var(--clay); font-family: var(--serif); font-size: 18px; }
+.gift-grid h3 { margin: 46px 0 12px; font-family: var(--serif); font-size: 25px; font-weight: 500; }
+.gift-grid p { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.68; }
+
 .faq-section { display: grid; grid-template-columns: .72fr 1.28fr; gap: 80px; padding: clamp(70px, 9vw, 130px) 7vw; background: var(--paper); }
 .faq-heading h2 { margin: 0; font-family: var(--serif); font-size: clamp(44px, 5vw, 74px); font-weight: 400; line-height: .98; }
 .faq-heading > p:last-child { color: var(--ink-soft); font-size: 14px; line-height: 1.6; }
