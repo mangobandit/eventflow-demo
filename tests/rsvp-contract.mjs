@@ -28,6 +28,8 @@ const config = read("config.js");
 
 assert.match(homepage, /Below you'll find guidance for both of our weddings\./);
 assert.match(homepage, /we'll keep adding friendlier, more detailed updates as we get closer to each celebration/);
+assert.match(homepage, /See our suggested Spain travel plan/);
+assert.match(homepage, /See our suggested South Africa travel plan/);
 assert.match(homepage, /guest\.js\?v=20260704-homepage-copy/);
 assert.match(homepage, /style\.css\?v=20260704-mission-house-gallery/);
 assert.match(homepage, /Mission House reception tables overlooking the KZN Midlands/);
