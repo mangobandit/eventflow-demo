@@ -78,10 +78,13 @@
 .experience-tabs button { min-width: 130px; min-height: 44px; border: 1px solid rgba(255,255,255,.2); border-radius: 999px; color: #fff; background: transparent; cursor: pointer; font-size: 10px; font-weight: 800; letter-spacing: .13em; text-transform: uppercase; }
 .experience-tabs button.active { color: var(--ink); background: var(--paper); }
 .experience-panel { display: grid; grid-template-columns: repeat(3, 1fr); border-top: 1px solid rgba(255,255,255,.16); border-left: 1px solid rgba(255,255,255,.16); }
-.experience-panel article { min-height: 290px; padding: 30px; border-right: 1px solid rgba(255,255,255,.16); border-bottom: 1px solid rgba(255,255,255,.16); }
+.experience-panel article { display: flex; min-height: 290px; flex-direction: column; padding: 30px; border-right: 1px solid rgba(255,255,255,.16); border-bottom: 1px solid rgba(255,255,255,.16); }
 .experience-panel article > span { color: #aebba8; font-family: var(--serif); font-size: 18px; }
 .experience-panel h3 { margin: 58px 0 12px; font-family: var(--serif); font-size: 30px; font-weight: 400; }
 .experience-panel p { color: #c8cec4; font-size: 13px; line-height: 1.7; }
+.experience-map-link { display: inline-flex; width: max-content; align-items: center; gap: 8px; margin-top: auto; padding-top: 24px; color: #eef3e8; font-size: 10px; font-weight: 850; letter-spacing: .1em; text-decoration: none; text-transform: uppercase; }
+.experience-map-link span { color: #aebba8; font-size: 15px; transition: transform .2s ease; }
+.experience-map-link:hover span { transform: translateX(3px); }
 
 .practical-section { display: grid; grid-template-columns: .8fr 1.2fr; gap: 80px; padding: clamp(70px, 9vw, 130px) 7vw; background: #e5dbcd; }
 .practical-intro h2 { margin: 0; font-family: var(--serif); font-size: clamp(40px, 4.8vw, 72px); font-weight: 400; line-height: 1; }
