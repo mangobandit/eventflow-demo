@@ -50,7 +50,7 @@
 .stay-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; padding: 0 6vw; }
 .stay-card { min-height: 460px; padding: clamp(36px, 5vw, 74px); border-radius: var(--radius-lg); color: #fff; background-position: center; background-size: cover; box-shadow: var(--shadow-lg); }
 .finca-stay { background-image: linear-gradient(110deg, rgba(31,35,29,.84), rgba(31,35,29,.22)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/IMG-20210520-WA0011.jpg'); }
-.mission-stay { background-image: linear-gradient(110deg, rgba(31,35,29,.84), rgba(31,35,29,.22)), url('https://cdn.prod.website-files.com/685aacf16261e83391c243e8/69847affe9fb3bc0ebce860d_Tab%20Pane%206.avif'); }
+.mission-stay { background-image: linear-gradient(110deg, rgba(31,35,29,.84), rgba(31,35,29,.22)), url('assets/mission-house-hero.webp'); }
 .stay-card > span { font-size: 10px; font-weight: 800; letter-spacing: .17em; text-transform: uppercase; }
 .stay-card h3 { max-width: 540px; margin: 50px 0 18px; font-family: var(--serif); font-size: clamp(48px, 5vw, 72px); font-weight: 400; line-height: .94; }
 .stay-card p { max-width: 600px; color: rgba(255,255,255,.88); font-family: var(--serif); font-size: 20px; line-height: 1.55; }

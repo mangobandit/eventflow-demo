@@ -60,7 +60,7 @@ img { max-width: 100%; }
 .guest-hero { position: relative; display: grid; grid-template-columns: .92fr 1.25fr .92fr; min-height: calc(100vh - 76px); overflow: hidden; background: #e8ded0; }
 .hero-photo { min-height: 680px; background-position: center; background-size: cover; }
 .hero-photo-spain { background-image: linear-gradient(180deg, rgba(35,31,25,.03), rgba(35,31,25,.18)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardin-8377-1024x682.jpg'); }
-.hero-photo-sa { background-image: linear-gradient(180deg, rgba(35,31,25,.02), rgba(35,31,25,.22)), url('https://cdn.prod.website-files.com/685aacf16261e83391c243e8/69847affe9fb3bc0ebce860d_Tab%20Pane%206.avif'); }
+.hero-photo-sa { background-image: linear-gradient(180deg, rgba(35,31,25,.02), rgba(35,31,25,.22)), url('assets/mission-house-hero.webp'); }
 .hero-copy { position: relative; z-index: 2; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 70px clamp(24px, 5vw, 88px); text-align: center; background: radial-gradient(circle at top, #fffdf8 0, #f4ebdf 58%, #e9ddce 100%); }
 .hero-copy:before, .hero-copy:after { content: ""; position: absolute; top: 8%; bottom: 8%; width: 1px; background: linear-gradient(transparent, var(--line), transparent); }
 .hero-copy:before { left: 0; }
@@ -109,4 +109,4 @@ img { max-width: 100%; }
 .event-feature:nth-of-type(even) { background: #e5dbcd; }
 .event-image { min-height: 620px; background-size: cover; background-position: center; }
 .finca-main { background-image: linear-gradient(180deg, rgba(39,30,21,.02), rgba(39,30,21,.22)), url('https://fincamesajardin.com/wp-content/uploads/2022/07/Finca-Mesa-Jardi%CC%81n-8872-1024x682.jpg'); }
-.mission-main { background-image: linear-gradient(180deg, rgba(30,48,29,.02), rgba(30,48,29,.22)), url('https://cdn.prod.website-files.com/685aacf16261e83391c243e8/69847affe9fb3bc0ebce860d_Tab%20Pane%206.avif'); }
+.mission-main { background-image: linear-gradient(180deg, rgba(30,48,29,.02), rgba(30,48,29,.22)), url('assets/mission-house-hero.webp'); }
