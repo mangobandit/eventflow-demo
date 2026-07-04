@@ -37,7 +37,7 @@ assert.match(homepage, /https:\/\/www\.midlandsreservations\.co\.za\/za\/lions-r
 assert.match(homepage, /Boots, hats, denim/);
 assert.match(homepage, /If you don't have a cowboy hat, we'll have one for you if you'd like one\./);
 assert.match(homepage, /https:\/\/za\.pinterest\.com\/carakenny\/mxc-wedding-outfit-inspo\//);
-assert.match(homepage, /guest\.js\?v=20260704-outfit-card/);
+assert.match(homepage, /guest\.js\?v=20260704-drinks-note/);
 assert.match(homepage, /style\.css\?v=20260704-mission-house-gallery/);
 assert.match(homepage, /Mission House reception tables overlooking the KZN Midlands/);
 assert.doesNotMatch(homepage, /Save both dates\. South Africa accommodation options are below/);
@@ -101,6 +101,10 @@ assert.match(guest, /Don't have a cowboy hat\? We'll provide one for you if you'
 assert.match(guest, /If you don't have a cowboy hat, we'll have one for you if you'd like one\./);
 assert.match(guest, /https:\/\/za\.pinterest\.com\/carakenny\/mxc-wedding-outfit-inspo\//);
 assert.match(guest, /Outfit inspo board/);
+assert.match(guest, /Welcome drinks and soft drinks will be available before the reception/);
+assert.match(guest, /the bar will open fully afterwards/);
+assert.match(guest, /gets a drink swiftly once the bar opens/);
+assert.doesNotMatch(guest, /bar will remain closed until the official kick-off time/);
 assert.match(guest, /const CHECK_IN_ENABLED = false;/, "homepage guest check-in entry points must stay archived");
 assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visibility must be controlled separately from the live RSVP backend");
 assert.match(guest, /function normalizeFaqTitle/);
