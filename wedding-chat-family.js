@@ -18,11 +18,11 @@
     },
     {
       test: /how early|arrive early|arrival time|early can i arrive/i,
-      answer: "You may arrive up to two hours before the official start time if you need to. Welcome drinks and soft drinks will be available before the reception, and the bar will open fully afterwards. We will do our best to make sure everyone gets a drink swiftly once the bar opens."
+      answer: "Guest arrival is 16:15 to 16:40. If you are travelling by bus, pickup runs from 15:00 to 16:15. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards."
     },
     {
       test: /open bar|bar|drinks|paid bar|cash bar/i,
-      answer: "Welcome drinks and soft drinks will be available before the reception. The bar will open fully after the reception, and we will do our best to make sure guests get their drinks swiftly once it opens."
+      answer: "Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards so guests can get drinks swiftly for the evening."
     },
     {
       test: /indoors|outdoors|inside|outside|tent|rain|weather/i,
@@ -34,7 +34,7 @@
     },
     {
       test: /timing|times|schedule|late|start|ceremony time|what time/i,
-      answer: "We will keep the day running with clear start and stop times, so please arrive promptly and avoid being late. Welcome drinks and soft drinks will be available before the reception, and the bar will open fully afterwards. Final timings will be shared closer to the day."
+      answer: "For both weddings, guest arrival is 16:15 to 16:40, guests are seated from 16:45, and the ceremony runs from 17:00 to 17:20. Drinks reception and canapes run from 17:20 to 18:45, dinner and speeches run from 19:00 to 21:00, cake cutting is from 21:00, the first dance is at 22:00, and drinks and dancing continue until 01:00."
     },
     {
       test: /food|eat|meal|bbq|braai|meat|vegetarian|graz/i,

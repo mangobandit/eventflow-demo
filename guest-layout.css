@@ -9,6 +9,13 @@
 .detail-grid dt { color: var(--ink-soft); font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
 .detail-grid dd { margin: 8px 0 0; font-family: var(--serif); font-size: 24px; }
 .note-box { margin-top: 24px; padding: 18px 20px; border-left: 3px solid var(--clay); background: rgba(255,255,255,.55); color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
+.event-schedule { margin-top: 24px; padding: 22px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: rgba(255,255,255,.5); }
+.event-schedule h3 { margin: 0; font-family: var(--serif); font-size: 25px; font-weight: 500; }
+.event-schedule dl { margin: 18px 0 0; border-top: 1px solid var(--line); }
+.event-schedule dl > div { display: grid; grid-template-columns: minmax(110px, .28fr) 1fr; gap: 16px; padding: 11px 0; border-bottom: 1px solid var(--line); }
+.event-schedule dt { color: var(--clay); font-size: 10px; font-weight: 850; letter-spacing: .09em; text-transform: uppercase; }
+.event-schedule dd { margin: 0; color: var(--ink-soft); font-size: 13px; line-height: 1.55; }
+.event-schedule p { margin: 16px 0 0; color: var(--ink-soft); font-size: 12px; line-height: 1.6; }
 
 .countdown-section { position: relative; z-index: 6; display: grid; grid-template-columns: minmax(280px, .86fr) minmax(420px, 1.14fr); gap: clamp(22px, 4vw, 58px); align-items: center; width: min(1320px, calc(100% - 48px)); margin: clamp(-72px, -5vw, -44px) auto clamp(44px, 6vw, 84px); padding: clamp(24px, 3.6vw, 46px); overflow: hidden; color: var(--olive-dark); border: 1px solid rgba(255,255,255,.72); border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(255,253,248,.96), rgba(246,240,230,.9)); box-shadow: 0 26px 76px rgba(34,31,25,.2); backdrop-filter: blur(18px); }
 .countdown-section:before { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(48,58,45,.08); border-radius: calc(var(--radius-lg) - 9px); pointer-events: none; }
