@@ -56,7 +56,7 @@ assert.match(homepage, /Please message Matt or Cara privately/);
 assert.match(homepage, /Mission House reception tables overlooking the KZN Midlands/);
 assert.match(homepage, /data-countdown="2026-10-10T17:00:00\+02:00"/);
 assert.match(homepage, /data-countdown="2026-12-19T17:00:00\+02:00"/);
-assert.equal((homepage.match(/<div><dt>Bus pick up<\/dt><dd>15:00<\/dd><\/div>/g) || []).length, 2);
+assert.equal((homepage.match(/<div><dt>Bus pick up \(Location TBC\)<\/dt><dd>15:00<\/dd><\/div>/g) || []).length, 2);
 assert.equal((homepage.match(/<div><dt>Guest arrival<\/dt><dd>16:15 to 16:40<\/dd><\/div>/g) || []).length, 2);
 assert.equal((homepage.match(/<div><dt>Ceremony<\/dt><dd>17:00<\/dd><\/div>/g) || []).length, 2);
 assert.equal((homepage.match(/<div><dt>Celebration ends<\/dt><dd>01:00<\/dd><\/div>/g) || []).length, 2);
