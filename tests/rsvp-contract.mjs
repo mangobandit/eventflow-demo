@@ -56,7 +56,7 @@ assert.match(homepage, /Please message Matt or Cara privately/);
 assert.match(homepage, /Mission House reception tables overlooking the KZN Midlands/);
 assert.match(homepage, /data-countdown="2026-10-10T17:00:00\+02:00"/);
 assert.match(homepage, /data-countdown="2026-12-19T17:00:00\+02:00"/);
-assert.equal((homepage.match(/<div><dt>Bus pick up \(Location TBC\)<\/dt><dd>15:00<\/dd><\/div>/g) || []).length, 2);
+assert.equal((homepage.match(/<div><dt>Bus pick up &middot; Location TBC<\/dt><dd>15:00<\/dd><\/div>/g) || []).length, 2);
 assert.equal((homepage.match(/<div><dt>Guest arrival<\/dt><dd>16:15 to 16:40<\/dd><\/div>/g) || []).length, 2);
 assert.equal((homepage.match(/<div><dt>Ceremony<\/dt><dd>17:00<\/dd><\/div>/g) || []).length, 2);
 assert.equal((homepage.match(/<div><dt>Celebration ends<\/dt><dd>01:00<\/dd><\/div>/g) || []).length, 2);
@@ -187,6 +187,9 @@ assert.doesNotMatch(access, /const\s+(?:PIN|PASSWORD)\s*=\s*["']\d{4}["']/i, "th
 assert.doesNotMatch(access, /estimated:\s*\d{3,}|quote_amount:\s*\d{3,}|title:\s*"Spain venue"|name:\s*"Finca Mesa/i, "browser-mode fallback must not ship private budget or vendor seed data");
 assert.match(sw, /pathname\.includes\("rsvp"\)/);
 assert.match(sw, /url\.search/);
+assert.match(sw, /mxc-guest-v17/);
+assert.match(sw, /style\.css\?v=20260704-no-schedules/);
+assert.match(sw, /guest\.js\?v=20260704-timings/);
 assert.match(checkinSql, /checked_in_at/);
 assert.match(checkinSql, /check_in_status/);
 assert.match(checkinSql, /last_confirmed_at/);
