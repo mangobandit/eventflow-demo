@@ -73,10 +73,13 @@ const expectedFaqs = [
 ];
 
 // Content cross-checked against the original mxcwedding.squarespace.com
-// pages (July 2026): gifts wording, run sheets and shuttle details must
-// keep matching what guests were originally told.
-assert.match(guestPage, /No need for gifts! Just grab your boots and join us\. Your presence is the greatest gift we could ask for\./);
-assert.doesNotMatch(guestPage, /cash or EFT|banking details/i, "the original site asks for no gifts; money-gift copy must not return");
+// pages (July 2026): run sheets and shuttle details must keep matching what
+// guests were originally told. Gifts wording was updated by the couple on
+// 2026-07-05: contributions welcome in EUR, ZAR or GBP, presence-first tone,
+// and never any banking details on the public site.
+assert.match(guestPage, /Your presence is the greatest gift we could ask for\. If you would like to give something/);
+assert.match(guestPage, /we can accept EUR, ZAR or GBP/);
+assert.doesNotMatch(guestPage, /IBAN|account number|sort code|branch code|swift/i, "banking details must never appear on the public site");
 assert.match(guestPage, /Join us for our first celebration in this Spanish finca surrounded by gardens with views over Sierra de Grazalema\./);
 assert.match(guestPage, /Join us for our second celebration in the Midlands Meander of KwaZulu-Natal\./);
 ["17:30", "18:00", "18:30", "19:30", "20:30", "21:00", "23:30"].forEach((time) => assert.match(guestPage, new RegExp(`<li><b>${time}</b>`)));
