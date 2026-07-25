@@ -1,11 +1,9 @@
 name: Deploy site to GitHub Pages
 
-# The wedding site is a static site served from the repository root. Pages was
-# disabled on the repo, so the auto "Deploy from a branch" pipeline 404s
-# ("Ensure GitHub Pages has been enabled"). This workflow re-enables Pages from
-# inside Actions (configure-pages enablement uses the runner's pages:write
-# token) and publishes the repo root — including the CNAME file that binds the
-# custom domain mxcwedding.com — through the Pages deployment API.
+# The wedding site is a static site served from the repository root. GitHub
+# Pages must be enabled for this repository with GitHub Actions selected as the
+# publishing source. This workflow then publishes the complete site, including
+# the CNAME file that binds mxcwedding.com.
 
 on:
   push:
@@ -17,7 +15,6 @@ permissions:
   pages: write
   id-token: write
 
-# One production deployment at a time; never cancel an in-flight deploy.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -30,24 +27,28 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Assemble published site (repo root minus VCS metadata)
+      - name: Assemble published site
         run: |
           mkdir -p _site
-          rsync -a --exclude='.git' --exclude='_site' ./ _site/
-          test -f _site/CNAME && echo "CNAME -> $(cat _site/CNAME)"
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='_site' \
+            --exclude='node_modules' \
+            ./ _site/
+          test -f _site/index.html
+          test "$(tr -d '\r\n' < _site/CNAME)" = "mxcwedding.com"
 
-      - name: Configure Pages (enable it if currently disabled)
+      - name: Configure Pages
         uses: actions/configure-pages@v5
-        with:
-          enablement: true
 
-      - name: Upload site artifact (includes CNAME for mxcwedding.com)
-        uses: actions/upload-pages-artifact@v3
+      - name: Upload site artifact
+        uses: actions/upload-pages-artifact@v4
         with:
           path: _site
 
       - name: Deploy to GitHub Pages
         id: deployment
-        uses: actions/deploy-pages@v5
+        uses: actions/deploy-pages@v4
