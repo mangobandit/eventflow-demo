@@ -1,0 +1,37 @@
+name: Export production site
+
+on:
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  export:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout production source
+        uses: actions/checkout@v6
+
+      - name: Assemble clean site export
+        run: |
+          mkdir -p export
+          rsync -a \
+            --exclude='.git' \
+            --exclude='.github' \
+            --exclude='node_modules' \
+            --exclude='export' \
+            ./ export/
+          test -f export/index.html
+          test "$(tr -d '\r\n' < export/CNAME)" = "mxcwedding.com"
+
+      - name: Upload complete site export
+        uses: actions/upload-artifact@v4
+        with:
+          name: mxcwedding-production-site
+          path: export
+          include-hidden-files: true
+          if-no-files-found: error
+          retention-days: 1
