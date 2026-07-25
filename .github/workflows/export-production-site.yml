@@ -1,4 +1,4 @@
-name: Export production site
+name: Recover GitHub Pages and export production site
 
 on:
   pull_request:
@@ -7,13 +7,51 @@ on:
 
 permissions:
   contents: read
+  pages: write
+  id-token: write
 
 jobs:
-  export:
+  recover-and-export:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout production source
         uses: actions/checkout@v6
+
+      - name: Inspect and repair GitHub Pages configuration
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -u
+          api="${GITHUB_API_URL}/repos/${GITHUB_REPOSITORY}/pages"
+          auth=(-H "Accept: application/vnd.github+json" -H "Authorization: Bearer ${GH_TOKEN}" -H "X-GitHub-Api-Version: 2026-03-10")
+
+          get_code=$(curl -sS -o pages-get.json -w '%{http_code}' "${auth[@]}" "$api")
+          echo "GET /pages -> ${get_code}"
+          cat pages-get.json || true
+          echo
+
+          if [ "$get_code" = "404" ]; then
+            create_code=$(curl -sS -o pages-create.json -w '%{http_code}' -X POST "${auth[@]}" \
+              "$api" -d '{"build_type":"workflow"}')
+            echo "POST /pages -> ${create_code}"
+            cat pages-create.json || true
+            echo
+          fi
+
+          update_code=$(curl -sS -o pages-update.json -w '%{http_code}' -X PUT "${auth[@]}" \
+            "$api" -d '{"build_type":"workflow","cname":"mxcwedding.com","https_enforced":true}')
+          echo "PUT /pages -> ${update_code}"
+          cat pages-update.json || true
+          echo
+
+          final_code=$(curl -sS -o pages-final.json -w '%{http_code}' "${auth[@]}" "$api")
+          echo "FINAL GET /pages -> ${final_code}"
+          cat pages-final.json || true
+          echo
+
+          printf '%s\n' "$get_code" > pages-get.code
+          printf '%s\n' "$update_code" > pages-update.code
+          printf '%s\n' "$final_code" > pages-final.code
 
       - name: Assemble clean site export
         run: |
@@ -26,6 +64,16 @@ jobs:
             ./ export/
           test -f export/index.html
           test "$(tr -d '\r\n' < export/CNAME)" = "mxcwedding.com"
+
+      - name: Upload recovery diagnostics
+        uses: actions/upload-artifact@v4
+        with:
+          name: github-pages-recovery-diagnostics
+          path: |
+            pages-*.json
+            pages-*.code
+          if-no-files-found: error
+          retention-days: 1
 
       - name: Upload complete site export
         uses: actions/upload-artifact@v4
