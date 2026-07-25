@@ -1,0 +1,53 @@
+name: Deploy site to GitHub Pages
+
+# The wedding site is a static site served from the repository root. Pages was
+# disabled on the repo, so the auto "Deploy from a branch" pipeline 404s
+# ("Ensure GitHub Pages has been enabled"). This workflow re-enables Pages from
+# inside Actions (configure-pages enablement uses the runner's pages:write
+# token) and publishes the repo root — including the CNAME file that binds the
+# custom domain mxcwedding.com — through the Pages deployment API.
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+# One production deployment at a time; never cancel an in-flight deploy.
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Assemble published site (repo root minus VCS metadata)
+        run: |
+          mkdir -p _site
+          rsync -a --exclude='.git' --exclude='_site' ./ _site/
+          test -f _site/CNAME && echo "CNAME -> $(cat _site/CNAME)"
+
+      - name: Configure Pages (enable it if currently disabled)
+        uses: actions/configure-pages@v5
+        with:
+          enablement: true
+
+      - name: Upload site artifact (includes CNAME for mxcwedding.com)
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site
+
+      - name: Deploy to GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v5
