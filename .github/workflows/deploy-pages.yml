@@ -43,6 +43,10 @@ jobs:
 
       - name: Configure Pages
         uses: actions/configure-pages@v5
+        with:
+          # The repository is public, so the workflow token can create the Pages
+          # site itself. This is a no-op once Pages is enabled.
+          enablement: true
 
       - name: Upload site artifact
         uses: actions/upload-pages-artifact@v4
