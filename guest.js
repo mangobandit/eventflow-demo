@@ -83,13 +83,15 @@
 
     if (announcements.length) {
       const wrapper = document.getElementById("announcement-list");
-      const latest = announcements[0];
-      wrapper.innerHTML = `
-        <div>
-          <span class="announcement-kicker">${escapeHtml(latest.country || "Planning update")}</span>
-          <h2 id="updates-title">${escapeHtml(latest.title)}</h2>
-        </div>
-        <p>${formatBody(latest.body)}</p>`;
+      if (wrapper) {
+        const latest = announcements[0];
+        wrapper.innerHTML = `
+          <div>
+            <span class="announcement-kicker">${escapeHtml(latest.country || "Planning update")}</span>
+            <h2 id="updates-title">${escapeHtml(latest.title)}</h2>
+          </div>
+          <p>${formatBody(latest.body)}</p>`;
+      }
     }
 
     renderFaqList(faqs);
