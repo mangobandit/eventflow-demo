@@ -43,7 +43,7 @@ assert.match(homepage, /https:\/\/www\.midlandsreservations\.co\.za\/za\/lions-r
 assert.match(homepage, /Boots, hats, denim/);
 assert.match(homepage, /If you don't have a cowboy hat, we'll have one for you if you'd like one\./);
 assert.match(homepage, /https:\/\/za\.pinterest\.com\/carakenny\/mxc-wedding-outfit-inspo\//);
-assert.match(homepage, /guest\.js\?v=20260911-transport/);
+assert.match(homepage, /guest\.js\?v=20260911-cleanup/);
 assert.match(homepage, /style\.css\?v=20260704-no-schedules/);
 assert.match(homepage, /href="#gifts">Gifts/);
 assert.match(homepage, /id="gifts"/);
