@@ -29,8 +29,9 @@ const checkinDropdownLockdownSql = read("supabase/migrations/20260630_guest_chec
 const plannerLoginSql = read("supabase/migrations/20260630_planner_username_login.sql");
 const config = read("config.js");
 
-assert.match(homepage, /Below you'll find guidance for both of our weddings\./);
-assert.match(homepage, /we'll keep adding friendlier, more detailed updates as we get closer to each celebration/);
+assert.doesNotMatch(homepage, /id="live-updates"/);
+assert.doesNotMatch(homepage, /Latest updates/);
+assert.doesNotMatch(homepage, /<h3>Transport<\/h3><p>Answer transport questions early/);
 assert.match(homepage, /See our suggested Spain travel plan/);
 assert.match(homepage, /See our suggested South Africa travel plan/);
 assert.match(homepage, /Suggested wedding weekend route/);
