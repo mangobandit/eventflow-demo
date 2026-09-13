@@ -3,7 +3,7 @@
 
   if (!document.body.classList.contains("guest-site")) return;
 
-  const ANSWER = "Matt or Cara will share your private household check in link or code directly in the few days before each wedding. Use it then to reconfirm attendance for each guest, add dietary and allergy requirements, and record access needs or other updates in the guest notes. Contact Matt or Cara privately if you need your link or code.";
+  const ANSWER = "Matt and Cara will send your guest check in link a few days before the wedding.";
   const TRANSPORT_ANSWER = "Transport will not be provided for either wedding. Please arrange your own travel to and from the venue.";
 
   function replaceVisibleText(root) {

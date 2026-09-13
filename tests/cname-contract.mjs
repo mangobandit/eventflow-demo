@@ -16,9 +16,9 @@ assert.ok(existsSync(cnamePath), "CNAME file must exist in the published root");
 
 const raw = readFileSync(cnamePath, "utf8");
 
-// Exactly one apex domain, optional single trailing newline, nothing else.
+// Exactly one apex domain, optional single trailing LF or CRLF, nothing else.
 assert.equal(
-  raw.replace(/\n$/, ""),
+  raw.replace(/\r?\n$/, ""),
   "mxcwedding.com",
   "CNAME must contain exactly the apex domain mxcwedding.com",
 );

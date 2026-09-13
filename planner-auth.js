@@ -1,4 +1,6 @@
   const PLANNER_SESSION_KEY = "mxc-planner-session-v1";
+  const EVENTFLOW_INSTALLATION_KEY = "eventflow-installation-id-v1";
+  const EVENTFLOW_ACTIVATION_KEY = "eventflow-activation-token-v1";
 
   async function init() {
     const requestedView = location.hash.replace(/^#/, "");
@@ -63,13 +65,24 @@
     const username = els.loginUsername.value.trim().toLowerCase();
     const password = els.loginPassword.value;
     if (!username || !password) return;
+    const activationToken = localStorage.getItem(EVENTFLOW_ACTIVATION_KEY);
+    const installationId = localStorage.getItem(EVENTFLOW_INSTALLATION_KEY);
+    if (config.requirePaidLicense && (!activationToken || !installationId)) {
+      setAuthStatus("Activate a paid EventFlow licence on this browser before signing in.", true);
+      return;
+    }
     setAuthStatus("Checking planner access...");
     els.loginForm.querySelector("button").disabled = true;
     try {
-      const response = await plannerRpc("planner_login", {
+      const loginPayload = {
         p_username: username,
         p_password: password
-      }, { allowExpired: true });
+      };
+      if (config.requirePaidLicense) {
+        loginPayload.p_activation_token = activationToken;
+        loginPayload.p_installation_id = installationId;
+      }
+      const response = await plannerRpc("planner_login", loginPayload, { allowExpired: true });
       storePlannerSession(response);
       els.loginPassword.value = "";
       state.session = { token: response.session_token, expires_at: response.expires_at, user: { username: response.identity.username } };
@@ -187,4 +200,3 @@
     renderTimeline();
     renderPublishing();
   }
-

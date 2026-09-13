@@ -2,6 +2,8 @@ window.MXC_CONFIG = Object.freeze({
   supabaseUrl: "https://uwupepywyldwmsktvxdt.supabase.co",
   supabaseAnonKey: "sb_publishable_PYc6vx29OsEUCwEGFdVtqg_woEuCII1",
   siteUrl: "https://mxcwedding.com",
+  licenseApiBaseUrl: "",
+  requirePaidLicense: false,
   guestContentRefreshMinutes: 15,
   chatEndpoint: ""
 });
@@ -11,7 +13,7 @@ window.addEventListener("load", () => {
   const isPlanner = document.body.classList.contains("planner-site");
   if (!isGuest && !isPlanner) return;
 
-  const ASSET_VERSION = "20260913-guest-details";
+  const ASSET_VERSION = "20260913-guest-copy";
 
   function versioned(src) {
     if (/^https?:\/\//i.test(src)) return src;

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#151712">
+  <meta name="description" content="Buy and activate an EventFlow licence through secure Stripe Checkout.">
+  <meta name="referrer" content="no-referrer">
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; connect-src 'self' https://*.supabase.co; img-src 'self' data:; base-uri 'none'; frame-ancestors 'none'; form-action 'none'">
+  <title>EventFlow · Licence access</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700&family=Newsreader:opsz,wght@6..72,300;6..72,500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="license.css?v=20260730">
+  <script defer src="config.js?v=20260730-licensing"></script>
+  <script defer src="license.js?v=20260730"></script>
+</head>
+<body>
+  <a class="skip-link" href="#main">Skip to content</a>
+
+  <header class="licence-header">
+    <a class="wordmark" href="license.html" aria-label="EventFlow licence home">
+      <span>EVENT</span><i>/</i><span>FLOW</span>
+    </a>
+    <nav aria-label="Licence navigation">
+      <a href="#included">What you get</a>
+      <a href="#activate">Activate</a>
+      <button class="text-button" type="button" data-buy>Get a licence <span aria-hidden="true">↗</span></button>
+    </nav>
+  </header>
+
+  <main id="main">
+    <section class="delivery-shell" id="delivery" hidden aria-labelledby="delivery-title">
+      <div class="delivery-index" aria-hidden="true">ACCESS / 01</div>
+      <div class="delivery-copy">
+        <p class="kicker">Payment confirmed</p>
+        <h1 id="delivery-title">Your access key is being cut.</h1>
+        <p id="delivery-message" aria-live="polite">Stripe has confirmed your checkout. We are securely issuing your EventFlow licence now.</p>
+        <div class="issue-progress" id="issue-progress" aria-hidden="true"><span></span><span></span><span></span></div>
+      </div>
+      <div class="key-envelope" id="key-envelope" hidden>
+        <div class="key-envelope-head"><span>EventFlow licence</span><span>Keep private</span></div>
+        <code id="delivered-key">EVF1-••••-••••-••••-••••-••••-••••</code>
+        <p>Save this key now. The secure delivery link expires after 30 days.</p>
+        <div class="key-actions">
+          <button class="button button-ink" type="button" id="copy-key">Copy key</button>
+          <button class="button button-paper" type="button" id="download-key">Download</button>
+          <button class="button button-signal" type="button" id="activate-delivered-key">Activate here</button>
+        </div>
+        <p class="action-status" id="key-action-status" role="status" aria-live="polite"></p>
+      </div>
+    </section>
+
+    <section class="hero" aria-labelledby="hero-title">
+      <div class="hero-copy">
+        <p class="kicker">Plan live. Move together.</p>
+        <h1 id="hero-title">The event will change.<br><em>Your control</em> won’t.</h1>
+        <p class="hero-intro">One operational home for the guest list, budget, suppliers, timeline and live event updates—without the spreadsheet drift.</p>
+        <div class="hero-actions">
+          <button class="button button-signal" type="button" data-buy>Buy EventFlow <span aria-hidden="true">↗</span></button>
+          <a class="quiet-link" href="#included">See what is included <span aria-hidden="true">↓</span></a>
+        </div>
+      </div>
+
+      <aside class="access-docket" aria-label="EventFlow licence summary">
+        <div class="docket-stamp">EF<br>01</div>
+        <p class="docket-label">Permanent access docket</p>
+        <h2>One payment.<br>Three activations.</h2>
+        <dl>
+          <div><dt>Term</dt><dd>Lifetime</dd></div>
+          <div><dt>Devices</dt><dd>Up to 3</dd></div>
+          <div><dt>Delivery</dt><dd>Instant key</dd></div>
+          <div><dt>Payment</dt><dd>Stripe Checkout</dd></div>
+        </dl>
+        <p class="price-note">The current price, tax and currency are shown before you pay.</p>
+        <button class="docket-button" type="button" data-buy>
+          <span>Proceed to secure checkout</span><span aria-hidden="true">→</span>
+        </button>
+      </aside>
+
+      <div class="flow-mark" aria-hidden="true">FLOW</div>
+    </section>
+
+    <section class="proof-rail" aria-label="Purchase safeguards">
+      <span>01 / Stripe-hosted payment</span>
+      <span>02 / Signed webhook verification</span>
+      <span>03 / Encrypted key delivery</span>
+      <span>04 / Revocable activation</span>
+    </section>
+
+    <section class="included" id="included" aria-labelledby="included-title">
+      <div class="section-lead">
+        <p class="section-number">02 — THE SYSTEM</p>
+        <div>
+          <p class="kicker">Built for the moving parts</p>
+          <h2 id="included-title">From first list<br>to final headcount.</h2>
+        </div>
+        <p>EventFlow keeps the private work private, publishes only what guests should see, and gives the people running the day one shared operational picture.</p>
+      </div>
+
+      <div class="feature-ledger">
+        <article>
+          <span class="feature-number">01</span>
+          <div><h3>Guest control</h3><p>Households, invitations, dietary needs, transport and check-in status in one protected register.</p></div>
+          <span class="feature-code">GUEST / LIVE</span>
+        </article>
+        <article>
+          <span class="feature-number">02</span>
+          <div><h3>Money & suppliers</h3><p>Keep the working budget and vendor decisions beside the tasks they affect.</p></div>
+          <span class="feature-code">COST / LOCK</span>
+        </article>
+        <article>
+          <span class="feature-number">03</span>
+          <div><h3>Day-of command</h3><p>Turn confirmations into reliable household counts and a timeline your team can act on.</p></div>
+          <span class="feature-code">OPS / READY</span>
+        </article>
+        <article>
+          <span class="feature-number">04</span>
+          <div><h3>Guest publishing</h3><p>Release approved announcements and guidance without exposing private planning data.</p></div>
+          <span class="feature-code">PUBLIC / SAFE</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="issue-sequence" aria-labelledby="sequence-title">
+      <div class="sequence-title">
+        <p class="section-number">03 — ACCESS SEQUENCE</p>
+        <h2 id="sequence-title">Pay. Verify. Issue. Activate.</h2>
+      </div>
+      <ol>
+        <li><span>01</span><h3>Checkout</h3><p>Stripe handles payment details, tax information and payment authentication.</p></li>
+        <li><span>02</span><h3>Verify</h3><p>EventFlow accepts only signed, paid webhook events directly from Stripe.</p></li>
+        <li><span>03</span><h3>Issue</h3><p>A high-entropy key is generated server-side, hashed for lookup and encrypted for delivery.</p></li>
+        <li><span>04</span><h3>Activate</h3><p>Your key creates a revocable installation token without remaining in browser storage.</p></li>
+      </ol>
+    </section>
+
+    <section class="activation" id="activate" aria-labelledby="activation-title">
+      <div class="activation-copy">
+        <p class="section-number">04 — ACTIVATE</p>
+        <p class="kicker">Already have a key?</p>
+        <h2 id="activation-title">Bind this browser<br>to your licence.</h2>
+        <p>The key is sent once for activation and is not saved in browser storage. EventFlow keeps a revocable activation token instead.</p>
+        <div class="activation-state" id="activation-state" role="status" aria-live="polite">
+          <span class="state-light"></span>
+          <span>No active licence on this browser</span>
+        </div>
+      </div>
+
+      <form class="activation-form" id="activation-form">
+        <label for="licence-key">EventFlow licence key</label>
+        <input id="licence-key" name="licence-key" type="text" inputmode="text" autocomplete="off" autocapitalize="characters" spellcheck="false" placeholder="EVF1-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX" maxlength="39" required>
+        <label for="device-label">Device label <span>Optional</span></label>
+        <input id="device-label" name="device-label" type="text" autocomplete="off" maxlength="80" placeholder="e.g. Studio laptop">
+        <button class="button button-ink" type="submit">Activate this browser <span aria-hidden="true">→</span></button>
+        <p class="form-status" id="activation-status" role="status" aria-live="polite"></p>
+      </form>
+    </section>
+
+    <section class="closing">
+      <p class="kicker">Ready when the plan moves.</p>
+      <h2>Give every moving part<br>one place to land.</h2>
+      <button class="button button-signal" type="button" data-buy>Get your EventFlow licence <span aria-hidden="true">↗</span></button>
+    </section>
+  </main>
+
+  <footer>
+    <a class="wordmark wordmark-light" href="license.html"><span>EVENT</span><i>/</i><span>FLOW</span></a>
+    <p>Secure licence checkout and activation.</p>
+    <div><a href="TERMS_OF_USE.md">Terms</a><a href="SECURITY.md">Security</a><a href="README.md">Documentation</a></div>
+  </footer>
+
+  <div class="notice" id="notice" role="status" aria-live="polite" hidden></div>
+</body>
+</html>

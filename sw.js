@@ -1,5 +1,5 @@
-const CACHE = "mxc-guest-v20";
-const PUBLIC_ASSETS = ["/", "/index.html", "/style.css?v=20260913-guest-details", "/style-core.css?v=20260704-mission-house-gallery", "/guest-layout.css?v=20260913-guest-details", "/responsive.css?v=20260630-accommodation-layout", "/brand.css", "/brand-hero.css?v=20260630-header-photo-2", "/wedding-chat.css", "/guest.js?v=20260913-guest-details", "/guest-children-note.js", "/assets/invitation-picture.jpg", "/manifest.webmanifest", "/icon.svg"];
+const CACHE = "mxc-guest-v23";
+const PUBLIC_ASSETS = ["/", "/index.html", "/style.css?v=20260913-guest-details", "/style-core.css?v=20260704-mission-house-gallery", "/guest-layout.css?v=20260913-guest-details", "/responsive.css?v=20260630-accommodation-layout", "/brand.css", "/brand-hero.css?v=20260630-header-photo-2", "/wedding-chat.css", "/guest.js?v=20260913-no-checkin-faq", "/guest-children-note.js", "/assets/invitation-picture.jpg", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PUBLIC_ASSETS)).then(() => self.skipWaiting()));
@@ -13,7 +13,7 @@ self.addEventListener("fetch", (event) => {
   const request = event.request;
   if (request.method !== "GET") return;
   const url = new URL(request.url);
-  const privatePath = url.pathname.includes("planner") || url.pathname.includes("rsvp") || url.pathname.includes("check-in") || url.pathname.endsWith("config.js");
+  const privatePath = url.pathname.includes("planner") || url.pathname.includes("rsvp") || url.pathname.includes("check-in") || url.pathname.includes("license") || url.pathname.endsWith("config.js");
   if (url.origin !== self.location.origin || privatePath || url.search) return;
   const networkRequest = request.mode === "navigate" || request.destination === "document" || url.pathname === "/" || url.pathname.endsWith(".html")
     ? new Request(request, { cache: "reload" })

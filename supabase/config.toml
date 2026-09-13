@@ -1,0 +1,11 @@
+[functions.create-license-checkout]
+verify_jwt = false
+
+[functions.stripe-license-webhook]
+verify_jwt = false
+
+[functions.get-license]
+verify_jwt = false
+
+[functions.activate-license]
+verify_jwt = false

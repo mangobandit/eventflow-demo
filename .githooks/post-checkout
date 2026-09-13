@@ -1,0 +1,28 @@
+#!/usr/bin/env sh
+set -u
+
+NOTICE_URL="https://www.youtube.com/watch?v=ueufxzUjsS0"
+MARKER="$(git rev-parse --git-path repo-notice-shown 2>/dev/null || printf '')"
+
+if [ -n "$MARKER" ] && [ -f "$MARKER" ]; then
+  exit 0
+fi
+
+printf '\nRepository notice: scraping, unauthorized cloning, mirroring, AI training, and reverse engineering are not permitted.\nTerms: TERMS_OF_USE.md\nNotice: %s\n\n' "$NOTICE_URL" >&2
+
+if command -v powershell.exe >/dev/null 2>&1; then
+  powershell.exe -NoProfile -Command "Start-Process '$NOTICE_URL'" >/dev/null 2>&1 &
+elif command -v open >/dev/null 2>&1; then
+  open "$NOTICE_URL" >/dev/null 2>&1 &
+elif command -v xdg-open >/dev/null 2>&1; then
+  xdg-open "$NOTICE_URL" >/dev/null 2>&1 &
+elif command -v cmd.exe >/dev/null 2>&1; then
+  cmd.exe /c start "" "$NOTICE_URL" >/dev/null 2>&1 &
+fi
+
+if [ -n "$MARKER" ]; then
+  mkdir -p "$(dirname "$MARKER")" >/dev/null 2>&1
+  : > "$MARKER"
+fi
+
+exit 0

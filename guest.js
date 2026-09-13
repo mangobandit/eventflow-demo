@@ -18,11 +18,10 @@
     { title: "How early can I arrive?", body: "Guest arrival is 16:15 to 16:40. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards." },
     { title: "What are the timings for the day?", body: "For both weddings, guest arrival is 16:15 to 16:40, guests are seated from 16:45, and the ceremony runs from 17:00 to 17:20. Drinks reception and canapes run from 17:20 to 18:45, dinner and speeches run from 19:00 to 21:00, cake cutting is from 21:00, the first dance is at 22:00, and drinks and dancing continue until 01:00." },
     { title: "Will there be wedding day transport?", body: "Transport will not be provided for either wedding. Please arrange your own travel to and from the venue." },
-    { title: "Is there parking at the venue?", body: "Parking is available at both venues. Use the map link in your wedding details, allow time to park and reach the ceremony, and arrive between 16:15 and 16:40. Tell Matt or Cara before the day if you need a closer drop-off point so arrangements can be confirmed." },
+    { title: "Is there parking at the venue?", body: "Parking is available at both venues. Use the map link in your wedding details, allow time to park and reach the ceremony, and arrive between 16:15 and 16:40." },
     { title: "How should I arrange my journey home?", body: "Both celebrations finish at 01:00. Arrange your own return journey before the wedding and agree a collection time and point with your driver. Your accommodation may be able to help you book a taxi or private transfer. Please check with the venue before planning to leave a car overnight." },
-    { title: "How do I share dietary requirements or allergies?", body: "Tell Matt or Cara privately about allergies, dietary requirements and vegetarian or vegan needs as early as possible. When you receive your private guest check in link, add the details for each person in the Dietary or allergy notes field." },
-    { title: "What if I need accessibility arrangements?", body: "Both celebrations include outdoor spaces. Tell Matt or Cara privately before travelling if you need step-free access, accessible toilets or help getting from your car to the ceremony. Arrangements need to be confirmed for your venue. Record your access needs in the guest notes when you receive your private check in link." },
-    { title: "How do I complete guest check in?", body: "Matt and Cara will share a household link or code directly in the few days before each celebration. Use it to reconfirm attendance and update each guest's dietary notes, accommodation and access needs. You can reopen the same link to make changes. If you have not received your link, ask Matt or Cara privately." },
+    { title: "How do I share dietary requirements or allergies?", body: "Please let Matt or Cara know about any dietary requirements or allergies." },
+    { title: "What if I need accessibility arrangements?", body: "The venue is wheelchair friendly." },
     { title: "Can children come?", body: "Children are very welcome. We will provide things to help keep them entertained, and there will be people nearby to keep a friendly eye on them, but parents and guardians remain responsible for their children throughout the celebration." },
     { title: "What gifts should I bring?", body: "Your presence is the main thing. If you would like to give a gift, a cash or EFT contribution is most helpful and very appreciated. We can accept EUR or ZAR; please message Matt or Cara privately for the right banking details." },
     { title: "Can I take photos or post online?", body: "You are welcome to take a few personal photos, but please do not post the day publicly online without our permission. This is a private, intimate celebration and we have invested in a professional photography team. We will also use a private social wall, Walls.io, so guests can share moments in a more controlled and private way." },
@@ -190,6 +189,7 @@
     const finalFaqs = [];
     [...BUILT_IN_FAQS, ...liveFaqs.map((faq) => ({ title: faq.title, body: faq.body }))].forEach((faq) => {
       const key = normalizeFaqTitle(faq.title);
+      if (!CHECK_IN_ENABLED && key === "check in") return;
       if (!faq.title || !faq.body || seen.has(key)) return;
       seen.add(key);
       finalFaqs.push(faq);

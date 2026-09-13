@@ -14,11 +14,11 @@
     },
     {
       test: /diet(?:ary)?|allerg(?:y|ies|ic)|coeliac|celiac|gluten|dairy[- ]?free|vegan|vegetarian|halal|kosher|food intolerance/i,
-      answer: "Please tell Matt or Cara privately about dietary requirements or allergies as early as possible. Add each guest's requirements to their dietary and allergy field in your private household check in."
+      answer: "Please let Matt or Cara know about any dietary requirements or allergies."
     },
     {
       test: /accessib(?:le|ility)|access needs|step[- ]?free|wheelchair|mobility|disabled|disabilit(?:y|ies)|close drop[- ]?off/i,
-      answer: "Please tell Matt or Cara privately about access needs as early as possible, including step-free routes, accessible toilets or a close drop-off. Arrangements need to be confirmed with the venue. Record access needs in the guest notes in your private household check in."
+      answer: "The venue is wheelchair friendly."
     },
     {
       test: /parking|park (?:my |our |the )?car|car park/i,
@@ -30,7 +30,7 @@
     },
     {
       test: /\b(rsvp|check\s*-?\s*in|confirm|confirmation|invite|invitation)\b/i,
-      answer: "Matt or Cara will share your private household check in link or code directly in the few days before each wedding. Use it then to reconfirm attendance for each guest, add dietary and allergy requirements, and record access needs or other updates in the guest notes. Contact Matt or Cara privately if you need your link or code."
+      answer: "Matt and Cara will send your guest check in link a few days before the wedding."
     },
     {
       test: /\b(child|children|kid|kids|baby|babies|toddler|toddlers|family|families)\b/i,

@@ -1,5 +1,7 @@
 # Matt & Cara Wedding House
 
+> **Repository notice:** This repository is all rights reserved. Unauthorized scraping, mirroring, AI training, reverse engineering, or cloning outside explicit written permission is prohibited. See [TERMS_OF_USE.md](TERMS_OF_USE.md). Automated-access notice: https://www.youtube.com/watch?v=ueufxzUjsS0
+
 A high-end wedding planning and guest experience for `mxcwedding.com`.
 
 ## What is included
@@ -38,6 +40,12 @@ Run the repository checks with:
 ```bash
 npm test
 ```
+
+## Paid commercial licensing
+
+`license.html` is the EventFlow purchase, secure key-delivery and browser-activation portal. Stripe Checkout handles the payment; a signed webhook issues the licence only after Stripe reports the Checkout Session as paid. Commercial deployments can require that paid activation at the database layer before planner login.
+
+Start with [docs/LICENSE_SALES_SETUP.md](docs/LICENSE_SALES_SETUP.md). Paid enforcement defaults to off so the existing private wedding deployment is not interrupted during setup.
 
 ## Security rule
 

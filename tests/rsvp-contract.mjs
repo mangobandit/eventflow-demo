@@ -45,7 +45,7 @@ assert.match(homepage, /https:\/\/www\.midlandsreservations\.co\.za\/za\/lions-r
 assert.match(homepage, /Boots, hats, denim/);
 assert.match(homepage, /If you don't have a cowboy hat, we'll have one for you if you'd like one\./);
 assert.match(homepage, /https:\/\/za\.pinterest\.com\/carakenny\/mxc-wedding-outfit-inspo\//);
-assert.match(homepage, /guest\.js\?v=20260913-guest-details/);
+assert.match(homepage, /guest\.js\?v=20260913-no-checkin-faq/);
 assert.match(homepage, /style\.css\?v=20260913-guest-details/);
 assert.match(homepage, /href="#gifts">Gifts/);
 assert.match(homepage, /id="gifts"/);
@@ -157,6 +157,8 @@ assert.match(guest, /drinks and dancing continue until 01:00/);
 assert.doesNotMatch(guest, /bar will remain closed until the official kick-off time/);
 assert.match(guest, /const CHECK_IN_ENABLED = false;/, "homepage guest check-in entry points must stay archived");
 assert.match(guest, /if\s*\(\s*!CHECK_IN_ENABLED\s*\)\s*return;/, "check-in visibility must be controlled separately from the live RSVP backend");
+assert.doesNotMatch(homepage, /id="guest-checkin-guide"|<summary>How do I complete guest check in\?<\/summary>/, "homepage check-in instructions must stay removed");
+assert.doesNotMatch(guest, /title: "How do I complete guest check in\?"/, "built-in check-in FAQ must stay removed");
 assert.match(guest, /function normalizeFaqTitle/);
 assert.match(guest, /renderFaqList\(faqs\)/);
 
@@ -184,14 +186,15 @@ assert.deepEqual(renderedFaqTitles(), builtInTitles, "every distinct built-in FA
 renderFaqList([
   ...builtInFaqs.map(({ title }) => ({ title: `  ${title.toUpperCase()}  `, body: "Stale live duplicate" })),
   ...["Can kids attend?", "What is the dress code?", "What is the full schedule?", "Are shuttle buses provided?", "Where can I park?", "Can I bring a gift?", "How do I use Walls.io?", "What food will we eat?"].map((title) => ({ title, body: "Stale live duplicate" })),
+  ...["How do I complete guest check in?", "How do I check-in?", "How do I checkin?", "Can I RSVP online?"].map((title) => ({ title, body: "Stale live check-in instructions" })),
   { title: "Can I book a room at the venue?", body: "A separate accommodation question." },
   { title: "", body: "An incomplete published row." },
   { title: "An incomplete published question" }
 ]);
-assert.deepEqual(renderedFaqTitles(), [...builtInTitles, "Can I book a room at the venue?"], "live duplicate topics stay suppressed while a different booking question remains visible");
-assert.doesNotMatch(faqList.innerHTML, /Stale live duplicate|incomplete published/);
+assert.deepEqual(renderedFaqTitles(), [...builtInTitles, "Can I book a room at the venue?"], "live duplicates and archived check-in topics stay suppressed while a different booking question remains visible");
+assert.doesNotMatch(faqList.innerHTML, /Stale live duplicate|Stale live check-in instructions|incomplete published/);
 
-// With no built-ins, distinct practical questions still need their own answers.
+// With no built-ins, distinct practical questions remain visible and check-in stays hidden.
 builtInFaqs.length = 0;
 const practicalFaqs = [
   "What kind of food will there be?",
@@ -203,7 +206,7 @@ const practicalFaqs = [
   "What are the timings for the day?"
 ].map((title) => ({ title, body: "A distinct practical answer." }));
 renderFaqList(practicalFaqs);
-assert.deepEqual(renderedFaqTitles(), practicalFaqs.map(({ title }) => title), "dietary, accessibility, bar and check-in questions must not collide with food, gifts or timings");
+assert.deepEqual(renderedFaqTitles(), practicalFaqs.filter(({ title }) => title !== "What time will guest check in open?").map(({ title }) => title), "dietary, accessibility, bar, food, gifts and timing questions remain distinct while archived check-in is hidden");
 
 assert.doesNotMatch(guest, /Can children attend/);
 assert.doesNotMatch(guest, /Open your RSVP|Guest RSVP|navLink\.textContent = "RSVP"|Rodeo-style|Western-inspired|braai-style|wedding-day|check-in|Check-In/);
@@ -252,10 +255,10 @@ assert.doesNotMatch(access, /const\s+(?:PIN|PASSWORD)\s*=\s*["']\d{4}["']/i, "th
 assert.doesNotMatch(access, /estimated:\s*\d{3,}|quote_amount:\s*\d{3,}|title:\s*"Spain venue"|name:\s*"Finca Mesa/i, "browser-mode fallback must not ship private budget or vendor seed data");
 assert.match(sw, /pathname\.includes\("rsvp"\)/);
 assert.match(sw, /url\.search/);
-assert.match(sw, /mxc-guest-v20/);
+assert.match(sw, /mxc-guest-v23/);
 assert.match(sw, /new Request\(request, \{ cache: "reload" \}\)/);
 assert.match(sw, /style\.css\?v=20260913-guest-details/);
-assert.match(sw, /guest\.js\?v=20260913-guest-details/);
+assert.match(sw, /guest\.js\?v=20260913-no-checkin-faq/);
 assert.match(checkinSql, /checked_in_at/);
 assert.match(checkinSql, /check_in_status/);
 assert.match(checkinSql, /last_confirmed_at/);
