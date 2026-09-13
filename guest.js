@@ -15,10 +15,14 @@
     { title: "What should we wear?", body: "The dress feel is Rodeo Western. Cowboy boots, hats, leather, denim, belts, bolo ties, fringe, country shirts and country style dresses are welcome and encouraged. Choose shoes that work on gardens, lawns and a dancefloor." },
     { title: "Is everything in the same location?", body: "Yes. The ceremony, food, drinks and celebration are all planned around the same venue, so once you arrive you can settle in and enjoy the day without moving between locations." },
     { title: "Is the wedding indoors or outdoors?", body: "The wedding has a country/Rodeo feel and is planned as an outdoor celebration. If the weather turns, there will be cover under a tent or suitable shelter so the day can keep flowing comfortably." },
-    { title: "How early can I arrive?", body: "Guest arrival is 16:15 to 16:40. If you are travelling by bus, pickup runs from 15:00 to 16:15. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards." },
+    { title: "How early can I arrive?", body: "Guest arrival is 16:15 to 16:40. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards." },
     { title: "What are the timings for the day?", body: "For both weddings, guest arrival is 16:15 to 16:40, guests are seated from 16:45, and the ceremony runs from 17:00 to 17:20. Drinks reception and canapes run from 17:20 to 18:45, dinner and speeches run from 19:00 to 21:00, cake cutting is from 21:00, the first dance is at 22:00, and drinks and dancing continue until 01:00." },
-    { title: "Will there be wedding day transport?", body: "Unfortunately, due to the location of the finca, we are now unable to offer group transport from Chiclana to and from the venue.\n\nWe recommend either driving or organizing a taxi/private hire car. Unfortunately, Uber isn’t available in this area yet, but all towns and cities have local taxi companies who can help you arrange transport to and from the venue. If you need any assistance with booking, please reach out to us." },
-    { title: "Is there parking at the venue?", body: "Yes, there will be parking available at the venue. We will share any final parking or arrival notes closer to the wedding date." },
+    { title: "Will there be wedding day transport?", body: "Transport will not be provided for either wedding. Please arrange your own travel to and from the venue." },
+    { title: "Is there parking at the venue?", body: "Parking is available at both venues. Use the map link in your wedding details, allow time to park and reach the ceremony, and arrive between 16:15 and 16:40. Tell Matt or Cara before the day if you need a closer drop-off point so arrangements can be confirmed." },
+    { title: "How should I arrange my journey home?", body: "Both celebrations finish at 01:00. Arrange your own return journey before the wedding and agree a collection time and point with your driver. Your accommodation may be able to help you book a taxi or private transfer. Please check with the venue before planning to leave a car overnight." },
+    { title: "How do I share dietary requirements or allergies?", body: "Tell Matt or Cara privately about allergies, dietary requirements and vegetarian or vegan needs as early as possible. When you receive your private guest check in link, add the details for each person in the Dietary or allergy notes field." },
+    { title: "What if I need accessibility arrangements?", body: "Both celebrations include outdoor spaces. Tell Matt or Cara privately before travelling if you need step-free access, accessible toilets or help getting from your car to the ceremony. Arrangements need to be confirmed for your venue. Record your access needs in the guest notes when you receive your private check in link." },
+    { title: "How do I complete guest check in?", body: "Matt and Cara will share a household link or code directly in the few days before each celebration. Use it to reconfirm attendance and update each guest's dietary notes, accommodation and access needs. You can reopen the same link to make changes. If you have not received your link, ask Matt or Cara privately." },
     { title: "Can children come?", body: "Children are very welcome. We will provide things to help keep them entertained, and there will be people nearby to keep a friendly eye on them, but parents and guardians remain responsible for their children throughout the celebration." },
     { title: "What gifts should I bring?", body: "Your presence is the main thing. If you would like to give a gift, a cash or EFT contribution is most helpful and very appreciated. We can accept EUR or ZAR; please message Matt or Cara privately for the right banking details." },
     { title: "Can I take photos or post online?", body: "You are welcome to take a few personal photos, but please do not post the day publicly online without our permission. This is a private, intimate celebration and we have invested in a professional photography team. We will also use a private social wall, Walls.io, so guests can share moments in a more controlled and private way." },
@@ -195,21 +199,26 @@
 
   function normalizeFaqTitle(title) {
     const normalized = String(title || "").toLowerCase().replace(/&/g, "and").replace(/[^a-z0-9]+/g, " ").trim();
-    if (/child|children|kid|kids|baby|babies|family|families/.test(normalized)) return "children";
-    if (/theme|rodeo|western/.test(normalized)) return "theme";
-    if (/wear|dress|outfit|boots|denim|leather|hat/.test(normalized)) return "wear";
-    if (/timing|times|schedule|start|late|punctual/.test(normalized)) return "timing";
-    if (/transport|shuttle|bus|pickup/.test(normalized)) return "transport";
-    if (/parking|park/.test(normalized)) return "parking";
-    if (/photo|photos|post|online|social|instagram/.test(normalized)) return "photos";
-    if (/walls/.test(normalized)) return "walls";
-    if (/flight|flights|book/.test(normalized)) return "flights";
-    if (/food|bbq|braai|meal|eat/.test(normalized)) return "food";
-    if (/gift|cash|eft|bank|registry|present/.test(normalized)) return "gifts";
-    if (/same location|one location|same venue|location/.test(normalized)) return "same location";
-    if (/indoor|indoors|outdoor|outdoors|tent|weather|rain/.test(normalized)) return "indoors outdoors";
-    if (/early|arrive|arrival/.test(normalized)) return "arrival";
-    if (/expect|happen|games|entertainment/.test(normalized)) return "expect";
+    // Match words and specific phrases: "hat" must not match every "what" question.
+    if (/\b(dietary|allergies|allergy|allergens|intolerances?|vegetarian|vegan)\b/.test(normalized)) return "dietary";
+    if (/\b(accessibility|accessible|wheelchairs?|mobility|step free|access needs)\b/.test(normalized)) return "accessibility";
+    if (/\b(check in|checkin|rsvp)\b/.test(normalized)) return "check in";
+    if (/\b(drinks?|bar|alcohol|beverages?)\b/.test(normalized)) return "drinks";
+    if (/\b(child|children|kids?|babies|baby|families|family)\b/.test(normalized)) return "children";
+    if (/\b(wear|dress|outfits?|boots|denim|leather|hats?)\b/.test(normalized)) return "wear";
+    if (/\b(theme|rodeo|western)\b/.test(normalized)) return "theme";
+    if (/\b(transport|shuttles?|buses?|bus|pickups?|pick up)\b/.test(normalized)) return "transport";
+    if (/\b(parking|park)\b/.test(normalized)) return "parking";
+    if (/\b(timings?|times?|schedule|start|late|punctual)\b/.test(normalized)) return "timing";
+    if (/\bwalls(?: io)?\b/.test(normalized)) return "walls";
+    if (/\b(photos?|post|online|social|instagram)\b/.test(normalized)) return "photos";
+    if (/\bflights?\b/.test(normalized)) return "flights";
+    if (/\b(food|bbq|braai|meals?|eat)\b/.test(normalized)) return "food";
+    if (/\b(gifts?|cash|eft|bank|registry|presents?)\b/.test(normalized)) return "gifts";
+    if (/\b(same location|one location|same venue)\b/.test(normalized)) return "same location";
+    if (/\b(indoors?|outdoors?|tent|weather|rain)\b/.test(normalized)) return "indoors outdoors";
+    if (/\b(early|arrive|arrival)\b/.test(normalized)) return "arrival";
+    if (/\b(expect|happen|games|entertainment)\b/.test(normalized)) return "expect";
     return normalized;
   }
 

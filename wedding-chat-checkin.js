@@ -3,7 +3,8 @@
 
   if (!document.body.classList.contains("guest-site")) return;
 
-  const ANSWER = "Use the guest check in page in the few days before each celebration so we can finalise who is still coming, transport, food and any last minute notes for your household.";
+  const ANSWER = "Matt or Cara will share your private household check in link or code directly in the few days before each wedding. Use it then to reconfirm attendance for each guest, add dietary and allergy requirements, and record access needs or other updates in the guest notes. Contact Matt or Cara privately if you need your link or code.";
+  const TRANSPORT_ANSWER = "Transport will not be provided for either wedding. Please arrange your own travel to and from the venue.";
 
   function replaceVisibleText(root) {
     if (!root) return;
@@ -36,12 +37,15 @@
     input.placeholder = input.placeholder.replace(/RSVP/g, "guest check in");
     form.addEventListener("submit", (event) => {
       const text = input.value.trim();
-      if (!/\b(rsvp|check\s*-?\s*in|confirm|confirmation)\b/i.test(text)) return;
+      const isTransportQuestion = /\b(transport|bus|buses|shuttles?|pick[\s-]*ups?)\b/i.test(text);
+      if (!isTransportQuestion && /diet(?:ary)?|allerg(?:y|ies|ic)|coeliac|celiac|gluten|dairy[- ]?free|vegan|vegetarian|halal|kosher|food intolerance|accessib(?:le|ility)|access needs|step[- ]?free|wheelchair|mobility|disabled|disabilit(?:y|ies)|close drop[- ]?off|parking|park (?:my |our |the )?car|car park|getting home|get home|go home|travel home|journey home|return journey|ride home|taxi home|transfer home|drive home|journey back|getting back|get back|taxi after|transfer after|leave the venue|leave the wedding/i.test(text)) return;
+      if (!isTransportQuestion && /\bdirections?\b|\bmaps?\b|venue address|wedding address|address.*(?:finca|mission|venue|wedding|spain|africa)|(?:finca|mission|venue|wedding).*address|where is (?:the )?(?:finca|mission|venue|wedding)|venue location|how (?:do|can) (?:i|we) get (?:there|to (?:the )?(?:venue|wedding|finca|mission))/i.test(text)) return;
+      if (!isTransportQuestion && !/\b(rsvp|check\s*-?\s*in|confirm|confirmation|invite|invitation)\b/i.test(text)) return;
       event.preventDefault();
       event.stopImmediatePropagation();
       input.value = "";
       addMessage(log, text, "user");
-      addMessage(log, ANSWER, "bot");
+      addMessage(log, isTransportQuestion ? TRANSPORT_ANSWER : ANSWER, "bot");
     }, true);
   }
 

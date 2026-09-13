@@ -6,7 +6,7 @@
   const LOOKUP_KEY = "mxc-rsvp-lookup";
   const TOKEN_PATTERN = /^[0-9a-f]{48}$/i;
   const LOOKUP_PATTERN = /^[0-9a-f]{32}$/i;
-  const CHECK_IN_WINDOW_COPY = "Use this to confirm your household in the few days before the celebration so we can keep the final head count, transport and food planning accurate.";
+  const CHECK_IN_WINDOW_COPY = "Use this to confirm your household in the few days before the celebration so we can keep the final head count and food planning accurate.";
   const DEMO_TOKEN = "000000000000000000000000000000000000000000000000";
   const DEMO_LOOKUP_KEY = "11111111111111111111111111111111";
   const DEMO_STORAGE_KEY = "mxc-demo-checkin";
@@ -243,7 +243,6 @@
 
   function renderPerson(person, index) {
     const attending = person.attending;
-    const transportValue = person.transport_needed === true ? "yes" : person.transport_needed === false ? "no" : "tbc";
     return `<article class="guest-response" data-person-id="${escapeHtml(person.id)}">
       <div class="guest-response-head">
         <h3>${escapeHtml(person.name)}</h3>
@@ -256,21 +255,11 @@
         <label>Dietary or allergy notes
           <textarea data-field="dietary" maxlength="800" placeholder="Leave blank when none">${escapeHtml(person.dietary || "")}</textarea>
         </label>
-        <label>Wedding day transport
-          <select data-field="transport_needed">
-            <option value="tbc" ${transportValue === "tbc" ? "selected" : ""}>Not sure yet</option>
-            <option value="yes" ${transportValue === "yes" ? "selected" : ""}>Yes, transport needed</option>
-            <option value="no" ${transportValue === "no" ? "selected" : ""}>No transport needed</option>
-          </select>
-        </label>
-        <label>Pickup area / accommodation
-          <input data-field="transport_location" maxlength="300" value="${escapeHtml(person.transport_location || "")}" placeholder="Town, hotel or area">
-        </label>
         <label>Where are you staying?
           <input data-field="accommodation" maxlength="300" value="${escapeHtml(person.accommodation || "")}" placeholder="Optional or TBC">
         </label>
-        <label class="full">Last minute note for Matt & Cara
-          <textarea data-field="notes" maxlength="800" placeholder="Arrival timing, transport change, child note, accessibility need or anything useful.">${escapeHtml(person.notes || "")}</textarea>
+        <label class="full">Access needs or other guest notes
+          <textarea data-field="notes" maxlength="800" placeholder="Step-free access, help getting from the car, arrival timing, child note or anything useful.">${escapeHtml(person.notes || "")}</textarea>
         </label>
       </div>
     </article>`;
@@ -284,13 +273,14 @@
       people = [...elements.people.querySelectorAll(".guest-response")].map((card, index) => {
         const attendance = card.querySelector(`input[name="attendance-${index}"]:checked`)?.value;
         if (!attendance) throw new Error("Please choose a check in answer for every guest.");
-        const transport = card.querySelector('[data-field="transport_needed"]').value;
+        const person = invitation.people.find((person) => person.id === card.dataset.personId);
         return {
           id: card.dataset.personId,
           attending: attendance === "yes",
           dietary: value(card, "dietary"),
-          transport_needed: transport === "yes" ? true : transport === "no" ? false : null,
-          transport_location: value(card, "transport_location"),
+          // The existing RPC overwrites these legacy fields, so retain saved answers.
+          transport_needed: person?.transport_needed ?? null,
+          transport_location: person?.transport_location ?? null,
           accommodation: value(card, "accommodation"),
           notes: value(card, "notes")
         };

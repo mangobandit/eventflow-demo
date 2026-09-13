@@ -165,7 +165,7 @@
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20260704-coherence-pass";
+    script.src = "planner-rsvp.js?v=20260913-no-transport";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

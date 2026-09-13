@@ -5,6 +5,34 @@
 
   const FAQ_ANSWERS = [
     {
+      test: /\b(transport|bus|buses|shuttles?|pick[\s-]*ups?)\b/i,
+      answer: "Transport will not be provided for either wedding. Please arrange your own travel to and from the venue."
+    },
+    {
+      test: /getting home|get home|go home|travel home|journey home|return journey|ride home|taxi home|transfer home|drive home|journey back|getting back|get back|taxi after|transfer after|leave the venue|leave the wedding/i,
+      answer: "Both celebrations finish at 01:00. Arrange your return journey before the wedding and agree a collection point with your driver. Your accommodation may be able to help you book a taxi or private transfer."
+    },
+    {
+      test: /diet(?:ary)?|allerg(?:y|ies|ic)|coeliac|celiac|gluten|dairy[- ]?free|vegan|vegetarian|halal|kosher|food intolerance/i,
+      answer: "Please tell Matt or Cara privately about dietary requirements or allergies as early as possible. Add each guest's requirements to their dietary and allergy field in your private household check in."
+    },
+    {
+      test: /accessib(?:le|ility)|access needs|step[- ]?free|wheelchair|mobility|disabled|disabilit(?:y|ies)|close drop[- ]?off/i,
+      answer: "Please tell Matt or Cara privately about access needs as early as possible, including step-free routes, accessible toilets or a close drop-off. Arrangements need to be confirmed with the venue. Record access needs in the guest notes in your private household check in."
+    },
+    {
+      test: /parking|park (?:my |our |the )?car|car park/i,
+      answer: "Parking is available at both venues. Use the map link in your wedding details, allow time to park and reach the ceremony, and arrive between 16:15 and 16:40."
+    },
+    {
+      test: /\bdirections?\b|\bmaps?\b|venue address|wedding address|address.*(?:finca|mission|venue|wedding|spain|africa)|(?:finca|mission|venue|wedding).*address|where is (?:the )?(?:finca|mission|venue|wedding)|venue location|how (?:do|can) (?:i|we) get (?:there|to (?:the )?(?:venue|wedding|finca|mission))/i,
+      answer: "Spain: Finca Mesa Jardín, Carretera Arcos de la Frontera–El Bosque, km 11, 11630 Arcos de la Frontera, Cádiz, Spain. The final access lane is 1.5 km from the main road at km 11. South Africa: Mission House, 39 Currys Post Road, Howick, 3290, KwaZulu-Natal, South Africa. Use the Directions link in your wedding details to plan your journey."
+    },
+    {
+      test: /\b(rsvp|check\s*-?\s*in|confirm|confirmation|invite|invitation)\b/i,
+      answer: "Matt or Cara will share your private household check in link or code directly in the few days before each wedding. Use it then to reconfirm attendance for each guest, add dietary and allergy requirements, and record access needs or other updates in the guest notes. Contact Matt or Cara privately if you need your link or code."
+    },
+    {
       test: /\b(child|children|kid|kids|baby|babies|toddler|toddlers|family|families)\b/i,
       answer: "Yes, children are very welcome. We’ll provide some things to help keep them entertained, and there will be people nearby to keep a friendly eye on them. Parents and guardians are still responsible for their own children throughout the celebration, so please keep an eye on them as you normally would."
     },
@@ -13,12 +41,8 @@
       answer: "Yes, everything is planned around the same venue. Once you arrive, you can settle in and enjoy the ceremony, food, drinks and celebration without moving between locations."
     },
     {
-      test: /parking|park car|car park/i,
-      answer: "Yes, there will be parking available at the venue. We’ll share any final parking or arrival notes closer to the wedding date."
-    },
-    {
       test: /how early|arrive early|arrival time|early can i arrive/i,
-      answer: "Guest arrival is 16:15 to 16:40. If you are travelling by bus, pickup runs from 15:00 to 16:15. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards."
+      answer: "Guest arrival is 16:15 to 16:40. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards."
     },
     {
       test: /open bar|bar|drinks|paid bar|cash bar/i,

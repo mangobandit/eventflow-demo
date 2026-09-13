@@ -1,7 +1,7 @@
 (() => {
   "use strict";
 
-  const COPY_MESSAGE = "Hi, quick wedding check in for Matt & Cara. Please confirm your household here in the few days before the celebration so we can finalise numbers, transport and food: [link]";
+  const COPY_MESSAGE = "Hi, quick wedding check in for Matt & Cara. Please confirm your household here in the few days before the celebration so we can finalise numbers and food: [link]. Transport will not be provided for either wedding. Please arrange your own travel to and from the venue.";
   const VENUES = [
     ["spain", "Spain", "Finca Mesa Jardin"],
     ["south_africa", "South Africa", "Mission House"]
@@ -89,7 +89,7 @@
     panel.dataset.viewPanel = "checkin";
     panel.innerHTML = `
       <div class="view-intro">
-        <div><p class="eyebrow">Private head count</p><h2>Guest Check In.</h2><p>Use this in the few days before each celebration for final head count, transport and food planning.</p></div>
+        <div><p class="eyebrow">Private head count</p><h2>Guest Check In.</h2><p>Use this in the few days before each celebration for final head count and food planning.</p></div>
         <div class="view-tools"><button class="primary-action" id="copy-checkin-message" type="button">Copy check in message</button></div>
       </div>
       <div id="checkin-root" class="guest-list-tracker"></div>`;
@@ -231,7 +231,6 @@
     const checkinLabel = confirmed ? (guest.check_in_status === "cant_make_it" ? "Confirmed out" : "Checked in") : "Needs check in";
     const detail = [
       guest.party_name || "No party label",
-      guest.transport ? `Transport: ${guest.transport}` : "Transport TBC",
       guest.accommodation ? `Stay: ${guest.accommodation}` : "Stay TBC",
       guest.last_confirmed_at || guest.checked_in_at ? `Confirmed: ${formatDateTime(guest.last_confirmed_at || guest.checked_in_at)}` : ""
     ].filter(Boolean).join(" - ");

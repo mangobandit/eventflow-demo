@@ -4,6 +4,7 @@
   const isPlanner = document.body.classList.contains("planner-site");
   const isGuest = document.body.classList.contains("guest-site");
   const CHAT_ENDPOINT = window.MXC_CONFIG?.chatEndpoint || "";
+  const TRANSPORT_ANSWER = "Transport will not be provided for either wedding. Please arrange your own travel to and from the venue.";
   const PLANNER_STORE = "mxc-planner-browser-v3";
   const HONEYMOON_STORE = "mxc-honeymoon-japan-v1";
 
@@ -65,6 +66,8 @@
   }
 
   async function respond(text) {
+    const guidance = isGuest ? guestPracticalAnswer(text) : null;
+    if (guidance) return guidance;
     if (CHAT_ENDPOINT) {
       try {
         const response = await fetch(CHAT_ENDPOINT, {
@@ -88,20 +91,19 @@
     const faq = guestFaqAnswer(q);
     if (faq) return faq;
     if (has(q, ["date", "when", "day"])) return "Spain is Saturday 10 October 2026 at Finca Mesa JardÃ­n near Arcos de la Frontera. South Africa is Saturday 19 December 2026 at Mission House in the KZN Midlands.";
-    if (has(q, ["rsvp", "respond", "invite", "check in", "checkin"])) return "Use the guest check in page in the few days before each celebration to confirm who is still coming, transport, food notes and any useful household updates.";
     if (has(q, ["travel", "airport", "flight", "fly"])) return "For Spain: Jerez is closest, Seville is the best all round option, and MÃ¡laga or Gibraltar can help with wider route choice. For South Africa: fly into Durban or King Shaka, then transfer or drive to the KZN Midlands.";
     if (has(q, ["stay", "hotel", "accommodation", "lodging", "sleep"])) return "For Spain, Arcos is closest to the venue and Jerez is better for restaurants and transport. For South Africa, Howick is practical and the Midlands Meander gives the best country weekend feel.";
     if (has(q, ["weather", "temperature"])) return "Spain in October should be mild with cooler evenings. South Africa in December is warm summer weather with a real chance of afternoon storms. Final forecasts will be updated closer to each week.";
     if (has(q, ["things", "do", "visit", "activities"])) return "Spain ideas: Arcos, Jerez, CÃ¡diz, Chiclana, Vejer, Grazalema and Seville. South Africa ideas: Midlands Meander, Howick Falls, Mandela Capture Site, Drakensberg, Durban or Umhlanga, safari or a Cape Town add on.";
-    if (has(q, ["transport", "bus", "pickup", "shuttle"])) return "Spain bus pickup is planned from 15:00 to 16:15 in Chiclana. South Africa bus pickup is planned from 15:00 to 16:15. Final pickup points depend on where guests stay, so please answer the guest check in transport questions early.";
     return "I can help with dates, locations, Rodeo dress code, children, parking, drinks, gifts, food, photos, guest check in, travel, accommodation, weather, transport and things to do. Ask me one of those and I'll answer from the wedding guide.";
   }
 
   function guestFaqAnswer(q) {
+    const guidance = guestPracticalAnswer(q);
+    if (guidance) return guidance;
     if (has(q, ["child", "children", "kid", "kids", "baby", "babies", "toddler", "toddlers", "family", "families"])) return "Yes, children are very welcome. Weâ€™ll provide some things to help keep them entertained, and there will be people nearby to keep a friendly eye on them. Parents and guardians are still responsible for their own children throughout the celebration, so please keep an eye on them as you normally would.";
     if (has(q, ["same location", "one location", "different location", "move venue", "moving venue", "all in one place"])) return "Yes, everything is planned around the same venue. Once you arrive, you can settle in and enjoy the ceremony, food, drinks and celebration without moving between locations.";
-    if (has(q, ["parking", "park car", "car park"])) return "Yes, there will be parking available at the venue. Weâ€™ll share any final parking or arrival notes closer to the wedding date.";
-    if (has(q, ["how early", "arrive early", "early can", "early arrive", "arrival time"])) return "Guest arrival is 16:15 to 16:40. If you are travelling by bus, pickup runs from 15:00 to 16:15. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards.";
+    if (has(q, ["how early", "arrive early", "early can", "early arrive", "arrival time"])) return "Guest arrival is 16:15 to 16:40. Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards.";
     if (has(q, ["open bar", "bar", "drinks", "paid bar", "cash bar", "alcohol"])) return "Welcome drinks and soft drinks will be available as guests arrive before the ceremony. Drinks reception and canapes run from 17:20 to 18:45, and the bar opens fully afterwards so guests can get drinks swiftly for the evening.";
     if (has(q, ["indoors", "outdoors", "inside", "outside", "tent", "rain", "inclement"])) return "The wedding has a country/Rodeo feel and is planned as an outdoor celebration. If the weather turns, there will be cover under a tent or suitable shelter so the day can keep flowing comfortably.";
     if (has(q, ["gift", "gifts", "cash", "eft", "bank", "banking", "present", "registry"])) return "Your presence is the main thing. If you would like to give a gift, a cash or EFT contribution is most helpful and very appreciated. We can accept EUR or ZAR; please message Matt or Cara privately for banking details.";
@@ -201,8 +203,23 @@
     return words.some((word) => text.includes(word));
   }
 
+  function isTransportQuestion(text) {
+    return /\b(transport|bus|buses|shuttles?|pick[\s-]*ups?)\b/i.test(text);
+  }
+
+  function guestPracticalAnswer(text) {
+    if (isTransportQuestion(text)) return TRANSPORT_ANSWER;
+    if (/getting home|get home|go home|travel home|journey home|return journey|ride home|taxi home|transfer home|drive home|journey back|getting back|get back|taxi after|transfer after|leave the venue|leave the wedding/i.test(text)) return "Both celebrations finish at 01:00. Arrange your return journey before the wedding and agree a collection point with your driver. Your accommodation may be able to help you book a taxi or private transfer.";
+    if (/diet(?:ary)?|allerg(?:y|ies|ic)|coeliac|celiac|gluten|dairy[- ]?free|vegan|vegetarian|halal|kosher|food intolerance/i.test(text)) return "Please tell Matt or Cara privately about dietary requirements or allergies as early as possible. Add each guest's requirements to their dietary and allergy field in your private household check in.";
+    if (/accessib(?:le|ility)|access needs|step[- ]?free|wheelchair|mobility|disabled|disabilit(?:y|ies)|close drop[- ]?off/i.test(text)) return "Please tell Matt or Cara privately about access needs as early as possible, including step-free routes, accessible toilets or a close drop-off. Arrangements need to be confirmed with the venue. Record access needs in the guest notes in your private household check in.";
+    if (/parking|park (?:my |our |the )?car|car park/i.test(text)) return "Parking is available at both venues. Use the map link in your wedding details, allow time to park and reach the ceremony, and arrive between 16:15 and 16:40.";
+    if (/\bdirections?\b|\bmaps?\b|venue address|wedding address|address.*(?:finca|mission|venue|wedding|spain|africa)|(?:finca|mission|venue|wedding).*address|where is (?:the )?(?:finca|mission|venue|wedding)|venue location|how (?:do|can) (?:i|we) get (?:there|to (?:the )?(?:venue|wedding|finca|mission))/i.test(text)) return "Spain: Finca Mesa Jardín, Carretera Arcos de la Frontera–El Bosque, km 11, 11630 Arcos de la Frontera, Cádiz, Spain. The final access lane is 1.5 km from the main road at km 11. South Africa: Mission House, 39 Currys Post Road, Howick, 3290, KwaZulu-Natal, South Africa. Use the Directions link in your wedding details to plan your journey.";
+    if (/\b(rsvp|check\s*-?\s*in|confirm|confirmation|invite|invitation)\b/i.test(text)) return "Matt or Cara will share your private household check in link or code directly in the few days before each wedding. Use it then to reconfirm attendance for each guest, add dietary and allergy requirements, and record access needs or other updates in the guest notes. Contact Matt or Cara privately if you need your link or code.";
+    return null;
+  }
+
   function publicContext() {
-    return { site: "mxcwedding.com", theme: "Rodeo style Western music and BBQ weddings", spain: "10 October 2026, Finca Mesa JardÃ­n, Arcos de la Frontera", southAfrica: "19 December 2026, Mission House, KZN Midlands" };
+    return { site: "mxcwedding.com", theme: "Rodeo style Western music and BBQ weddings", spain: "10 October 2026, Finca Mesa JardÃ­n, Arcos de la Frontera", southAfrica: "19 December 2026, Mission House, KZN Midlands", transport: TRANSPORT_ANSWER };
   }
 
   function addMessage(text, type) {

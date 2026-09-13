@@ -8,6 +8,15 @@
 .detail-grid > div { padding: 20px; border-right: 1px solid var(--line); border-bottom: 1px solid var(--line); }
 .detail-grid dt { color: var(--ink-soft); font-size: 9px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
 .detail-grid dd { margin: 8px 0 0; font-family: var(--serif); font-size: 24px; }
+.venue-directions { margin-top: 28px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
+.venue-directions h3 { margin: 0 0 12px; color: var(--ink); font-family: var(--serif); font-size: 26px; font-weight: 500; }
+.venue-directions p { margin: 10px 0 0; }
+.venue-directions .text-link { margin-top: 16px; }
+.venue-source { display: block; width: fit-content; margin-top: 10px; color: var(--ink-soft); font-size: 12px; text-underline-offset: 3px; }
+.guest-help-section { border-top: 1px solid var(--line); }
+.guest-help-section .practical-grid h3 { margin-top: 0; }
+.guest-help-section .practical-grid article:nth-child(odd):last-child { grid-column: 1 / -1; }
+.guest-help-section .practical-intro > p:last-child { max-width: 380px; color: var(--ink-soft); font-size: 14px; line-height: 1.7; }
 .note-box { margin-top: 24px; padding: 18px 20px; border-left: 3px solid var(--clay); background: rgba(255,255,255,.55); color: var(--ink-soft); font-size: 13px; line-height: 1.65; }
 .countdown-section { position: relative; z-index: 6; display: grid; grid-template-columns: minmax(280px, .86fr) minmax(420px, 1.14fr); gap: clamp(22px, 4vw, 58px); align-items: center; width: min(1320px, calc(100% - 48px)); margin: clamp(-72px, -5vw, -44px) auto clamp(44px, 6vw, 84px); padding: clamp(24px, 3.6vw, 46px); overflow: hidden; color: var(--olive-dark); border: 1px solid rgba(255,255,255,.72); border-radius: var(--radius-lg); background: linear-gradient(135deg, rgba(255,253,248,.96), rgba(246,240,230,.9)); box-shadow: 0 26px 76px rgba(34,31,25,.2); backdrop-filter: blur(18px); }
 .countdown-section:before { content: ""; position: absolute; inset: 9px; border: 1px solid rgba(48,58,45,.08); border-radius: calc(var(--radius-lg) - 9px); pointer-events: none; }

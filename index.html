@@ -7,11 +7,11 @@
   <meta name="description" content="Matt and Cara's guest guide for their Spain and South Africa wedding celebrations in 2026.">
   <title>Matt & Cara · Wedding Guest Guide</title>
   <link rel="manifest" href="manifest.webmanifest">
-  <link rel="stylesheet" href="style.css?v=20260704-no-schedules">
+  <link rel="stylesheet" href="style.css?v=20260913-guest-details">
   <link rel="stylesheet" href="responsive.css?v=20260630-accommodation-layout">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-  <script defer src="config.js?v=20260630-supabase-live"></script>
-  <script defer src="guest.js?v=20260911-cleanup"></script>
+  <script defer src="config.js?v=20260913-guest-details"></script>
+  <script defer src="guest.js?v=20260913-guest-details"></script>
 </head>
 <body class="guest-site">
   <a class="skip-link" href="#main">Skip to content</a>
@@ -91,13 +91,19 @@
         <p class="event-location">Arcos de la Frontera · Cádiz · Andalucía</p>
         <p class="event-lead">Spain will bring the Rodeo spirit to the Andalusian countryside: Western music, BBQ food, boots, hats, denim and leather against a finca backdrop.</p>
         <dl class="detail-grid">
-          <div><dt>Bus pick up &middot; Location TBC</dt><dd>15:00</dd></div>
           <div><dt>Guest arrival</dt><dd>16:15 to 16:40</dd></div>
           <div><dt>Ceremony</dt><dd>17:00</dd></div>
           <div><dt>Celebration ends</dt><dd>01:00</dd></div>
           <div><dt>Dress feel</dt><dd>Rodeo Western</dd></div>
         </dl>
         <div class="note-box"><b>Rodeo style dress code.</b> Cowboy boots, hats, leather and denim are welcome and encouraged. Dress for good BBQ, Western music, outdoor spaces and a proper dancefloor.</div>
+        <div class="venue-directions" id="spain-directions">
+          <h3>Getting to the finca</h3>
+          <p>Carretera Arcos de la Frontera–El Bosque, km 11<br>11630 Arcos de la Frontera, Cádiz, Spain</p>
+          <p>From the road at km 11, allow for the final 1.5 km along the finca’s access lane. Arrive between 16:15 and 16:40, with time to park and reach the ceremony.</p>
+          <a class="text-link" href="https://www.google.com/maps/dir/?api=1&amp;destination=Finca+Mesa+Jardin,+Carretera+Arcos+El+Bosque+km+11,+11630+Arcos+de+la+Frontera,+Cadiz,+Spain" target="_blank" rel="noopener noreferrer">Directions to Finca Mesa Jardín <span aria-hidden="true">↗</span></a>
+          <a class="venue-source" href="https://fincamesajardin.com/localizacion" target="_blank" rel="noopener noreferrer">Venue location guide</a>
+        </div>
         <a class="text-link" href="#spain-plan">See our suggested Spain travel plan <span>→</span></a>
       </div>
     </section>
@@ -109,13 +115,19 @@
         <p class="event-location">KwaZulu-Natal Midlands · near Howick</p>
         <p class="event-lead">South Africa will carry the same Rodeo style energy in the KZN Midlands: great BBQ food, Western music, cowboy boots, hats, leather and denim encouraged.</p>
         <dl class="detail-grid">
-          <div><dt>Bus pick up &middot; Location TBC</dt><dd>15:00</dd></div>
           <div><dt>Guest arrival</dt><dd>16:15 to 16:40</dd></div>
           <div><dt>Ceremony</dt><dd>17:00</dd></div>
           <div><dt>Celebration ends</dt><dd>01:00</dd></div>
           <div><dt>Dress feel</dt><dd>Rodeo Western</dd></div>
         </dl>
         <div class="note-box"><b>Rodeo style dress code.</b> Cowboy boots, hats, leather and denim are welcome and encouraged. Dress for good BBQ, Western music, outdoor spaces and a proper dancefloor.</div>
+        <div class="venue-directions" id="sa-directions">
+          <h3>Getting to Mission House</h3>
+          <p>39 Currys Post Road, Howick, 3290<br>KwaZulu-Natal, South Africa</p>
+          <p>Use the full venue address when planning your route or arranging a driver. Arrive between 16:15 and 16:40, with time to park and reach the ceremony.</p>
+          <a class="text-link" href="https://www.google.com/maps/dir/?api=1&amp;destination=Mission+House,+39+Currys+Post+Road,+Howick,+3290,+South+Africa" target="_blank" rel="noopener noreferrer">Directions to Mission House <span aria-hidden="true">↗</span></a>
+          <a class="venue-source" href="https://www.missionhouse.co.za/contact" target="_blank" rel="noopener noreferrer">Venue address details</a>
+        </div>
         <a class="text-link" href="#sa-plan">See our suggested South Africa travel plan <span>→</span></a>
       </div>
       <div class="event-image mission-main" role="img" aria-label="Mission House reception tables overlooking the KZN Midlands"></div>
@@ -185,7 +197,7 @@
       <div class="section-heading compact-heading">
         <div class="intro-number">03</div>
         <div><p class="eyebrow">Where to stay</p><h2>Base yourself for calm arrivals.</h2></div>
-        <p>Nearby accommodation options are listed below. Transport pickup points will be published once supplier routes are locked.</p>
+        <p>Nearby accommodation options are listed below. Transport will not be provided for either wedding. Please arrange your own travel to and from the venue.</p>
       </div>
       <div class="live-note-grid" id="stay-live-notes" hidden></div>
       <div class="stay-grid">
@@ -281,6 +293,17 @@
       </div>
     </section>
 
+    <section class="practical-section guest-help-section" id="guest-help" aria-labelledby="guest-help-title">
+      <div class="practical-intro"><p class="eyebrow">Before you arrive</p><h2 id="guest-help-title">A little planning,<br>an easier day.</h2><p>Venue directions are above. Here is what to arrange before each celebration.</p></div>
+      <div class="practical-grid">
+        <article id="parking-notes"><h3>Parking and arrival</h3><p>Parking is available at both venues. Use your venue’s directions above and allow time to park and reach the ceremony. Guest arrival is 16:15 to 16:40; the ceremony starts at 17:00. If you need a closer drop-off point, let Matt or Cara know before the day so arrangements can be confirmed.</p></article>
+        <article id="return-travel"><h3>Getting home</h3><p>Both celebrations finish at 01:00. Arrange your own return journey before the wedding and agree a collection time and point with your driver. Your accommodation may be able to help you book a taxi or private transfer. Please check with the venue before planning to leave a car overnight.</p></article>
+        <article id="dietary-needs"><h3>Food allergies and dietary needs</h3><p>Tell Matt or Cara privately about allergies, dietary requirements and vegetarian or vegan needs as early as possible, rather than waiting until the wedding week. When you receive your private guest check in link, add the details for each person in “Dietary or allergy notes”.</p></article>
+        <article id="access-needs"><h3>Accessibility and getting around</h3><p>Both celebrations include outdoor spaces. If you need step-free access, an accessible toilet or help getting from your car to the ceremony, tell Matt or Cara privately before travelling. Arrangements need to be confirmed for your venue. Include your access needs in the guest notes when you receive your private check in link.</p></article>
+        <article id="guest-checkin-guide"><h3>Your private guest check in</h3><p>Matt and Cara will share a household link or code directly in the few days before each celebration. Use it to reconfirm who is coming and update each guest’s dietary notes, accommodation and access needs. You can reopen the same link to make changes. If you have not received your link, ask Matt or Cara privately.</p></article>
+      </div>
+    </section>
+
     <section class="gift-section" id="gifts" aria-labelledby="gifts-title">
       <div class="gift-copy">
         <p class="eyebrow">Gifts</p>
@@ -298,10 +321,14 @@
       <div class="faq-heading"><p class="eyebrow">Frequently asked</p><h2>Before you message us...</h2><p>We will keep expanding this section as plans are confirmed.</p></div>
       <div class="faq-list" id="faq-list">
         <details><summary>When should we book flights?</summary><p>Once your attendance is confirmed, begin tracking routes and book when the itinerary and price feel right. Prefer flexible fares because regional schedules can change.</p></details>
-        <details><summary>Will there be wedding day transport?</summary><p>Unfortunately, due to the location of the finca, we are now unable to offer group transport from Chiclana to and from the venue.</p><p>We recommend either driving or organizing a taxi/private hire car. Unfortunately, Uber isn’t available in this area yet, but all towns and cities have local taxi companies who can help you arrange transport to and from the venue. If you need any assistance with booking, please reach out to us.</p></details>
+        <details><summary>Will there be wedding day transport?</summary><p>Transport will not be provided for either wedding. Please arrange your own travel to and from the venue.</p></details>
+        <details><summary>Is there parking at the venue?</summary><p>Parking is available at both venues. Use the venue directions above and arrive between 16:15 and 16:40, with time to park and reach the ceremony. Arrange your own return journey before the wedding; both celebrations finish at 01:00.</p></details>
+        <details><summary>How do I share dietary requirements or allergies?</summary><p>Tell Matt or Cara privately as early as possible. When you receive your private guest check in link, add the details for each person in “Dietary or allergy notes”.</p></details>
+        <details><summary>What if I need accessibility arrangements?</summary><p>Tell Matt or Cara privately before travelling about step-free access, accessible toilets or help getting from your car to the ceremony. Arrangements need to be confirmed for your venue. Add your access needs to the guest notes when you receive your private check in link.</p></details>
+        <details><summary>How do I complete guest check in?</summary><p>Matt and Cara will share your household link or code directly in the few days before each celebration. Use it to reconfirm attendance and update your guest details. If you have not received your link, ask them privately.</p></details>
         <details><summary>Can children come?</summary><p>Children are very welcome. We will provide things to help keep them entertained, and parents and guardians remain responsible for their children throughout the celebration.</p></details>
         <details><summary>What should we wear?</summary><p>The dress feel is Rodeo Western. Cowboy boots, hats, leather, denim, belts, bolo ties, fringe, country shirts and country style dresses are welcome and encouraged. Choose shoes that work on gardens, lawns and a dancefloor.</p></details>
-        <details><summary>When will final timings be shared?</summary><p>The key guest timings are shown above. Exact pickup points, arrival notes and weather guidance will be refreshed closer to each wedding week.</p></details>
+        <details><summary>When will final timings be shared?</summary><p>The key guest timings are shown above. Arrival notes and weather guidance will be refreshed closer to each wedding week.</p></details>
       </div>
     </section>
 
