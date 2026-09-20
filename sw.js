@@ -1,5 +1,5 @@
-const CACHE = "mxc-guest-v23";
-const PUBLIC_ASSETS = ["/", "/index.html", "/style.css?v=20260913-guest-details", "/style-core.css?v=20260704-mission-house-gallery", "/guest-layout.css?v=20260913-guest-details", "/responsive.css?v=20260630-accommodation-layout", "/brand.css", "/brand-hero.css?v=20260630-header-photo-2", "/wedding-chat.css", "/guest.js?v=20260913-no-checkin-faq", "/guest-children-note.js", "/assets/invitation-picture.jpg", "/manifest.webmanifest", "/icon.svg"];
+const CACHE = "mxc-guest-v24";
+const PUBLIC_ASSETS = ["/guest-language.css?v=20260920", "/guest-translations.js?v=20260920", "/guest-language.js?v=20260920", "/", "/index.html", "/style.css?v=20260913-guest-details", "/style-core.css?v=20260704-mission-house-gallery", "/guest-layout.css?v=20260913-guest-details", "/responsive.css?v=20260630-accommodation-layout", "/brand.css", "/brand-hero.css?v=20260630-header-photo-2", "/wedding-chat.css", "/guest.js?v=20260913-no-checkin-faq", "/guest-children-note.js", "/assets/invitation-picture.jpg", "/manifest.webmanifest", "/icon.svg"];
 
 self.addEventListener("install", (event) => {
   event.waitUntil(caches.open(CACHE).then((cache) => cache.addAll(PUBLIC_ASSETS)).then(() => self.skipWaiting()));

@@ -9,12 +9,24 @@
   <link rel="manifest" href="manifest.webmanifest">
   <link rel="stylesheet" href="style.css?v=20260913-guest-details">
   <link rel="stylesheet" href="responsive.css?v=20260630-accommodation-layout">
+  <link rel="stylesheet" href="guest-language.css?v=20260920">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260913-guest-copy"></script>
   <script defer src="guest.js?v=20260913-no-checkin-faq"></script>
+  <script defer src="guest-translations.js?v=20260920"></script>
+  <script defer src="guest-language.js?v=20260920"></script>
 </head>
 <body class="guest-site">
   <a class="skip-link" href="#main">Skip to content</a>
+
+  <div class="language-bar" role="group" aria-label="Language / Idioma" translate="no">
+    <span class="language-label"><span lang="en">Language</span> / <span lang="es">Idioma</span></span>
+    <div class="language-options">
+      <button type="button" data-language="en" lang="en" aria-pressed="true">English</button>
+      <button type="button" data-language="es" lang="es" aria-pressed="false">Español</button>
+    </div>
+  </div>
+  <p class="language-status" role="status" aria-live="polite" translate="no"></p>
 
   <header class="public-header" id="top">
     <a class="monogram" href="#top" aria-label="Matt and Cara home"><span>M</span><i>×</i><span>C</span></a>

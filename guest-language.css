@@ -1,0 +1,70 @@
+/* A visible language choice on arrival, outside the mobile menu. */
+.language-bar {
+  position: sticky;
+  top: 0;
+  z-index: 110;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px 20px;
+  min-height: 60px;
+  padding: 6px 16px;
+  background: var(--olive-dark);
+  color: var(--paper);
+}
+.language-label { font-size: .875rem; font-weight: 600; }
+.language-options { display: flex; gap: 4px; }
+.language-options button {
+  min-height: 44px;
+  padding: 8px 18px;
+  border: 1px solid rgba(255,255,255,.6);
+  border-radius: 999px;
+  background: transparent;
+  color: inherit;
+  font-size: .9375rem;
+  font-weight: 650;
+  cursor: pointer;
+}
+.language-options button[aria-pressed="true"] {
+  background: var(--paper);
+  color: var(--olive-dark);
+  border-color: var(--paper);
+}
+.language-options button:hover { border-color: #fff; box-shadow: inset 0 0 0 1px #fff; }
+.language-options button:focus-visible { outline: 3px solid #e5bd85; outline-offset: 3px; }
+.language-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+.guest-site .public-header { top: var(--language-bar-height, 60px); }
+.guest-site .guest-hero,
+.guest-site .guest-hero .hero-copy { min-height: calc(100svh - 76px - var(--language-bar-height, 60px)); }
+.guest-site section[id] { scroll-margin-top: calc(90px + var(--language-bar-height, 60px)); }
+/* Spanish navigation needs a little more room without squeezing the logo. */
+html[lang="es"] .public-header { grid-template-columns: 120px minmax(0, 1fr) 155px; }
+html[lang="es"] .public-nav { gap: clamp(12px, 1.8vw, 26px); }
+@media (max-width: 980px) {
+  .guest-site .public-header,
+  html[lang="es"] .public-header { grid-template-columns: 1fr auto; min-height: 66px; }
+  .guest-site .public-nav, .guest-site .portal-link { display: none; }
+  .guest-site .menu-button { display: block; }
+  .guest-site.menu-open { overflow: hidden; }
+  .guest-site.menu-open .public-nav {
+    position: absolute;
+    inset: 100% 0 auto;
+    display: grid;
+    gap: 0;
+    padding: 18px;
+    max-height: calc(100dvh - 66px - var(--language-bar-height, 60px));
+    overflow-y: auto;
+    background: var(--paper);
+    box-shadow: var(--shadow-lg);
+  }
+  .guest-site.menu-open .public-nav a { padding: 17px; border-bottom: 1px solid var(--line); font-family: var(--serif); font-size: 23px; letter-spacing: 0; text-transform: none; }
+  .guest-site .guest-hero,
+  .guest-site .guest-hero .hero-copy { min-height: calc(100svh - 66px - var(--language-bar-height, 60px)); }
+}
+@media (max-width: 480px) {
+  .language-bar { gap: 8px; padding-inline: 8px; }
+  .language-label { font-size: .875rem; }
+  .language-options button { padding-inline: 13px; }
+  html[lang="es"] .mobile-nav a { font-size: 9px; letter-spacing: 0; }
+}
