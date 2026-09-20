@@ -255,7 +255,7 @@ assert.doesNotMatch(access, /const\s+(?:PIN|PASSWORD)\s*=\s*["']\d{4}["']/i, "th
 assert.doesNotMatch(access, /estimated:\s*\d{3,}|quote_amount:\s*\d{3,}|title:\s*"Spain venue"|name:\s*"Finca Mesa/i, "browser-mode fallback must not ship private budget or vendor seed data");
 assert.match(sw, /pathname\.includes\("rsvp"\)/);
 assert.match(sw, /url\.search/);
-assert.match(sw, /mxc-guest-v23/);
+assert.match(sw, /mxc-guest-v24/);
 assert.match(sw, /new Request\(request, \{ cache: "reload" \}\)/);
 assert.match(sw, /style\.css\?v=20260913-guest-details/);
 assert.match(sw, /guest\.js\?v=20260913-no-checkin-faq/);
