@@ -1,9 +1,21 @@
 name: Deploy site to GitHub Pages
 
-# The wedding site is a static site served from the repository root. GitHub
-# Pages must be enabled for this repository with GitHub Actions selected as the
-# publishing source. This workflow then publishes the complete site, including
-# the CNAME file that binds mxcwedding.com.
+# The wedding site is a static site served from the repository root, and
+# mxcwedding.com is bound to it. Publishing requires GitHub Pages to be enabled
+# on the repository with "GitHub Actions" as the build source. Enabling Pages is
+# an administrative action that the automatic GITHUB_TOKEN cannot perform:
+# workflow tokens have no "administration" permission scope at all. Two ways to
+# satisfy that:
+#
+#   1. Repository owner enables it once: Settings -> Pages -> Build and
+#      deployment -> Source: "GitHub Actions". Private repositories need a paid
+#      GitHub plan for Pages; on a free plan the repository must be public.
+#   2. Add a repository secret named PAGES_ADMIN_TOKEN holding a token with
+#      administration rights on this repository. This workflow then enables
+#      Pages itself on the next run, without any visit to the settings UI.
+#
+# The preflight step below reports which of these is missing, so a failure names
+# the cause instead of surfacing a bare "Not Found" from the Pages API.
 
 on:
   push:
@@ -15,6 +27,7 @@ permissions:
   pages: write
   id-token: write
 
+# One production deployment at a time; never cancel an in-flight deploy.
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -29,6 +42,23 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Preflight - report GitHub Pages status
+        env:
+          GH_TOKEN: ${{ secrets.PAGES_ADMIN_TOKEN || github.token }}
+          HAS_ADMIN_TOKEN: ${{ secrets.PAGES_ADMIN_TOKEN != '' }}
+        run: |
+          if status="$(gh api "repos/${GITHUB_REPOSITORY}/pages" \
+            --jq '"build_type=\(.build_type) cname=\(.cname // "none")"' 2>/dev/null)"; then
+            echo "GitHub Pages is enabled: $status"
+          else
+            echo "::warning::GitHub Pages is NOT enabled for ${GITHUB_REPOSITORY}."
+            if [ "$HAS_ADMIN_TOKEN" = "true" ]; then
+              echo "PAGES_ADMIN_TOKEN is present; the Configure Pages step will try to enable it."
+            else
+              echo "::error::Cannot enable Pages automatically. Either set Settings -> Pages -> Source to 'GitHub Actions', or add a PAGES_ADMIN_TOKEN secret with administration rights on this repository. Private repositories additionally require a paid GitHub plan for Pages."
+            fi
+          fi
+
       - name: Assemble published site
         run: |
           mkdir -p _site
@@ -41,11 +71,17 @@ jobs:
           test -f _site/index.html
           test "$(tr -d '\r\n' < _site/CNAME)" = "mxcwedding.com"
 
+      # enablement:true is a no-op once Pages is on. It only does real work when
+      # PAGES_ADMIN_TOKEN supplies a token permitted to create the Pages site.
+      # Making the repository public does NOT let github.token create the site:
+      # run 30197962825 tried exactly that on the now-public repository and still
+      # got "Create Pages site failed. Resource not accessible by integration".
+      # Visibility governs whether Pages may serve at all; creating the site is a
+      # separate administrative permission the workflow token never carries.
       - name: Configure Pages
         uses: actions/configure-pages@v5
         with:
-          # The repository is public, so the workflow token can create the Pages
-          # site itself. This is a no-op once Pages is enabled.
+          token: ${{ secrets.PAGES_ADMIN_TOKEN || github.token }}
           enablement: true
 
       - name: Upload site artifact
