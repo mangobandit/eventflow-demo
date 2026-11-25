@@ -49,7 +49,7 @@
     ["pending", "Pending"],
     ["approved", "Approved"]
   ];
-  const OWNER_OPTIONS = [["shared", "Shared"], ["matt", "Matt"], ["cara", "Cara"]];
+  const OWNER_OPTIONS = [["shared", "Shared"], ["matt", "Matt"], ["cara", "Cara"], ["kelly", "Kelly"]];
   const CELEBRATION_OPTIONS = [["shared", "Shared / both"], ["spain", "Spain"], ["south_africa", "South Africa"]];
 
   const definitions = {

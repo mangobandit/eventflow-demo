@@ -236,9 +236,17 @@
     if (rerender) renderAll();
   }
 
+  function updateOwnerLens() {
+    document.querySelectorAll("[data-owner]").forEach(button => {
+      const active = button.dataset.owner === state.owner;
+      button.classList.toggle("active", active);
+      button.setAttribute("aria-pressed", String(active));
+    });
+  }
+
   function setOwner(owner) {
     state.owner = owner;
-    document.querySelectorAll("[data-owner]").forEach((button) => button.classList.toggle("active", button.dataset.owner === owner));
+    updateOwnerLens();
     switchView(state.view);
   }
 

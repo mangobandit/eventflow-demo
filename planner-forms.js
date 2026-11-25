@@ -131,7 +131,7 @@
 
   function statusBadge(status) { return `<span class="status-badge status-${escapeHtml(status || "outstanding")}">${escapeHtml(titleCase(status || "outstanding"))}</span>`; }
   function ownerTag(owner) { return `<span class="mini-tag ${escapeHtml(owner || "shared")}">${escapeHtml(ownerLabel(owner))}</span>`; }
-  function ownerLabel(owner) { return owner === "matt" ? "Matt" : owner === "cara" ? "Cara" : "Shared"; }
+  function ownerLabel(owner) { return OWNER_OPTIONS.find(([value]) => value === owner)?.[1] || "Shared"; }
   function labelCelebration(value) { return value === "spain" ? "Spain" : value === "south_africa" ? "South Africa" : "Shared / both"; }
   function labelCountry(value) { return value === "spain" ? "Spain" : value === "south_africa" ? "South Africa" : "Both weddings"; }
   function labelRsvp(value) { return ({ yes: "Yes", no: "No", tbc: "TBC", no_response: "No response" })[value] || "No response"; }

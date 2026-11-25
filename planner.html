@@ -7,7 +7,7 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>Matt & Cara · Private Wedding Planner</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="planner.css?v=20261125-grouped-nav">
+  <link rel="stylesheet" href="planner.css?v=20261125-kelly-lens">
   <link rel="stylesheet" href="planner-seating.css?v=20261125-seating-viewport">
   <link rel="stylesheet" href="planner-workspace.css?v=20261125-budget-editing">
   <link rel="stylesheet" href="planner-operations.css?v=20261125-tools">
@@ -19,10 +19,10 @@
   <link rel="stylesheet" href="responsive.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260913-guest-details"></script>
-  <script defer src="planner-core.js?v=20261125-meal-colours"></script>
+  <script defer src="planner-core.js?v=20261125-kelly-lens"></script>
   <script defer src="planner-nav.js?v=20261125-grouped-nav"></script>
-  <script defer src="planner-auth.js?v=20261125-sa-workbook"></script>
-  <script defer src="planner-views.js?v=20261125-planner-home"></script>
+  <script defer src="planner-auth.js?v=20261125-kelly-lens"></script>
+  <script defer src="planner-views.js?v=20261125-kelly-lens"></script>
   <script defer src="planner-seat-colours.js?v=20261125-meal-colours"></script>
   <script defer src="planner-seat-viewport.js?v=20261125-seating-viewport"></script>
   <script defer src="planner-seating.js?v=20261125-seating-viewport"></script>
@@ -34,7 +34,7 @@
   <script defer src="planner-home.js?v=20261125-planner-home"></script>
   <script defer src="planner-registers.js?v=20261125-meal-colours"></script>
   <script defer src="planner-conversations.js?v=20261125-planner-home"></script>
-  <script defer src="planner-forms.js?v=20261125-meal-colours"></script>
+  <script defer src="planner-forms.js?v=20261125-kelly-lens"></script>
 </head>
 <body class="planner-site">
   <section class="auth-screen" id="auth-screen">
@@ -136,9 +136,10 @@
       <div class="owner-switch">
         <span>Planner lens</span>
         <div class="owner-pills" role="group" aria-label="Filter by owner">
-          <button class="active" type="button" data-owner="shared">Shared</button>
-          <button type="button" data-owner="matt">Matt</button>
-          <button type="button" data-owner="cara">Cara</button>
+          <button class="active" type="button" data-owner="shared" aria-pressed="true">Shared</button>
+          <button type="button" data-owner="matt" aria-pressed="false">Matt</button>
+          <button type="button" data-owner="cara" aria-pressed="false">Cara</button>
+          <button type="button" data-owner="kelly" aria-pressed="false">Kelly</button>
         </div>
       </div>
 
@@ -175,7 +176,7 @@
         <section class="planner-view" data-view-panel="overview">
           <div id="plannerHome"></div>
           <div class="view-intro">
-            <div><h2>Planning progress by owner</h2><p>Use the Shared, Matt or Cara filter to see the work assigned to each of you.</p></div>
+            <div><h2>Planning progress by owner</h2><p>Select a planner lens to see the work assigned to that owner.</p></div>
             <div class="view-tools"><button class="filter-button active" type="button" data-celebration="all">Both weddings</button><button class="filter-button" type="button" data-celebration="spain">Spain</button><button class="filter-button" type="button" data-celebration="south_africa">South Africa</button></div>
           </div>
           <div class="kpi-grid">
@@ -225,6 +226,7 @@
                 <option value="shared">Shared</option>
                 <option value="matt">Matt</option>
                 <option value="cara">Cara</option>
+                <option value="kelly">Kelly</option>
               </select>
             </label>
             <label class="form-label">Search actions
