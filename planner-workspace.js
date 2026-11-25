@@ -4,7 +4,8 @@ const plannerWorkspace = (function createPlannerWorkspace() {
   const root = document.getElementById("plannerWorkspace");
   const tools = [
     ["projects", "Projects"], ["calendar", "Calendar"], ["templates", "Templates"],
-    ["notes", "Notes & messages"], ["comparison", "Suppliers & budget"],
+    ["notes", "Notes & messages"], ["conversations", "Client messages"],
+    ["catering", "Catering"], ["comparison", "Suppliers & budget"], ["payments", "Payments"],
     ["venue", "Venue designer"], ["guides", "Client guides"],
     ["site", "Website builder"], ["access", "Client access"]
   ];
@@ -14,7 +15,7 @@ const plannerWorkspace = (function createPlannerWorkspace() {
   ];
   const sections = [
     ["timeline", "Guest-facing timeline"], ["guides", "Shared guides"],
-    ["site", "Wedding website"], ["slots", "Available meeting times"]
+    ["site", "Wedding website"], ["slots", "Available meeting times"], ["feedback", "Private client messages"]
   ];
   let token;
   let scope;
@@ -59,6 +60,7 @@ const plannerWorkspace = (function createPlannerWorkspace() {
       active = state.workspaceTool;
       editor = null;
     }
+    restoreConversationScope();
     paint();
     if (!records && !loading && !error) load();
   }
@@ -76,7 +78,9 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     } finally {
       if (session === token) {
         loading = false;
+        restoreConversationScope();
         paint();
+        if (state.view === "overview") renderPlannerHome();
       }
     }
   }
@@ -127,10 +131,32 @@ const plannerWorkspace = (function createPlannerWorkspace() {
   }
 
   function setScope(id) {
+    if (scope !== id && active === "conversations") {
+      const url = new URL(location.href);
+      url.searchParams.delete("project");
+      url.searchParams.delete("thread");
+      history.replaceState(null, "", url);
+    }
     scope = id;
     editor = null;
     lastLink = null;
     paint();
+  }
+
+  function restoreConversationScope() {
+    if (active !== "conversations" || !records) return;
+    const requested = new URLSearchParams(location.search).get("project");
+    if (requested === "shared" || projects().some(project => project.id === requested)) scope = requested;
+  }
+
+  function openProject(id, tool = "projects") {
+    if (id !== "shared" && !projects().some(project => project.id === id)) return;
+    setScope(id);
+    switchView(viewForTool(tool));
+  }
+
+  function homeData() {
+    return { projects: projects(), records: records || [], loading, error };
   }
 
   function formField(name, title, value = "", options = {}) {
@@ -426,6 +452,12 @@ const plannerWorkspace = (function createPlannerWorkspace() {
         save: (record, title, data) => save("venue", record, title, data)
       });
       if (!Object.hasOwn(seatLayouts, scope)) loadVenueTables();
+    } else if (active === "conversations") {
+      renderPlannerConversations(content, { scope, token, view: viewForTool("conversations") });
+    } else if (active === "catering") {
+      plannerRegisters.renderMeals(content, { scope, token });
+    } else if (active === "payments") {
+      plannerRegisters.renderPayments(content, scope);
     } else if (active === "access" && !links) loadLinks();
   }
 
@@ -541,7 +573,11 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     return tools.find(([tool]) => viewForTool(tool) === view)?.[0];
   }
 
-  return { render, reset, viewForTool, toolForView };
+  function labelForTool(tool) {
+    return tools.find(([id]) => id === tool)?.[1] || "Planning tools";
+  }
+
+  return { render, reset, viewForTool, toolForView, labelForTool, homeData, openProject, reloadHome: load };
 })();
 
 function renderPlannerWorkspace() { plannerWorkspace.render(); }

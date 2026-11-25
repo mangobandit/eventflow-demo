@@ -58,6 +58,7 @@
     const guideRows = Array.isArray(data.guides) ? data.guides : [];
     const schedule = Array.isArray(data.timeline) ? data.timeline : [];
     const slots = Array.isArray(data.slots) ? data.slots : [];
+    const existingConversation = root.querySelector("[data-client-conversation]");
     root.innerHTML = `<header class="workspace-site-preview workspace-client-cover">
       <h1>${escape(title)}</h1>
       ${page.venue ? `<p>${escape(page.venue)}</p>` : ""}
@@ -86,7 +87,13 @@
           <button class="workspace-client-button" data-cancel-slot type="button">Cancel</button></div>
         <p data-book-status role="status"></p>
       </form>
-    </section>` : ""}`;
+    </section>` : ""}
+    ${shown.includes("feedback") ? '<section class="workspace-card conversation-thread" data-client-conversation aria-label="Messages with your planner"></section>' : ""}`;
+    const conversation = root.querySelector("[data-client-conversation]");
+    if (conversation) {
+      if (existingConversation) conversation.replaceWith(existingConversation);
+      else renderPlannerClientConversation(conversation, { token, client });
+    }
     root.setAttribute("aria-busy", "false");
   }
 

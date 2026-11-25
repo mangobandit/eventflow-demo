@@ -108,6 +108,8 @@
   function showAuth() {
     resetSeatingPlanner();
     resetPlannerWorkspace();
+    resetPlannerHome();
+    plannerRegisters.reset();
     plannerUpdates.reset();
     els.authScreen.hidden = false;
     els.plannerShell.hidden = true;
@@ -207,6 +209,7 @@
 
   function renderAll() {
     renderOverview();
+    if (state.view === "overview") renderPlannerHome();
     renderTasks();
     renderBudget();
     renderGuests();

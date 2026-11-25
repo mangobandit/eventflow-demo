@@ -12,19 +12,25 @@
   <link rel="stylesheet" href="planner-workspace.css?v=20261125-private-sections">
   <link rel="stylesheet" href="planner-operations.css?v=20261125-tools">
   <link rel="stylesheet" href="planner-venue.css?v=20261125-venue-camera">
+  <link rel="stylesheet" href="planner-home.css?v=20261125-planner-home">
+  <link rel="stylesheet" href="planner-registers.css?v=20261125-planner-home">
+  <link rel="stylesheet" href="planner-conversations.css?v=20261125-planner-home">
   <link rel="stylesheet" href="responsive.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260913-guest-details"></script>
   <script defer src="planner-core.js?v=20261125-grouped-nav"></script>
   <script defer src="planner-nav.js?v=20261125-grouped-nav"></script>
-  <script defer src="planner-auth.js?v=20261125-grouped-nav"></script>
-  <script defer src="planner-views.js?v=20261125-grouped-nav"></script>
+  <script defer src="planner-auth.js?v=20261125-planner-home"></script>
+  <script defer src="planner-views.js?v=20261125-planner-home"></script>
   <script defer src="planner-seating.js?v=20261125-sweetheart"></script>
   <script defer src="planner-operations.js?v=20261125-tools"></script>
   <script defer src="planner-venue.js?v=20261125-venue-camera"></script>
-  <script defer src="planner-workspace.js?v=20261125-private-sections"></script>
-  <script defer src="planner-updates.js?v=20261125-updates"></script>
-  <script defer src="planner-forms.js?v=20260630-user-login"></script>
+  <script defer src="planner-workspace.js?v=20261125-planner-home"></script>
+  <script defer src="planner-updates.js?v=20261125-planner-home"></script>
+  <script defer src="planner-home.js?v=20261125-planner-home"></script>
+  <script defer src="planner-registers.js?v=20261125-planner-home"></script>
+  <script defer src="planner-conversations.js?v=20261125-planner-home"></script>
+  <script defer src="planner-forms.js?v=20261125-planner-home"></script>
 </head>
 <body class="planner-site">
   <section class="auth-screen" id="auth-screen">
@@ -76,7 +82,7 @@
       </div>
 
       <nav class="planner-nav" aria-label="Planner sections">
-        <button class="active" type="button" data-view="overview" aria-current="page"><span aria-hidden="true">&#9707;</span>Overview</button>
+        <button class="active" type="button" data-view="overview" aria-current="page"><span aria-hidden="true">&#9707;</span>Planner Home</button>
         <button class="planner-nav-all" id="planner-nav-all" type="button" aria-expanded="false"
           aria-controls="planner-nav-scheduling planner-nav-people planner-nav-wedding planner-nav-tools">
           <span data-nav-all-label>Show all features</span>
@@ -95,15 +101,18 @@
           <summary><span aria-hidden="true">&#9678;</span>People &amp; vendors</summary>
           <div class="planner-nav-items" data-nav-items="people">
             <button type="button" data-view="guests"><span aria-hidden="true">&#9678;</span>Guests</button>
+            <button type="button" data-view="workspace-catering"><span aria-hidden="true">&#9673;</span>Catering</button>
             <button type="button" data-view="vendors"><span aria-hidden="true">&#9671;</span>Vendors</button>
             <button type="button" data-view="workspace-comparison"><span aria-hidden="true">&#8364;</span>Compare suppliers</button>
             <button type="button" data-view="workspace-notes"><span aria-hidden="true">&#9998;</span>Notes &amp; messages</button>
+            <button type="button" data-view="workspace-conversations"><span aria-hidden="true">&#9993;</span>Client messages</button>
           </div>
         </details>
         <details class="planner-nav-section" id="planner-nav-wedding">
           <summary><span aria-hidden="true">&#9638;</span>Wedding details</summary>
           <div class="planner-nav-items" data-nav-items="wedding">
             <button type="button" data-view="budget"><span aria-hidden="true">&#8364;</span>Budget</button>
+            <button type="button" data-view="workspace-payments"><span aria-hidden="true">&#9636;</span>Payments</button>
             <button type="button" data-view="seating"><span aria-hidden="true">&#8862;</span>Seating</button>
             <button type="button" data-view="workspace-venue"><span aria-hidden="true">&#9635;</span>Venue designer</button>
             <button type="button" data-view="workspace-site"><span aria-hidden="true">&#8599;</span>Website builder</button>
@@ -139,7 +148,7 @@
       <header class="planner-topbar">
         <div style="display:flex;align-items:center;gap:12px">
           <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle" type="button" aria-label="Open planner menu">☰</button>
-          <div><h1 id="topbar-title">Overview</h1><p id="topbar-subtitle">Shared planner · Spain and South Africa</p></div>
+          <div><h1 id="topbar-title">Planner Home</h1><p id="topbar-subtitle">Shared planner · Spain and South Africa</p></div>
         </div>
         <div class="topbar-actions">
           <span class="sync-state" id="sync-state">Securely synced</span>
@@ -159,8 +168,9 @@
         </section>
 
         <section class="planner-view" data-view-panel="overview">
+          <div id="plannerHome"></div>
           <div class="view-intro">
-            <div><p class="eyebrow">Private overview</p><h2>What needs attention now.</h2><p>The dashboard shows only the active planner lens: Shared, Matt or Cara. Nothing private appears on the guest site unless it is deliberately published.</p></div>
+            <div><h2>Planning progress by owner</h2><p>Use the Shared, Matt or Cara filter to see the work assigned to each of you.</p></div>
             <div class="view-tools"><button class="filter-button active" type="button" data-celebration="all">Both weddings</button><button class="filter-button" type="button" data-celebration="spain">Spain</button><button class="filter-button" type="button" data-celebration="south_africa">South Africa</button></div>
           </div>
           <div class="kpi-grid">
