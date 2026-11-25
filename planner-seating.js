@@ -11,6 +11,8 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   let loadError = "";
   let loading = false;
   let selected;
+  let selectedChair = null;
+  let pickedGuest = null;
   let editing = "";
   let query = "";
   let drag;
@@ -22,6 +24,8 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     loadError = "";
     loading = false;
     selected = null;
+    selectedChair = null;
+    pickedGuest = null;
     editing = "";
     query = "";
     drag = null;
@@ -63,7 +67,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         if (onlyEvent && key !== onlyEvent) continue;
         const record = response?.[key];
         cache[key] = {
-          plan: record?.plan || { tables: [], assignments: {} },
+          plan: reconcileSeats(record?.plan || { tables: [], assignments: {} }),
           version: record?.version || 0,
           history: [],
           saving: false,
@@ -96,15 +100,21 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
     const roster = guests();
     const { tables, assignments } = current.plan;
+    const filled = new Map(tables.map(item => [item.id, chairsAt(item, current.plan, roster)]));
     const table = tables.find(item => item.id === selected) || tables[0];
+    if (!table || selected !== table.id || selectedChair > table.capacity) selectedChair = null;
     selected = table?.id || null;
     const assigned = roster.filter(person => Object.hasOwn(assignments, person.id));
     const pool = roster.filter(person => person.rsvp_status !== "no" && !Object.hasOwn(assignments, person.id));
+    const picking = roster.find(person => person.id === pickedGuest);
     const statusText = loading ? "Refreshing…" : current.saving ? "Saving…" : current.message || (current.unsaved ? "Unsaved changes" : "All changes saved");
     const unavailable = loading || current.saving || current.unsaved;
     const disabled = unavailable ? " disabled" : "";
     const retry = current.unsaved && !current.saving && !loading
       ? `<button type="button" class="secondary-action" data-seat-action="${current.conflict ? "reload" : "retry"}">${current.conflict ? "Reload plan" : "Retry save"}</button>` : "";
+    const oldList = room.querySelector(".seating-chair-list");
+    const chairScroll = oldList?.dataset.listTable === selected ? oldList.scrollTop : 0;
+    const poolScroll = room.querySelector("[data-seat-pool]")?.scrollTop || 0;
     room.innerHTML = `${heading}
       <div class="seating-toolbar">
         <div class="seating-tools" aria-label="Floor plan tools">
@@ -114,15 +124,17 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         </div>
         <div class="seating-save" role="status">${escapeHtml(statusText)} ${retry}</div>
       </div>
+      ${picking ? `<div class="seating-pick-status" role="status"><span>Choose a chair for <b>${escapeHtml(picking.name)}</b>.</span>
+        <button class="secondary-action" type="button" data-seat-action="cancel-pick">Cancel</button></div>` : ""}
       <div class="seating-workspace">
         <div class="seating-floor" data-seating-floor>
-          ${tables.map(item => floorTable(item, assigned.filter(person => assignments[person.id] === item.id).length)).join("")}
+          ${tables.map(item => floorTable(item, filled.get(item.id), unavailable)).join("")}
           ${tables.length ? "" : '<p class="seating-empty-floor">Add a table to start arranging the room.</p>'}
-          <div class="seating-floor-help">Drag tables to move them. Use arrow keys when a table is focused.</div>
+          <div class="seating-floor-help">Drag a guest onto a chair, or choose a guest and tap a chair.</div>
         </div>
         <aside class="seating-side" aria-label="Guests and table settings">
           <section class="seating-card">
-            ${table ? inspector(table, roster, pool, current, disabled) : "<h3>Table details</h3><p>Select a table to edit its seats and guests.</p>"}
+            ${table ? inspector(table, roster, pool, current, filled.get(table.id), unavailable) : "<h3>Table details</h3><p>Select a table to edit its seats and guests.</p>"}
           </section>
           <section class="seating-card seating-pool">
             <header><h3>Unseated guests</h3><span>${pool.length}</span></header>
@@ -134,48 +146,141 @@ const seatingWorkspace = (function createSeatingWorkspace() {
           </section>
         </aside>
       </div>`;
+    const list = room.querySelector(".seating-chair-list");
+    if (list) list.scrollTop = chairScroll;
+    room.querySelector("[data-seat-pool]").scrollTop = poolScroll;
   }
 
-  function floorTable(table, occupied) {
-    const shape = shapes.some(([value]) => value === table.shape) ? table.shape : "round";
-    const width = shape === "rectangle" ? Math.min(274, 116 + table.capacity * 5.8) : Math.min(145, 100 + table.capacity * 1.6);
-    const markers = Math.min(table.capacity, 36);
-    const top = Math.ceil(markers / 2);
-    const positions = Array.from({ length: markers }, (_, index) => {
-      if (shape === "round") {
-        const angle = index * 2 * Math.PI / markers - Math.PI / 2;
-        return [50 + 56 * Math.cos(angle), 50 + 56 * Math.sin(angle)];
+  function reconcileSeats(plan) {
+    const seats = {};
+    const original = plan.seats || {};
+    const names = new Map(state.data.guests.map(guest => [guest.id, guest.name]));
+    for (const table of plan.tables) {
+      const people = Object.keys(plan.assignments).filter(id => plan.assignments[id] === table.id);
+      people.sort((left, right) => {
+        const byChair = (original[left] || Infinity) - (original[right] || Infinity);
+        return byChair || (names.get(left) || left).localeCompare(names.get(right) || right) || left.localeCompare(right);
+      });
+      const used = new Set();
+      const overflow = [];
+      for (const id of people) {
+        const chair = original[id];
+        if (Number.isInteger(chair) && chair > 0 && chair <= table.capacity && !used.has(chair)) {
+          seats[id] = chair;
+          used.add(chair);
+        } else {
+          overflow.push(id);
+        }
       }
-      const firstRow = index < top;
-      return [100 * ((firstRow ? index : index - top) + 1) / ((firstRow ? top : markers - top) + 1), firstRow ? -8 : 108];
-    });
-    const chairs = positions.map(([x, y], index) =>
-      `<i class="seating-chair${index < occupied ? " is-filled" : ""}" style="left:${x}%;top:${y}%"></i>`
-    ).join("");
-
-    return `<button type="button" class="seating-table seating-table--${shape}" data-seat-table="${escapeHtml(table.id)}"
-      aria-pressed="${selected === table.id}" aria-label="${escapeHtml(table.name)}, ${occupied} of ${table.capacity} seats filled"
-      style="left:${table.x}%;top:${table.y}%;--table-width:${width}px;--table-rotation:${table.rotation}deg">
-      <span class="seating-table-shape" aria-hidden="true">${chairs}</span>
-      <span class="seating-table-label"><b>${escapeHtml(table.name)}</b><small>${occupied} / ${table.capacity}</small></span>
-    </button>`;
+      let chair = 1;
+      for (const id of overflow) {
+        while (used.has(chair)) chair++;
+        if (chair > table.capacity) break;
+        seats[id] = chair++;
+      }
+    }
+    plan.seats = seats;
+    return plan;
   }
 
-  function inspector(table, roster, pool, current, disabled) {
-    const { tables, assignments } = current.plan;
-    const members = roster.filter(person => assignments[person.id] === table.id);
+  function chairsAt(table, plan, roster) {
+    const occupants = new Map();
+    for (const person of roster) {
+      if (plan.assignments[person.id] === table.id) {
+        occupants.set(plan.seats[person.id], person);
+      }
+    }
+    return occupants;
+  }
+
+  function chairAttributes(table, number, person, unavailable) {
+    const label = `${table.name}, chair ${number}, ${person?.name || "empty"}`;
+    const controls = `data-seat-chair="${number}" data-chair-table="${escapeHtml(table.id)}"
+      aria-pressed="${selected === table.id && selectedChair === number}"
+      aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}"`;
+    const draggable = person ? ` data-seat-guest="${escapeHtml(person.id)}" draggable="${!unavailable}"` : "";
+    return controls + draggable;
+  }
+
+  function chairPositions(shape, capacity) {
+    const count = Math.min(capacity, 36);
+    if (shape === "round") {
+      return Array.from({ length: count }, (_, index) => {
+        const angle = index * 2 * Math.PI / count - Math.PI / 2;
+        return [50 + 58 * Math.cos(angle), 50 + 58 * Math.sin(angle), "ring"];
+      });
+    }
+    const endChair = shape === "rectangle" && count > 2 && count % 2 === 1;
+    const rowCount = count - Number(endChair);
+    const topCount = Math.ceil(rowCount / 2);
+    const rows = Array.from({ length: rowCount }, (_, index) => {
+      const top = index < topCount;
+      const rowIndex = top ? index : index - topCount;
+      const length = top ? topCount : rowCount - topCount;
+      return [100 * (rowIndex + 1) / (length + 1), top ? -9 : 109, top ? "top" : "bottom"];
+    });
+    return endChair ? [[-4, 50, "end"], ...rows] : rows;
+  }
+
+  function floorTable(table, occupants, unavailable) {
+    const shape = shapes.some(([value]) => value === table.shape) ? table.shape : "round";
+    const width = shape === "rectangle" ? Math.min(314, 116 + table.capacity * 7.5) : Math.min(150, 100 + table.capacity * 1.7);
+    const chairs = chairPositions(shape, table.capacity).map(([x, y, edge], index) => {
+      const person = occupants.get(index + 1);
+      const initials = person ? person.name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(name => Array.from(name)[0]).join("").toUpperCase() : "";
+      return `<button type="button" class="seating-chair${person ? " is-filled" : ""}" ${chairAttributes(table, index + 1, person, unavailable)}
+        data-chair-edge="${edge}" style="left:${x}%;top:${y}%">
+        <span class="seating-chair-initials" aria-hidden="true">${escapeHtml(initials)}</span>
+        <span class="seating-chair-name" aria-hidden="true">${escapeHtml(person?.name || "")}</span>
+      </button>`;
+    }).join("");
+
+    return `<div class="seating-table seating-table--${shape}${selected === table.id ? " is-selected" : ""}" data-seat-group="${escapeHtml(table.id)}"
+    data-chair-labels="${shape === "rectangle" && table.rotation === 0 && table.capacity >= 10 ? "row" : "compact"}"
+      style="left:${table.x}%;top:${table.y}%;--table-width:${width}px;--table-rotation:${table.rotation}deg">
+      <button type="button" class="seating-table-handle" data-seat-table="${escapeHtml(table.id)}"
+        aria-pressed="${selected === table.id}" aria-label="${escapeHtml(table.name)}, ${occupants.size} of ${table.capacity} seats filled">
+        <span class="seating-table-shape" aria-hidden="true"></span>
+        <span class="seating-table-label"><b>${escapeHtml(table.name)}</b><small>${occupants.size} / ${table.capacity}</small></span>
+      </button>
+      ${chairs}
+    </div>`;
+  }
+
+  function chairList(table, occupants, unavailable) {
+    return Array.from({ length: table.capacity }, (_, index) => {
+      const number = index + 1;
+      const person = occupants.get(number);
+      return `<li class="seating-chair-row">
+        <button type="button" class="seating-chair-choice" ${chairAttributes(table, number, person, unavailable)}>
+          <span class="seating-chair-number">${number}</span>
+          <span class="seating-chair-person">${escapeHtml(person?.name || "Empty chair")}${person?.dietary ? "<small> Dietary note</small>" : ""}</span>
+        </button>
+        ${person ? `<button type="button" class="seating-unseat" aria-label="Unseat ${escapeHtml(person.name)}" data-seat-action="unseat"
+          data-unseat-guest="${escapeHtml(person.id)}"${unavailable ? " disabled" : ""}>×</button>` : ""}
+      </li>`;
+    }).join("");
+  }
+
+  function focusChair(table, number, floor) {
+    const kind = floor ? ".seating-chair" : ".seating-chair-choice";
+    room.querySelector(`${kind}[data-chair-table="${CSS.escape(table)}"][data-seat-chair="${CSS.escape(String(number))}"]`)?.focus();
+  }
+
+  function inspector(table, roster, pool, current, occupants, unavailable) {
+    const { tables } = current.plan;
+    const disabled = unavailable ? " disabled" : "";
+    const members = Array.from(occupants.values());
     const options = shapes.map(([value, title]) =>
       `<option value="${value}"${table.shape === value ? " selected" : ""}>${title}</option>`
     ).join("");
     const otherTables = tables.filter(item => item.id !== table.id);
-    const guestOptions = pool.map(person => `<option value="${escapeHtml(person.id)}">${escapeHtml(person.name)}</option>`).join("");
-    const memberList = members.map(person =>
-      `<li draggable="${disabled ? "false" : "true"}" data-seat-guest="${escapeHtml(person.id)}">
-        <span>${escapeHtml(person.name)}${person.dietary ? '<small> Dietary note</small>' : ""}</span>
-        <button type="button" aria-label="Unseat ${escapeHtml(person.name)}" data-seat-action="unseat"${disabled}>×</button>
-      </li>`
-    ).join("");
-
+    const occupant = selectedChair ? occupants.get(selectedChair) : null;
+    const candidates = selectedChair
+      ? roster.filter(person => person.id !== occupant?.id && person.rsvp_status !== "no")
+      : pool;
+    const peopleDisabled = unavailable || !candidates.length || (!selectedChair && members.length >= table.capacity);
+    const guestOptions = candidates.map(person => `<option value="${escapeHtml(person.id)}">${escapeHtml(person.name)}</option>`).join("");
     let extra = "";
     if (editing === "split") {
       extra = `<form class="seating-inline" data-seat-form="split">
@@ -208,15 +313,16 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         <button class="secondary-action" type="button" data-seat-action="remove"${disabled}>Remove</button>
       </div>
       ${extra}
+      ${occupant ? `<button class="secondary-action seating-move-current" type="button" data-seat-action="pick" data-pick-guest="${escapeHtml(occupant.id)}"${disabled}>Move ${escapeHtml(occupant.name)}</button>` : ""}
       <form class="seating-add-guest" data-seat-form="assign">
-        <label class="seating-label">Add a guest
-          <select name="guest" aria-label="Unseated guest to add" required${disabled || (!pool.length || members.length >= table.capacity ? " disabled" : "")}>
+        <label class="seating-label">${selectedChair ? `Guest for chair ${selectedChair}` : "Add a guest"}
+          <select name="guest" required${peopleDisabled ? " disabled" : ""}>
             <option value="">Choose a guest</option>${guestOptions}
           </select>
         </label>
-        <button class="secondary-action" type="submit"${disabled || (!pool.length || members.length >= table.capacity ? " disabled" : "")}>Seat</button>
+        <button class="secondary-action" type="submit"${peopleDisabled ? " disabled" : ""}>${occupant ? "Move here" : "Seat"}</button>
       </form>
-      <ul class="seating-members" aria-label="Guests at ${escapeHtml(table.name)}">${memberList || "<li>No guests at this table.</li>"}</ul>`;
+      <ul class="seating-members seating-chair-list" data-list-table="${escapeHtml(table.id)}" aria-label="Chairs at ${escapeHtml(table.name)}">${chairList(table, occupants, unavailable)}</ul>`;
   }
 
   function poolRows(pool, canAssign, disabled) {
@@ -225,7 +331,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (!shown.length) return `<li>${term ? "No matching names." : "All guests are seated."}</li>`;
     return shown.map(person =>
       `<li data-seat-guest="${escapeHtml(person.id)}" draggable="${disabled ? "false" : "true"}">
-        <span>${escapeHtml(person.name)}</span>
+        <button class="seating-guest-pick" type="button" data-seat-action="pick" aria-pressed="${pickedGuest === person.id}"${disabled}>${escapeHtml(person.name)}</button>
         ${canAssign ? `<button class="seating-pool-add" type="button" title="Seat at selected table" aria-label="Seat ${escapeHtml(person.name)} at selected table" data-seat-action="seat"${disabled}>+</button>` : ""}
       </li>`
     ).join("");
@@ -245,7 +351,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       current.history.push(current.plan);
       if (current.history.length > 20) current.history.shift();
     }
-    current.plan = next;
+    current.plan = reconcileSeats(next);
     current.unsaved = true;
     save();
   }
@@ -277,8 +383,13 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       if (session === token) {
         current.saving = false;
         if (event === celebration) {
-          const focusedTable = document.activeElement?.dataset.seatTable;
+          const focused = document.activeElement;
+          const focusedTable = focused?.dataset.seatTable;
+          const focusedChair = focused?.dataset.seatChair;
+          const chairTable = focused?.dataset.chairTable;
+          const wasFloorChair = focused?.classList.contains("seating-chair");
           draw();
+          if (focusedChair && chairTable && state.view === "seating") focusChair(chairTable, focusedChair, wasFloorChair);
           if (focusedTable && state.view === "seating") {
             room.querySelector(`[data-seat-table="${CSS.escape(focusedTable)}"]`)?.focus();
           }
@@ -304,16 +415,44 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       capacity: shape === "rectangle" ? 12 : 8, rotation: 0, ...position(plan.tables) };
   }
 
-  function seat(person, id) {
+  function clearSeat(plan, guest) {
+    delete plan.assignments[guest];
+    delete plan.seats[guest];
+  }
+
+  function seat(person, id, chair) {
     edit(plan => {
       const table = plan.tables.find(item => item.id === id);
-      if (!table || !guests().some(guest => guest.id === person) || plan.assignments[person] === id) return;
-      if (Object.values(plan.assignments).filter(value => value === id).length >= table.capacity) {
-        notify(`${table.name} is full. Increase its seats or choose another table.`);
-        return;
+      if (!table || !guests().some(guest => guest.id === person)) return;
+
+      const fromTable = plan.assignments[person];
+      const fromChair = plan.seats[person];
+      const taken = new Map(Object.keys(plan.assignments)
+        .filter(guest => plan.assignments[guest] === id)
+        .map(guest => [plan.seats[guest], guest]));
+      let destination = chair;
+      if (destination == null) {
+        if (fromTable === id) return;
+        destination = Array.from({ length: table.capacity }, (_, index) => index + 1).find(number => !taken.has(number));
+        if (!destination) return notify(`${table.name} is full. Choose a chair to swap seats.`);
       }
+      if (!Number.isInteger(destination) || destination < 1 || destination > table.capacity) return;
+
+      const occupant = taken.get(destination);
+      if (occupant === person) return;
+      if (occupant && fromTable && fromChair) {
+        plan.assignments[occupant] = fromTable;
+        plan.seats[occupant] = fromChair;
+      } else if (occupant) {
+        clearSeat(plan, occupant);
+      }
+
       plan.assignments[person] = id;
+      plan.seats[person] = destination;
+      if (selected !== id) editing = "";
       selected = id;
+      selectedChair = destination;
+      pickedGuest = null;
       return plan;
     });
   }
@@ -323,9 +462,24 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (tab) {
       event = tab.dataset.seatEvent;
       selected = null;
+      selectedChair = null;
+      pickedGuest = null;
       editing = "";
       query = "";
       draw();
+      return;
+    }
+    const chair = click.target.closest("[data-seat-chair]");
+    if (chair) {
+      if (pickedGuest) {
+        seat(pickedGuest, chair.dataset.chairTable, Number(chair.dataset.seatChair));
+        return;
+      }
+      if (selected !== chair.dataset.chairTable) editing = "";
+      selected = chair.dataset.chairTable;
+      selectedChair = Number(chair.dataset.seatChair);
+      draw();
+      focusChair(selected, selectedChair, chair.classList.contains("seating-chair"));
       return;
     }
     const button = click.target.closest("[data-seat-action]");
@@ -333,6 +487,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     const current = entry();
     if (tableButton && !button && performance.now() - lastDrag > 180) {
       selected = tableButton.dataset.seatTable;
+      selectedChair = null;
       editing = "";
       draw();
       room.querySelector(`[data-seat-table="${CSS.escape(selected)}"]`)?.focus();
@@ -346,6 +501,16 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       save();
     } else if (action === "undo" && current?.history.length) {
       edit(() => current.history.pop(), true);
+    } else if (action === "pick") {
+      const id = button.dataset.pickGuest || button.closest("[data-seat-guest]").dataset.seatGuest;
+      pickedGuest = pickedGuest === id ? null : id;
+      draw();
+      if (pickedGuest && matchMedia("(pointer: coarse)").matches) {
+        room.querySelector("[data-seating-floor]")?.scrollIntoView({ block: "nearest" });
+      }
+    } else if (action === "cancel-pick") {
+      pickedGuest = null;
+      draw();
     } else if (action === "seat") {
       seat(button.closest("[data-seat-guest]").dataset.seatGuest, selected);
     } else if (action === "split" || action === "merge") {
@@ -357,6 +522,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         const table = newTable(plan, action.slice(4));
         plan.tables.push(table);
         selected = table.id;
+        selectedChair = null;
         editing = "";
         return plan;
       });
@@ -372,16 +538,17 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         edit(plan => {
           plan.tables = plan.tables.filter(item => item.id !== selected);
           for (const [id, value] of Object.entries(plan.assignments)) {
-            if (value === selected) delete plan.assignments[id];
+            if (value === selected) clearSeat(plan, id);
           }
           selected = null;
+          selectedChair = null;
           editing = "";
           return plan;
         });
       }
     } else if (action === "unseat") {
       edit(plan => {
-        delete plan.assignments[button.closest("[data-seat-guest]").dataset.seatGuest];
+        clearSeat(plan, button.dataset.unseatGuest);
         return plan;
       });
     }
@@ -401,7 +568,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     submit.preventDefault();
     const values = new FormData(form);
     if (form.dataset.seatForm === "assign") {
-      seat(values.get("guest"), selected);
+      seat(values.get("guest"), selected, selectedChair);
       return;
     }
     edit(plan => {
@@ -429,17 +596,22 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         for (const id of moving) plan.assignments[id] = second.id;
         plan.tables.push(second);
         selected = second.id;
+        selectedChair = null;
         editing = "";
       } else if (form.dataset.seatForm === "merge") {
         const target = plan.tables.find(item => item.id === values.get("target"));
         if (!target || target.id === table.id) return;
         if (target.capacity + table.capacity > 200) return notify("The combined table would have more than 200 seats.");
+        const offset = target.capacity;
         target.capacity += table.capacity;
         for (const [id, value] of Object.entries(plan.assignments)) {
-          if (value === table.id) plan.assignments[id] = target.id;
+          if (value !== table.id) continue;
+          plan.assignments[id] = target.id;
+          plan.seats[id] += offset;
         }
         plan.tables = plan.tables.filter(item => item.id !== table.id);
         selected = target.id;
+        selectedChair = null;
         editing = "";
       }
       return plan;
@@ -460,8 +632,9 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     edit(plan => {
       const table = plan.tables.find(item => item.id === id);
       if (!table) return;
-      const button = room.querySelector(`[data-seat-table="${CSS.escape(id)}"]`);
-      Object.assign(table, bounds(x, y, button));
+      const group = room.querySelector(`[data-seat-group="${CSS.escape(id)}"]`);
+      Object.assign(table, bounds(x, y, group));
+      if (selected !== id) selectedChair = null;
       selected = id;
       return plan;
     });
@@ -473,7 +646,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (!button || !down.isPrimary || down.button !== 0 || loading || current?.saving || current?.unsaved) return;
     const table = current.plan.tables.find(item => item.id === button.dataset.seatTable);
     const frame = room.querySelector("[data-seating-floor]").getBoundingClientRect();
-    drag = { button, table, frame, pointer: down.pointerId, x0: down.clientX, y0: down.clientY };
+    drag = { button: button.closest("[data-seat-group]"), table, frame, pointer: down.pointerId, x0: down.clientX, y0: down.clientY };
     button.setPointerCapture(down.pointerId);
   });
 
@@ -518,29 +691,47 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     room.querySelector(`[data-seat-table="${CSS.escape(id)}"]`)?.focus();
   });
 
+  const guestDragType = "application/x-mxc-guest-id";
+
+  function dropTarget(element) {
+    return element?.closest?.("[data-seat-chair]") || element?.closest?.("[data-seat-table]")?.closest("[data-seat-group]");
+  }
+
   room.addEventListener("dragstart", start => {
     const item = start.target.closest("[data-seat-guest]");
-    if (!item || !start.dataTransfer || entry()?.unsaved) return;
+    if (!item || !start.dataTransfer || entry()?.unsaved || loading) return;
     start.dataTransfer.effectAllowed = "move";
-    start.dataTransfer.setData("application/x-mxc-guest-id", item.dataset.seatGuest);
+    start.dataTransfer.setData(guestDragType, item.dataset.seatGuest);
   });
 
   room.addEventListener("dragover", over => {
-    const table = over.target.closest("[data-seat-table]");
-    if (!table || !over.dataTransfer?.types.includes("application/x-mxc-guest-id")) return;
+    const target = dropTarget(over.target);
+    if (!target || !over.dataTransfer?.types.includes(guestDragType) || entry()?.unsaved || loading) return;
     over.preventDefault();
-    table.classList.add("is-drop-target");
+    target.classList.add("is-drop-target");
     over.dataTransfer.dropEffect = "move";
   });
 
-  room.addEventListener("dragleave", leave => leave.target.closest("[data-seat-table]")?.classList.remove("is-drop-target"));
+  room.addEventListener("dragleave", leave => {
+    const target = dropTarget(leave.target);
+    if (target !== dropTarget(leave.relatedTarget)) target?.classList.remove("is-drop-target");
+  });
+
+  room.addEventListener("dragend", () => {
+    room.querySelectorAll(".is-drop-target").forEach(target => target.classList.remove("is-drop-target"));
+  });
+
   room.addEventListener("drop", drop => {
-    const button = drop.target.closest("[data-seat-table]");
-    const person = drop.dataTransfer?.getData("application/x-mxc-guest-id");
-    if (!button || !person) return;
+    const target = dropTarget(drop.target);
+    const person = drop.dataTransfer?.getData(guestDragType);
+    if (!target || !person) return;
     drop.preventDefault();
-    button.classList.remove("is-drop-target");
-    seat(person, button.dataset.seatTable);
+    target.classList.remove("is-drop-target");
+    if (target.dataset.seatChair) {
+      seat(person, target.dataset.chairTable, Number(target.dataset.seatChair));
+    } else {
+      seat(person, target.dataset.seatGroup);
+    }
   });
 
   return { render, reset };
