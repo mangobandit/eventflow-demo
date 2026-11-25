@@ -18,7 +18,10 @@
     const full = spec.full ? " full" : "";
     const required = spec.required ? " required" : "";
     if (spec.type === "select") {
-      return `<label class="form-label${full}">${escapeHtml(spec.label)}<select name="${spec.name}"${required}>${(spec.options || []).map(([optionValue, optionLabel]) => `<option value="${escapeHtml(optionValue)}"${String(value ?? "") === String(optionValue) ? " selected" : ""}>${escapeHtml(optionLabel)}</option>`).join("")}</select></label>`;
+      const options = plannerIsSouthAfricaOnly() && ["celebration", "country"].includes(spec.name)
+        ? [["south_africa", "South Africa"]]
+        : spec.options || [];
+      return `<label class="form-label${full}">${escapeHtml(spec.label)}<select name="${spec.name}"${required}>${options.map(([optionValue, optionLabel]) => `<option value="${escapeHtml(optionValue)}"${String(value ?? "") === String(optionValue) ? " selected" : ""}>${escapeHtml(optionLabel)}</option>`).join("")}</select></label>`;
     }
     if (spec.type === "textarea") {
       return `<label class="form-label${full}">${escapeHtml(spec.label)}<textarea name="${spec.name}" placeholder="${escapeHtml(spec.placeholder || "")}"${required}>${escapeHtml(value ?? "")}</textarea></label>`;

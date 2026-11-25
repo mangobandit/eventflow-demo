@@ -6,6 +6,14 @@
     ["spain", "Spain", "Finca Mesa Jardin"],
     ["south_africa", "South Africa", "Mission House"]
   ];
+
+  function availableVenues() {
+    return plannerIsSouthAfricaOnly() ? VENUES.filter(([key]) => key === "south_africa") : VENUES;
+  }
+
+  function checkinMessage() {
+    return plannerIsSouthAfricaOnly() ? COPY_MESSAGE.replace("for either wedding", "for the South Africa wedding") : COPY_MESSAGE;
+  }
   const FILTERS = [
     ["needs_checkin", "Still to check in"],
     ["attending", "Still attending"],
@@ -107,8 +115,10 @@
     updatePlannerNavigation("checkin");
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === "checkin"));
     els.topbarTitle.textContent = "Guest Check In";
-    els.topbarSubtitle.textContent = "Private guest tracker for Spain and South Africa";
-    document.getElementById("global-add").textContent = "+ Add guest";
+    els.topbarSubtitle.textContent = plannerIsSouthAfricaOnly() ? "Private guest tracker for South Africa" : "Private guest tracker for Spain and South Africa";
+    const addButton = document.getElementById("global-add");
+    addButton.hidden = false;
+    addButton.textContent = "+ Add guest";
     document.body.classList.remove("sidebar-open");
     if (rerender && originalRenderAll) originalRenderAll();
     render();
@@ -134,11 +144,11 @@
       <div class="checkin-grid">
         <article class="panel">
           <div class="panel-head"><h3>Guests by venue</h3><button type="button" data-jump="guests">Open guests</button></div>
-          <div class="checkin-venue-grid">${VENUES.map(([key, label, venue]) => venueBlock(key, label, venue, summarize(guests.filter((guest) => guest.celebration === key)))).join("")}</div>
+          <div class="checkin-venue-grid">${availableVenues().map(([key, label, venue]) => venueBlock(key, label, venue, summarize(guests.filter((guest) => guest.celebration === key)))).join("")}</div>
         </article>
         <article class="panel checkin-copy">
           <div class="panel-head"><h3>Manual check in nudge</h3></div>
-          <textarea readonly>${COPY_MESSAGE}</textarea>
+          <textarea readonly>${checkinMessage()}</textarea>
           <button class="primary-action" id="copy-checkin-message-inline" type="button">Copy message</button>
           <div class="checkin-attention">${attention.length ? attention.map(row).join("") : '<div class="empty-state">No guests currently need a check in before the wedding.</div>'}</div>
         </article>
@@ -218,7 +228,7 @@
 
   function groupedRows(rows) {
     if (!rows.length) return '<div class="empty-state">No guests match this tracker filter.</div>';
-    return VENUES.map(([key, label]) => {
+    return availableVenues().map(([key, label]) => {
       const venueRows = rows.filter((guest) => guest.celebration === key);
       if (!venueRows.length) return "";
       return `<section class="checkin-list-section"><h4>${escapeHtml(label)}</h4><div class="checkin-list">${venueRows.map(row).join("")}</div></section>`;
@@ -278,10 +288,10 @@
 
   async function copyMessage() {
     try {
-      await navigator.clipboard.writeText(COPY_MESSAGE);
+      await navigator.clipboard.writeText(checkinMessage());
       if (typeof toast === "function") toast("Check in message copied.");
     } catch (_error) {
-      window.prompt("Copy check in message", COPY_MESSAGE);
+      window.prompt("Copy check in message", checkinMessage());
     }
   }
 

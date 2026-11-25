@@ -43,6 +43,10 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     return cache[event];
   }
 
+  function availableEvents() {
+    return plannerIsSouthAfricaOnly() ? events.filter(([key]) => key === "south_africa") : events;
+  }
+
   function guests() {
     return state.data.guests
       .filter(guest => guest.celebration === event)
@@ -71,7 +75,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     try {
       const response = await plannerRpc("planner_load_seating", { p_token: session });
       if (session !== token) return;
-      for (const [key] of events) {
+      for (const [key] of availableEvents()) {
         if (onlyEvent && key !== onlyEvent) continue;
         const record = response?.[key];
         cache[key] = {
@@ -103,7 +107,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     drag = null;
     draggingGuest = false;
     const current = entry();
-    const tabs = events.map(([value, label]) =>
+    const tabs = availableEvents().map(([value, label]) =>
       `<button type="button" data-seat-event="${value}" aria-pressed="${event === value}">${label}</button>`
     ).join("");
     const heading = `<header class="seating-header"><div><h2>Reception floor plan</h2><p>${eventLabel[event]}</p></div><div class="seating-events" role="group" aria-label="Wedding">${tabs}</div></header>`;
@@ -571,6 +575,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   room.addEventListener("click", click => {
     const tab = click.target.closest("[data-seat-event]");
     if (tab) {
+      if (!availableEvents().some(([key]) => key === tab.dataset.seatEvent)) return;
       event = tab.dataset.seatEvent;
       selected = null;
       selectedChair = null;

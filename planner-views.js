@@ -211,6 +211,7 @@
   }
 
   function switchView(view, rerender = true) {
+    if (plannerIsSouthAfricaOnly() && view === "honeymoon") view = "overview";
     const tool = plannerWorkspace.toolForView(view);
     if (tool) state.workspaceTool = tool;
     state.view = tool ? "workspace" : view || "overview";
@@ -251,9 +252,25 @@
   }
 
   function setCelebration(celebration) {
+    if (plannerIsSouthAfricaOnly() && celebration !== "south_africa") return;
     state.celebration = celebration;
-    document.querySelectorAll("[data-celebration]").forEach((button) => button.classList.toggle("active", button.dataset.celebration === celebration));
+    updateWeddingScope();
     switchView(state.view);
+  }
+
+  function updateWeddingScope() {
+    const restricted = plannerIsSouthAfricaOnly();
+    if (restricted) state.celebration = "south_africa";
+    document.querySelectorAll("[data-celebration]").forEach(button => {
+      button.hidden = restricted && button.dataset.celebration !== "south_africa";
+      button.classList.toggle("active", button.dataset.celebration === state.celebration);
+    });
+    Array.from(document.getElementById("task-wedding-filter").options).forEach(option => {
+      option.hidden = option.disabled = restricted && option.value !== "south_africa";
+    });
+    document.querySelectorAll('[data-view="honeymoon"], [data-view-panel="honeymoon"], [data-full-planner]').forEach(element => {
+      element.hidden = restricted;
+    });
   }
 
   function renderTableBySearch(key, value) {
