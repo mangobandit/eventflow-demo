@@ -58,7 +58,6 @@
       const session = await plannerRpc("planner_get_session", { p_session_token: saved.token }, { allowExpired: true });
       state.session = { token: saved.token, expires_at: saved.expires_at || null, user: { username: session.identity.username } };
       state.identity = session.identity;
-      state.owner = session.identity.planner_person === "matt" || session.identity.planner_person === "cara" ? session.identity.planner_person : "shared";
       showPlanner();
       await loadAll();
     } catch (_error) {
@@ -95,7 +94,6 @@
       els.loginPassword.value = "";
       state.session = { token: response.session_token, expires_at: response.expires_at, user: { username: response.identity.username } };
       state.identity = response.identity;
-      state.owner = response.identity.planner_person === "matt" || response.identity.planner_person === "cara" ? response.identity.planner_person : "shared";
       showPlanner();
       await loadAll();
     } catch (error) {
@@ -117,6 +115,9 @@
   }
 
   function showPlanner() {
+    // Keep the shared lens as Kelly's landing view for existing wedding work.
+    const person = state.identity.planner_person;
+    state.owner = person === "matt" || person === "cara" ? person : "shared";
     els.authScreen.hidden = true;
     els.plannerShell.hidden = false;
     els.loading.hidden = false;
@@ -124,7 +125,7 @@
     els.accountName.textContent = state.identity.display_name || titleCase(state.identity.planner_person || "Planner");
     els.accountEmail.textContent = state.identity.username;
     els.accountAvatar.textContent = (state.identity.display_name || state.identity.planner_person || "P").slice(0, 1).toUpperCase();
-    document.querySelectorAll("[data-owner]").forEach((button) => button.classList.toggle("active", button.dataset.owner === state.owner));
+    updateOwnerLens();
   }
 
   async function signOut() {
@@ -158,7 +159,6 @@
       });
       if (data?.identity) {
         state.identity = data.identity;
-        state.owner = data.identity.planner_person === "matt" || data.identity.planner_person === "cara" ? data.identity.planner_person : state.owner;
       }
       els.loading.hidden = true;
       switchView(state.view, false);
