@@ -4,7 +4,7 @@
 
   async function init() {
     const requestedView = location.hash.replace(/^#/, "");
-    if (["overview", "tasks", "budget", "guests", "checkin", "vendors", "timeline", "publishing"].includes(requestedView)) state.view = requestedView;
+    if (["overview", "tasks", "budget", "guests", "seating", "checkin", "vendors", "timeline", "publishing"].includes(requestedView)) state.view = requestedView;
     bindUi();
     if (!configured) {
       els.setupCard.hidden = false;
@@ -35,6 +35,7 @@
     document.querySelectorAll("[data-add]").forEach((button) => button.addEventListener("click", () => openEntity(button.dataset.add)));
     document.getElementById("global-add").addEventListener("click", () => openEntity(tableForView(state.view)));
 
+    bindTaskBoard();
     document.querySelectorAll("[data-search-table]").forEach((input) => {
       input.addEventListener("input", () => renderTableBySearch(input.dataset.searchTable, input.value));
     });
@@ -98,6 +99,7 @@
   }
 
   function showAuth() {
+    resetSeatingPlanner();
     els.authScreen.hidden = false;
     els.plannerShell.hidden = true;
   }
@@ -134,9 +136,11 @@
       showAuth();
       return;
     }
+    const token = state.session.token;
     setSync("Syncing...", true);
     try {
-      const data = await plannerRpc("planner_load_all", { p_session_token: state.session.token });
+      const data = await plannerRpc("planner_load_all", { p_session_token: token });
+      if (state.session?.token !== token) return;
       Object.keys(state.data).forEach((table) => {
         state.data[table] = Array.isArray(data?.[table]) ? data[table] : [];
       });
@@ -158,7 +162,8 @@
     const { data, error } = await state.client.rpc(name, payload);
     if (error) {
       const expired = /session expired|invalid username|password|too many attempts/i.test(error.message || "");
-      if (expired && !options.allowExpired) {
+      const requestToken = payload.p_session_token ?? payload.p_token;
+      if (expired && !options.allowExpired && requestToken === state.session?.token) {
         clearStoredSession();
         state.session = null;
         state.identity = null;
@@ -199,4 +204,5 @@
     renderVendors();
     renderTimeline();
     renderPublishing();
+    if (state.view === "seating") renderSeatingPlanner();
   }

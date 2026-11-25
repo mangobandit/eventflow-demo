@@ -49,15 +49,76 @@
     else nextCard.outerHTML = `<div id="next-event-card" class="action-list"><div class="action-row ${escapeHtml(next.status)}"><i class="action-dot"></i><div><b>${escapeHtml(next.title)}</b><small>${labelCelebration(next.celebration)}${next.location ? ` Â· ${escapeHtml(next.location)}` : ""}</small></div><time>${formatDate(next.item_date, { short: false })}${next.item_time ? ` Â· ${escapeHtml(next.item_time.slice(0, 5))}` : ""}</time></div></div>`;
   }
 
+  const taskStatusSaves = new Set();
+
+  function bindTaskBoard() {
+    document.getElementById("task-search").addEventListener("input", renderTasks);
+    document.getElementById("task-wedding-filter").addEventListener("change", (event) => setCelebration(event.target.value));
+    document.getElementById("task-owner-filter").addEventListener("change", renderTasks);
+    const board = document.getElementById("task-board");
+    board.addEventListener("click", (event) => {
+      if (event.target.closest(".task-status-control")) return;
+      const card = event.target.closest(".task-card");
+      const task = card && state.data.tasks.find((item) => item.id === card.dataset.id);
+      if (task) openEntity("tasks", task);
+    });
+    board.addEventListener("change", (event) => {
+      if (event.target.matches("[data-task-status]")) changeTaskStatus(event.target);
+    });
+  }
+
+  async function changeTaskStatus(select) {
+    const id = select.dataset.taskStatus;
+    const task = state.data.tasks.find((item) => item.id === id);
+    const token = state.session?.token;
+    if (!task || !token || task.status === select.value || taskStatusSaves.has(id)) return;
+    taskStatusSaves.add(id);
+    select.disabled = true;
+    try {
+      const saved = await plannerRpc("planner_set_task_status", {
+        p_token: token,
+        p_task_id: id,
+        p_status: select.value,
+        p_expected_status: task.status
+      });
+      if (state.session?.token !== token) return;
+      const index = state.data.tasks.findIndex((item) => item.id === id);
+      if (index >= 0) state.data.tasks[index] = { ...state.data.tasks[index], status: saved.status };
+      toast("Action moved.");
+    } catch (error) {
+      if (state.session?.token === token) {
+        toast(error.message || "The action could not be moved.", true);
+        if (/changed elsewhere/i.test(error.message)) await loadAll();
+      }
+    } finally {
+      taskStatusSaves.delete(id);
+      if (state.session?.token === token) {
+        const restoreFocus = document.activeElement === select || document.activeElement === document.body;
+        renderTasks();
+        renderOverview();
+        if (restoreFocus && state.view === "tasks") {
+          document.querySelector(`[data-task-status="${CSS.escape(id)}"]`)?.focus();
+        }
+      }
+    }
+  }
+
   function renderTasks() {
-    const tasks = filtered("tasks");
+    const owner = document.getElementById("task-owner-filter").value;
+    const activeWedding = state.celebration;
+    document.getElementById("task-wedding-filter").value = activeWedding;
+    const activeOwner = owner === "lens" ? state.owner : owner;
+    const rows = state.data.tasks.filter((task) =>
+      (activeOwner === "all" || !task.owner || task.owner === activeOwner) &&
+      (activeWedding === "all" || task.celebration === activeWedding || task.celebration === "shared")
+    );
+    const tasks = searchRows(rows, document.getElementById("task-search").value, ["title", "description", "category", "notes"]);
     STATUS_OPTIONS.forEach(([status]) => {
       const rows = tasks.filter((task) => task.status === status).sort((a, b) => priorityRank(b.priority) - priorityRank(a.priority) || compareDates(a.due_date, b.due_date));
       text(`task-count-${status}`, rows.length);
       const container = document.getElementById(`tasks-${status}`);
       container.innerHTML = rows.length ? rows.map(taskCard).join("") : empty(`Nothing ${status} here.`);
     });
-    bindRowEditors(".task-card[data-id]", "tasks");
   }
 
   function renderBudget(search = "") {
@@ -115,7 +176,29 @@
   }
 
   function taskCard(task) {
-    return `<article class="task-card" data-id="${task.id}"><div class="task-card-meta">${ownerTag(task.owner)}<span class="mini-tag ${task.celebration}">${escapeHtml(labelCelebration(task.celebration))}</span>${task.priority === "high" ? '<span class="mini-tag" style="background:#f6e0db;color:#8d463b">High priority</span>' : ""}</div><h4>${escapeHtml(task.title)}</h4>${task.description ? `<p>${escapeHtml(truncate(task.description, 150))}</p>` : ""}<div class="task-card-foot"><span>${escapeHtml(task.category || "General")}</span><span>${task.due_date ? formatDate(task.due_date) : "No date"}</span></div></article>`;
+    const options = STATUS_OPTIONS.map(([value, label]) =>
+      `<option value="${value}"${task.status === value ? " selected" : ""}>${label}</option>`
+    ).join("");
+    const priority = task.priority === "high" ? '<span class="mini-tag" style="background:#f6e0db;color:#8d463b">High priority</span>' : "";
+    const title = escapeHtml(task.title);
+    return `<article class="task-card" data-id="${escapeHtml(task.id)}">
+      <div class="task-card-meta">
+        ${ownerTag(task.owner)}
+        <span class="mini-tag ${escapeHtml(task.celebration)}">${escapeHtml(labelCelebration(task.celebration))}</span>
+        ${priority}
+      </div>
+      <h4><button type="button">${title}</button></h4>
+      ${task.description ? `<p>${escapeHtml(truncate(task.description, 150))}</p>` : ""}
+      <div class="task-card-foot">
+        <span>${escapeHtml(task.category || "General")}</span>
+        <span>${task.due_date ? formatDate(task.due_date) : "No date"}</span>
+      </div>
+      <label class="task-status-control">Status
+        <select data-task-status="${escapeHtml(task.id)}" aria-label="Status for ${title}"${taskStatusSaves.has(task.id) ? " disabled" : ""}>
+          ${options}
+        </select>
+      </label>
+    </article>`;
   }
 
   function actionRow(task) {
@@ -131,7 +214,7 @@
     if (history.replaceState) history.replaceState(null, "", `#${state.view}`);
     document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === state.view));
-    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", checkin: "Guest Check In", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing" }[state.view] || "Planner";
+    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", seating: "Seating", checkin: "Guest Check In", vendors: "Vendors", timeline: "Timeline", publishing: "Guest publishing" }[state.view] || "Planner";
     els.topbarTitle.textContent = label;
     els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner Â· ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
     const addButton = document.getElementById("global-add");

@@ -7,13 +7,15 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>Matt & Cara · Private Wedding Planner</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="planner.css">
+  <link rel="stylesheet" href="planner.css?v=20261125-private-planner">
+  <link rel="stylesheet" href="planner-seating.css?v=20261125-private-planner">
   <link rel="stylesheet" href="responsive.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260913-guest-details"></script>
   <script defer src="planner-core.js?v=20260913-guest-details"></script>
-  <script defer src="planner-auth.js?v=20260630-user-login"></script>
-  <script defer src="planner-views.js?v=20260630-user-login"></script>
+  <script defer src="planner-auth.js?v=20261125-private-planner"></script>
+  <script defer src="planner-views.js?v=20261125-private-planner"></script>
+  <script defer src="planner-seating.js?v=20261125-private-planner"></script>
   <script defer src="planner-forms.js?v=20260630-user-login"></script>
 </head>
 <body class="planner-site">
@@ -70,6 +72,7 @@
         <button type="button" data-view="tasks"><span>✓</span>Tasks</button>
         <button type="button" data-view="budget"><span>€</span>Budget</button>
         <button type="button" data-view="guests"><span>◎</span>Guests</button>
+        <button type="button" data-view="seating"><span aria-hidden="true">⊞</span>Seating</button>
         <button type="button" data-view="vendors"><span>◇</span>Vendors</button>
         <button type="button" data-view="timeline"><span>◷</span>Timeline</button>
         <button type="button" data-view="publishing"><span>↗</span>Guest publishing</button>
@@ -142,10 +145,31 @@
 
         <section class="planner-view" data-view-panel="tasks">
           <div class="view-intro">
-            <div><p class="eyebrow">Action board</p><h2>Outstanding. Pending. Approved.</h2><p>Three states only, so you can see exactly what must happen next without turning wedding planning into project-management theatre.</p></div>
+            <div><h2>Wedding actions</h2></div>
             <div class="view-tools"><button class="primary-action" type="button" data-add="tasks">+ Add task</button></div>
           </div>
-          <div class="kanban-board">
+          <div class="task-filters">
+            <label class="form-label">Wedding
+              <select id="task-wedding-filter">
+                <option value="all">Both weddings</option>
+                <option value="spain">Spain</option>
+                <option value="south_africa">South Africa</option>
+              </select>
+            </label>
+            <label class="form-label">Owner
+              <select id="task-owner-filter">
+                <option value="lens">Current planner lens</option>
+                <option value="all">All owners</option>
+                <option value="shared">Shared</option>
+                <option value="matt">Matt</option>
+                <option value="cara">Cara</option>
+              </select>
+            </label>
+            <label class="form-label">Search actions
+              <input id="task-search" type="search" placeholder="Title, category or notes">
+            </label>
+          </div>
+          <div class="kanban-board" id="task-board">
             <section class="kanban-column"><div class="kanban-column-head"><h3>Outstanding</h3><span id="task-count-outstanding">0</span></div><div class="kanban-list" id="tasks-outstanding"></div></section>
             <section class="kanban-column"><div class="kanban-column-head"><h3>Pending</h3><span id="task-count-pending">0</span></div><div class="kanban-list" id="tasks-pending"></div></section>
             <section class="kanban-column"><div class="kanban-column-head"><h3>Approved</h3><span id="task-count-approved">0</span></div><div class="kanban-list" id="tasks-approved"></div></section>
@@ -172,6 +196,10 @@
             <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="guests" placeholder="Search guests or parties"></div><div id="guest-summary">0 guests</div></div>
             <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Guest</th><th>Party</th><th>Wedding</th><th>Attendance</th><th>Dietary</th><th>Transport</th><th>Accommodation</th><th>Private notes</th></tr></thead><tbody id="guests-table-body"></tbody></table></div>
           </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="seating" aria-label="Seating planner">
+          <div id="seatingPlanner"></div>
         </section>
 
         <section class="planner-view" data-view-panel="vendors">
