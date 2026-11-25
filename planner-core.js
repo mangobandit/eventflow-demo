@@ -22,6 +22,10 @@
     }
   };
 
+  function plannerIsSouthAfricaOnly() {
+    return state.identity?.planning_scope === "south_africa";
+  }
+
   const els = {
     authScreen: document.getElementById("auth-screen"),
     plannerShell: document.getElementById("planner-shell"),
@@ -167,7 +171,7 @@
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20261125-budget-editing";
+    script.src = "planner-rsvp.js?v=20261125-sa-scope";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

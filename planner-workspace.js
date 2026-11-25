@@ -43,6 +43,7 @@ const plannerWorkspace = (function createPlannerWorkspace() {
   }
 
   function projects() {
+    if (plannerIsSouthAfricaOnly()) return celebrations.filter(project => project.id === "south_africa");
     return [...celebrations, ...(records || []).filter(row => row.kind === "project").map(row => ({
       id: row.id, title: row.title, date: row.data.date, location: row.data.location, record: row
     }))];
@@ -131,6 +132,7 @@ const plannerWorkspace = (function createPlannerWorkspace() {
   }
 
   function setScope(id) {
+    if (plannerIsSouthAfricaOnly() && id !== "south_africa") return;
     if (scope !== id && active === "conversations") {
       const url = new URL(location.href);
       url.searchParams.delete("project");
@@ -144,12 +146,24 @@ const plannerWorkspace = (function createPlannerWorkspace() {
   }
 
   function restoreConversationScope() {
-    if (active !== "conversations" || !records) return;
-    const requested = new URLSearchParams(location.search).get("project");
+    if (active !== "conversations") return;
+    const url = new URL(location.href);
+    const requested = url.searchParams.get("project");
+    if (plannerIsSouthAfricaOnly()) {
+      scope = "south_africa";
+      if (requested && requested !== scope) {
+        url.searchParams.delete("project");
+        url.searchParams.delete("thread");
+        history.replaceState(null, "", url);
+      }
+      return;
+    }
+    if (!records) return;
     if (requested === "shared" || projects().some(project => project.id === requested)) scope = requested;
   }
 
   function openProject(id, tool = "projects") {
+    if (plannerIsSouthAfricaOnly() && id !== "south_africa") return;
     if (id !== "shared" && !projects().some(project => project.id === id)) return;
     setScope(id);
     switchView(viewForTool(tool));
@@ -229,7 +243,7 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     ]) + deleteButton(row) : "";
     const taskRows = scoped("project_task");
     const milestones = scoped("project_timeline");
-    return `${heading("Wedding projects", add("project", "+ New project"))}${editing}
+    return `${heading("Wedding projects", plannerIsSouthAfricaOnly() ? "" : add("project", "+ New project"))}${editing}
       <div class="workspace-grid">${entries}</div>
       ${taskRows.length || milestones.length ? `<div class="workspace-grid workspace-subgrid">
         <section class="workspace-card"><h3>Project actions</h3>${taskRows.map(item => `<div class="workspace-list-row">
@@ -455,12 +469,14 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     }
 
     const lists = { projects: projectsView, notes: notesView, comparison: comparisonView, guides: guidesView, site: siteView, access: accessView };
+    const projectChoices = projects().map(item => [item.id, item.title]);
+    if (!plannerIsSouthAfricaOnly()) projectChoices.push(["shared", "Shared planning"]);
     root.innerHTML = `<div class="workspace-shell">
       <header class="workspace-heading">
         <nav class="workspace-tools" aria-label="Planning tools">${tools.map(([id, name]) =>
           `<button type="button" data-work-action="tab" data-tool="${id}" aria-pressed="${active === id}">${name}</button>`
         ).join("")}</nav>
-        ${active === "workbook" ? "" : formField("workspace-scope", "Wedding project", scope, { choices: [...projects().map(item => [item.id, item.title]), ["shared", "Shared planning"]] })}
+        ${active === "workbook" ? "" : formField("workspace-scope", "Wedding project", scope, { choices: projectChoices })}
       </header>
       ${error ? `<p class="workspace-error" role="alert">${escapeHtml(error)}</p>` : ""}
       <div class="workspace-content" data-workspace-content>${lists[active]?.() || ""}</div>

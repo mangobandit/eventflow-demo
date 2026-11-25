@@ -3,23 +3,38 @@
 
   const STORE = "mxc-honeymoon-japan-v1";
   let data = null;
+  let mountedToken = null;
+  let storageKey = null;
+  let request = null;
 
-  function waitForPlanner() {
-    if (typeof state === "undefined" || !document.querySelector(".planner-nav") || !state.session) {
-      window.setTimeout(waitForPlanner, 250);
-      return;
-    }
-    install();
+  function ownerToken() {
+    return state.identity?.planning_scope === "all" ? state.session?.token : null;
   }
 
-  function install() {
+  function reset() {
+    data = null;
+    mountedToken = null;
+    storageKey = null;
+    request = null;
+    document.querySelector('[data-view="honeymoon"]')?.remove();
+    document.querySelector('[data-view-panel="honeymoon"]')?.remove();
+  }
+
+  function refresh() {
+    const token = ownerToken();
+    if (!token) {
+      reset();
+      return;
+    }
+    if (mountedToken === token) return;
+    reset();
+    mountedToken = token;
+    storageKey = `${STORE}:${state.identity.username}`;
     addStyles();
     addNav();
     addPanel();
     bind();
-    data = load();
     if (state.view === "honeymoon") switchHoneymoon();
-    else render();
   }
 
   function addStyles() {
@@ -55,8 +70,8 @@
     panel.dataset.viewPanel = "honeymoon";
     panel.innerHTML = `
       <div class="honeymoon-hero">
-        <p class="eyebrow">Japan honeymoon portal</p>
-        <h2>Japan, shaped into a plan.</h2>
+        <p class="eyebrow">Private travel planning</p>
+        <h2>Honeymoon</h2>
         <p>A draft command centre for flights, itinerary, hotels, budget, saved places and booking tasks. Use it as a starting structure, then replace the placeholder cities and places with your Google Maps list.</p>
         <div class="honeymoon-tabs" role="tablist">
           <button class="active" type="button" data-hm-tab="overview">Overview</button>
@@ -74,107 +89,92 @@
   function bind() {
     document.querySelector('[data-view="honeymoon"]')?.addEventListener("click", () => switchHoneymoon());
     document.querySelectorAll("[data-hm-tab]").forEach((button) => button.addEventListener("click", () => {
+      if (!data || ownerToken() !== mountedToken) return;
       data.tab = button.dataset.hmTab;
       save();
       render();
     }));
-    const global = document.getElementById("global-add");
-    global?.addEventListener("click", (event) => {
-      if (state.view !== "honeymoon") return;
-      event.preventDefault();
-      event.stopImmediatePropagation();
-      addDraftTask();
-    }, true);
   }
 
   function switchHoneymoon() {
+    const token = ownerToken();
+    if (!token || mountedToken !== token) return;
     state.view = "honeymoon";
     if (history.replaceState) history.replaceState(null, "", "#honeymoon");
     if (typeof updatePlannerNavigation === "function") updatePlannerNavigation("honeymoon");
     else document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === "honeymoon"));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === "honeymoon"));
     els.topbarTitle.textContent = "Honeymoon";
-    els.topbarSubtitle.textContent = "Japan planner · draft itinerary and booking tracker";
-    document.getElementById("global-add").textContent = "+ Add honeymoon task";
+    els.topbarSubtitle.textContent = "Draft itinerary and booking tracker";
+    const addButton = document.getElementById("global-add");
+    addButton.textContent = "+ Add honeymoon task";
+    addButton.hidden = false;
     document.body.classList.remove("sidebar-open");
-    render();
+    if (data) render();
+    else if (!request) request = load(token);
   }
 
-  function load() {
+  function isDraft(value) {
+    return value && ["tasks", "itinerary", "flights", "places", "budget"].every(key => Array.isArray(value[key]));
+  }
+
+  function loadBrowserDraft() {
     try {
-      const saved = JSON.parse(localStorage.getItem(STORE) || "null");
-      if (saved) return saved;
+      const saved = JSON.parse(localStorage.getItem(storageKey) || "null");
+      if (isDraft(saved)) return saved;
     } catch (_error) {
-      localStorage.removeItem(STORE);
+      // If browser storage is unavailable, load the private server defaults.
     }
-    return seed();
+    try {
+      const legacy = JSON.parse(localStorage.getItem(STORE) || "null");
+      if (isDraft(legacy)) {
+        localStorage.setItem(storageKey, JSON.stringify(legacy));
+        localStorage.removeItem(STORE);
+        return legacy;
+      }
+    } catch (_error) {
+      // Leave a legacy draft intact if it could not be migrated.
+    }
+    return null;
+  }
+
+  async function load(token) {
+    const root = document.getElementById("honeymoon-root");
+    if (!root) return;
+    root.textContent = "Loading honeymoon planner…";
+    try {
+      const draft = await (loadBrowserDraft() || plannerRpc("planner_load_owner_defaults", {
+        p_session_token: token,
+        p_kind: "honeymoon"
+      }));
+      if (mountedToken !== token || ownerToken() !== token) return;
+      if (!isDraft(draft)) throw new Error("Missing honeymoon defaults");
+      data = draft;
+      render();
+    } catch (_error) {
+      if (mountedToken !== token || ownerToken() !== token) return;
+      root.textContent = "The honeymoon planner could not load. ";
+      const retry = document.createElement("button");
+      retry.type = "button";
+      retry.className = "secondary-action";
+      retry.textContent = "Try again";
+      retry.addEventListener("click", switchHoneymoon);
+      root.appendChild(retry);
+    } finally {
+      if (mountedToken === token) request = null;
+    }
   }
 
   function save() {
-    localStorage.setItem(STORE, JSON.stringify(data));
-  }
-
-  function seed() {
-    return {
-      tab: "overview",
-      route: "Spain â†’ Japan â†’ Spain",
-      dates: "TBC after South Africa wedding planning is locked",
-      nights: "14â€“18 nights draft",
-      tasks: [
-        item("Decide honeymoon dates", "Choose departure and return windows around wedding recovery, work and family time.", "high"),
-        item("Check Spain to Japan flight routes", "Compare MÃ¡laga, Madrid, Seville or Lisbon departures with Tokyo/Osaka arrivals.", "high"),
-        item("Book outbound flights", "Decide if arriving Tokyo or Osaka makes the route easier.", "high"),
-        item("Book return flights", "Consider open jaw return if route ends in a different city.", "high"),
-        item("Passport and travel document check", "Confirm passport validity and any entry requirements before booking.", "high"),
-        item("Build Google Maps saved place import list", "Export or manually copy the places already saved on your map into this tab.", "normal"),
-        item("Choose hotel areas", "Tokyo, Kyoto and final night airport hotel if needed.", "normal"),
-        item("Book first two hotels", "Lock Tokyo and Kyoto bases first; add ryokan or countryside stay after.", "normal"),
-        item("Research luggage forwarding", "Decide if large bags should be sent between hotels while moving cities.", "normal"),
-        item("Book key restaurants", "Prioritise special meals, BBQ/izakaya, sushi, ramen and any honeymoon dinner.", "normal"),
-        item("Book one premium ryokan / onsen stay", "Potential Hakone, Kawaguchiko, Izu or Kyoto countryside option.", "normal"),
-        item("Create rainy day alternatives", "Museums, shopping streets, food halls, indoor experiences.", "low")
-      ],
-      itinerary: [
-        day("1â€“4", "Tokyo", "Arrive, recover, food neighbourhoods, Shibuya/Shinjuku, coffee, shopping, one special dinner."),
-        day("5", "Hakone or Fuji area", "Ryokan, onsen, mountain views, slower honeymoon reset."),
-        day("6â€“9", "Kyoto", "Temples, old streets, tea, gardens, day trip options and a slower romantic base."),
-        day("10", "Nara or Uji", "Deer park / temples or matcha-focused day trip."),
-        day("11â€“13", "Osaka", "Street food, nightlife, markets, baseball/arcade energy, easy Kyoto access if needed."),
-        day("14â€“15", "Hiroshima / Miyajima or Kanazawa", "Choose one deeper culture/nature extension, not both unless the trip is longer."),
-        day("Final night", "Tokyo or Osaka airport side", "Easy final shopping, bags packed, low stress departure.")
-      ],
-      flights: [
-        row("Outbound", "Spain to Japan", "TBC", "Compare Madrid/MÃ¡laga/Seville/Lisbon routes; decide Tokyo vs Osaka arrival."),
-        row("Return", "Japan to Spain", "TBC", "Check open jaw pricing if route ends away from arrival city."),
-        row("Internal rail", "Tokyo Â· Kyoto Â· Osaka", "TBC", "Research whether individual tickets or a pass works better for the final route."),
-        row("Luggage", "Hotel to hotel forwarding", "TBC", "Useful if carrying wedding/honeymoon bags across multiple cities.")
-      ],
-      places: [
-        place("Tokyo", "Shibuya, Shinjuku, Ginza, Daikanyama, Nakameguro, TeamLab style digital art, food halls, cocktail bars."),
-        place("Kyoto", "Gion, Higashiyama, Arashiyama, Kiyomizu area, Nishiki Market, tea houses, gardens."),
-        place("Osaka", "Dotonbori, Namba, Shinsekai, Kuromon Market, food crawl and nightlife."),
-        place("Hakone / Fuji", "Ryokan, onsen, lake views, slower romantic reset."),
-        place("Nara", "Day trip for deer park, temples and a calmer old-Japan feel."),
-        place("Hiroshima / Miyajima", "Culture, history, island shrine and a deeper extension if the trip is long enough."),
-        place("Kanazawa", "Gardens, old districts, seafood and design if you want an alternative to Hiroshima.")
-      ],
-      budget: [
-        money("International flights", 1800, "EUR", "Placeholder for two people."),
-        money("Hotels / ryokan", 3500, "EUR", "Mix of city hotels and one premium stay."),
-        money("Rail and local transport", 900, "EUR", "Placeholder until route is final."),
-        money("Food and restaurants", 2200, "EUR", "Daily food plus special honeymoon dinners."),
-        money("Experiences and tickets", 800, "EUR", "Museums, digital art, temples, bookings, classes."),
-        money("Shopping and gifts", 1000, "EUR", "Flexible personal buffer."),
-        money("Contingency", 800, "EUR", "Cushion for route changes and extras.")
-      ]
-    };
+    if (!data || !storageKey || ownerToken() !== mountedToken) return;
+    try {
+      localStorage.setItem(storageKey, JSON.stringify(data));
+    } catch (_error) {
+      toast("This browser could not save your honeymoon changes.", true);
+    }
   }
 
   function item(title, notes, priority) { return { id: crypto.randomUUID(), title, notes, priority, done: false }; }
-  function day(day, city, notes) { return { day, city, notes }; }
-  function row(label, route, status, notes) { return { label, route, status, notes }; }
-  function place(area, notes) { return { area, notes }; }
-  function money(label, amount, currency, notes) { return { label, amount, currency, notes }; }
 
   function render() {
     const root = document.getElementById("honeymoon-root");
@@ -205,7 +205,7 @@
   }
 
   function flights() {
-    return `<div class="honeymoon-two"><article class="hm-card"><h3>Flights & transport</h3>${data.flights.map((item) => `<div class="hm-row"><div class="hm-day">${escape(item.label)}</div><div><b>${escape(item.route)}</b><p>${escape(item.notes)}</p></div><span class="hm-tag">${escape(item.status)}</span></div>`).join("")}</article><article class="hm-card"><h3>Booking questions</h3><ul><li>Do you want Tokyo in and Osaka out, or return from the same city?</li><li>How soon after the SA wedding do you want to travel?</li><li>Do you want a slow luxury ryokan stop or a faster city-heavy route?</li><li>Which Google Maps places are non-negotiable?</li></ul></article></div>`;
+    return `<div class="honeymoon-two"><article class="hm-card"><h3>Flights & transport</h3>${data.flights.map((item) => `<div class="hm-row"><div class="hm-day">${escape(item.label)}</div><div><b>${escape(item.route)}</b><p>${escape(item.notes)}</p></div><span class="hm-tag">${escape(item.status)}</span></div>`).join("")}</article><article class="hm-card"><h3>Booking questions</h3><ul><li>Would you rather arrive and depart from the same city?</li><li>How soon after the wedding do you want to travel?</li><li>Would you prefer a slower trip or more time in cities?</li><li>Which Google Maps places are non-negotiable?</li></ul></article></div>`;
   }
 
   function places() {
@@ -221,7 +221,7 @@
   }
 
   function taskHtml(task) {
-    return `<label class="hm-item"><input type="checkbox" data-hm-done="${task.id}" ${task.done ? "checked" : ""}><span><b>${escape(task.title)}</b><small>${escape(task.notes)}</small></span><span class="hm-tag">${escape(task.priority)}</span></label>`;
+    return `<label class="hm-item"><input type="checkbox" data-hm-done="${escape(task.id)}" ${task.done ? "checked" : ""}><span><b>${escape(task.title)}</b><small>${escape(task.notes)}</small></span><span class="hm-tag">${escape(task.priority)}</span></label>`;
   }
 
   function addDraftTask() {
@@ -239,5 +239,13 @@
     return String(value ?? "").replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;").replaceAll('"', "&quot;").replaceAll("'", "&#039;");
   }
 
-  waitForPlanner();
+  document.getElementById("global-add")?.addEventListener("click", (event) => {
+    if (state.view !== "honeymoon") return;
+    event.preventDefault();
+    event.stopImmediatePropagation();
+    if (data && ownerToken() === mountedToken) addDraftTask();
+  }, true);
+  document.addEventListener("planner-data-loaded", refresh);
+  document.addEventListener("planner-session-cleared", reset);
+  refresh();
 })();

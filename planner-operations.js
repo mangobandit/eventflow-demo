@@ -128,7 +128,7 @@ function renderPlannerOperations(container, context) {
       ${input("title", "Template name", editing?.title, "text", 'required maxlength="160"')}
       <label class="form-label">Template type<select name="type"><option value="tasks">Actions</option>
         <option value="timeline"${editing?.data.type === "timeline" ? " selected" : ""}>Timeline</option></select></label>
-      <label class="workspace-check"><input name="shared" type="checkbox"${editing?.scope === "shared" || !editing ? " checked" : ""}> Available across projects</label>
+      ${plannerIsSouthAfricaOnly() ? "" : `<label class="workspace-check"><input name="shared" type="checkbox"${editing?.scope === "shared" || !editing ? " checked" : ""}> Available across projects</label>`}
       <label class="form-label workspace-full">Entries, one per line<textarea name="entries" required maxlength="24000">${escape((editing?.data.entries || []).map(entryLine).join("\n"))}</textarea></label>
       <p class="workspace-full">Enter a title on each line. To include timing, use day offset | time | title | notes.</p>
       ${controls(Boolean(editing))}

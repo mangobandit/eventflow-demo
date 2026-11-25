@@ -145,7 +145,7 @@ const plannerHome = (function createPlannerHome() {
       <section class="panel planner-home-card" aria-labelledby="planner-home-calendar">
         <header class="planner-home-card-head"><h2 id="planner-home-calendar">Calendar</h2>
           <label class="planner-home-filter" for="planner-home-project-filter">Calendar project
-            <select id="planner-home-project-filter" data-home-focus="filter"><option value="all">All projects</option>${projects.map(project => `<option value="${escapeHtml(project.id)}"${projectId === project.id ? " selected" : ""}>${escapeHtml(project.title)}</option>`).join("")}</select>
+            <select id="planner-home-project-filter" data-home-focus="filter">${plannerIsSouthAfricaOnly() ? "" : '<option value="all">All projects</option>'}${projects.map(project => `<option value="${escapeHtml(project.id)}"${projectId === project.id ? " selected" : ""}>${escapeHtml(project.title)}</option>`).join("")}</select>
           </label></header>
         ${loading ? '<p class="planner-home-empty" role="status">Loading project appointments…</p>' : ""}
         ${error ? '<div class="planner-home-load-error" role="status"><span>Project appointments could not load.</span><button class="secondary-action" type="button" data-home-retry data-home-focus="retry">Retry</button></div>' : ""}

@@ -104,22 +104,26 @@
   }
 
   function showAuth() {
+    els.plannerShell.hidden = true;
+    closeModal();
+    els.toastRegion.replaceChildren();
+    Object.keys(state.data).forEach(table => { state.data[table] = []; });
     resetSeatingPlanner();
     resetPlannerWorkspace();
     resetPlannerHome();
     resetPlannerWorkbook();
     plannerRegisters.reset();
     plannerUpdates.reset();
+    renderAll();
+    document.dispatchEvent(new Event("planner-session-cleared"));
     els.authScreen.hidden = false;
-    els.plannerShell.hidden = true;
   }
 
   function showPlanner() {
     // Keep the shared lens as Kelly's landing view for existing wedding work.
     const person = state.identity.planner_person;
     state.owner = person === "matt" || person === "cara" ? person : "shared";
-    els.authScreen.hidden = true;
-    els.plannerShell.hidden = false;
+    state.celebration = plannerIsSouthAfricaOnly() ? "south_africa" : "all";
     els.loading.hidden = false;
     document.querySelectorAll(".planner-view").forEach((panel) => panel.classList.remove("active"));
     els.accountName.textContent = state.identity.display_name || titleCase(state.identity.planner_person || "Planner");
@@ -130,6 +134,11 @@
 
   async function signOut() {
     const token = state.session?.token;
+    clearStoredSession();
+    state.session = null;
+    state.identity = null;
+    setAuthStatus("Signed out safely.");
+    showAuth();
     if (token) {
       try {
         await state.client?.rpc("planner_logout", { p_session_token: token });
@@ -137,11 +146,6 @@
         // Local sign-out should still complete even if the session already expired.
       }
     }
-    clearStoredSession();
-    state.session = null;
-    state.identity = null;
-    setAuthStatus("Signed out safely.");
-    showAuth();
   }
 
   async function loadAll() {
@@ -160,21 +164,33 @@
       if (data?.identity) {
         state.identity = data.identity;
       }
+      updateWeddingScope();
       els.loading.hidden = true;
       switchView(state.view, false);
       renderAll();
+      els.plannerShell.hidden = false;
+      els.authScreen.hidden = true;
+      document.dispatchEvent(new Event("planner-data-loaded"));
       setSync("Securely synced", false);
     } catch (error) {
+      if (state.session?.token !== token) return;
+      if (els.plannerShell.hidden) {
+        els.authScreen.hidden = false;
+        setAuthStatus(error.message || "Could not load planner data.", true);
+      }
       toast(error.message || "Could not load planner data.", true);
       setSync("Sync problem", false);
     }
   }
 
   async function plannerRpc(name, payload = {}, options = {}) {
+    const requestToken = payload.p_session_token ?? payload.p_token;
     const { data, error } = await state.client.rpc(name, payload);
+    if (requestToken && !options.allowExpired && requestToken !== state.session?.token) {
+      throw new Error("The planner session changed. Sign in again.");
+    }
     if (error) {
       const expired = /session expired|invalid username|password|too many attempts/i.test(error.message || "");
-      const requestToken = payload.p_session_token ?? payload.p_token;
       if (expired && !options.allowExpired && requestToken === state.session?.token) {
         clearStoredSession();
         state.session = null;
