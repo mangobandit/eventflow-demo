@@ -4,6 +4,19 @@ function renderVenueDesigner(container, context) {
   let mode = "plan";
   let placeType = null;
   let pointer = null;
+  const defaultCamera = { yaw: -12, pitch: 55, zoom: 1 };
+  const camera = { ...defaultCamera };
+  const cameraPointers = new Map();
+  const cameraKeys = {
+    ArrowLeft: { yaw: -10 }, ArrowRight: { yaw: 10 },
+    ArrowUp: { pitch: -7 }, ArrowDown: { pitch: 7 },
+    "+": { zoom: 1.12 }, "=": { zoom: 1.12 },
+    "-": { zoom: 1 / 1.12 }, "_": { zoom: 1 / 1.12 }
+  };
+  const cameraControls = {
+    left: cameraKeys.ArrowLeft, right: cameraKeys.ArrowRight,
+    out: cameraKeys["-"], in: cameraKeys["+"]
+  };
   let changed = 0;
   let persisted = 0;
   let pending = false;
@@ -88,9 +101,47 @@ function renderVenueDesigner(container, context) {
     return `<label class="form-label">${caption}<input name="${name}" type="number" min="${min}" max="${max}" step=".1" value="${value}" required></label>`;
   }
 
+  function paintCamera() {
+    const stage = container.querySelector("[data-venue-camera-stage]");
+    if (!stage) return;
+    stage.style.setProperty("--venue-yaw", `${camera.yaw}deg`);
+    stage.style.setProperty("--venue-pitch", `${camera.pitch}deg`);
+    stage.style.setProperty("--venue-zoom", camera.zoom);
+    const zoom = container.querySelector("[data-venue-camera-zoom]");
+    const percentage = `${Math.round(camera.zoom * 100)}%`;
+    if (zoom.textContent !== percentage) zoom.textContent = percentage;
+  }
+
+  function adjustCamera({ yaw = 0, pitch = 0, zoom = 1 }) {
+    camera.yaw = ((camera.yaw + yaw + 180) % 360 + 360) % 360 - 180;
+    camera.pitch = bounded(camera.pitch + pitch, 20, 72);
+    camera.zoom = bounded(camera.zoom * zoom, .55, 2.25);
+    paintCamera();
+  }
+
+  function resetCamera() {
+    Object.assign(camera, defaultCamera);
+    paintCamera();
+  }
+
+  function cameraGap() {
+    const [first, second] = cameraPointers.values();
+    return Math.hypot(first.x - second.x, first.y - second.y);
+  }
+
+  function stopCameraPointer(event) {
+    if (!cameraPointers.delete(event.pointerId)) return false;
+    if (!cameraPointers.size) {
+      container.querySelector("[data-venue-camera-stage]")?.classList.remove("is-orbiting");
+    }
+    return true;
+  }
+
   function draw() {
     if (!container.isConnected) return;
+    cameraPointers.clear();
     const item = lookup();
+    const preview = mode === "preview";
     container.innerHTML = `<header class="workspace-section-head"><h2>Venue designer</h2>
       <div class="workspace-card-actions venue-controls">
         <button class="secondary-action" type="button" data-venue="mode" data-mode="plan" aria-pressed="${mode === "plan"}">2D edit</button>
@@ -123,16 +174,29 @@ function renderVenueDesigner(container, context) {
           <header><div><h3>${mode === "preview" ? "3D preview" : "Venue floor"}</h3>
             ${placeType ? `<p role="status">Click the floor to place ${escape(options[placeType][0].toLowerCase())}.</p>` : ""}
           </div><div data-venue-status role="status"></div></header>
-          <div class="venue-stage"><div class="venue-board${placeType ? " is-placing" : ""}" data-venue-board
+          ${preview ? `<div class="venue-camera">
+            <div class="venue-camera-actions" role="group" aria-label="3D view controls">
+              <button class="secondary-action" type="button" data-venue-camera="left" aria-label="Rotate left">↶</button>
+              <button class="secondary-action" type="button" data-venue-camera="right" aria-label="Rotate right">↷</button>
+              <button class="secondary-action" type="button" data-venue-camera="out" aria-label="Zoom out">−</button>
+              <output class="venue-camera-zoom" data-venue-camera-zoom aria-label="Zoom level"></output>
+              <button class="secondary-action" type="button" data-venue-camera="in" aria-label="Zoom in">+</button>
+              <button class="secondary-action" type="button" data-venue-camera="reset">Reset view</button>
+            </div>
+            <p id="venue-camera-help">Drag to rotate. Scroll or pinch to zoom. With the preview focused, use arrow keys and +/−.</p>
+          </div>` : ""}
+          <div class="venue-stage" ${preview ? 'data-venue-camera-stage tabindex="0" role="group" aria-label="3D venue preview" aria-describedby="venue-camera-help"' : ""}><div class="venue-board${placeType ? " is-placing" : ""}" data-venue-board
             aria-label="Venue floor" style="--venue-grid-x:${100 / layout.width}%;--venue-grid-y:${100 / layout.length}%;--venue-aspect:${layout.width / layout.length}">
-            ${layout.items.map(entry =>
-              `<button class="venue-item venue-item-${entry.type}" type="button" data-venue-item="${escape(entry.id)}"
+            ${layout.items.map(entry => preview
+              ? `<div class="venue-item venue-item-${entry.type}" title="${escape(entry.name)}" style="${itemStyle(entry)}"><span>${escape(entry.name)}</span></div>`
+              : `<button class="venue-item venue-item-${entry.type}" type="button" data-venue-item="${escape(entry.id)}"
                 aria-pressed="${selected === entry.id}" title="${escape(entry.name)}" style="${itemStyle(entry)}"><span>${escape(entry.name)}</span></button>`
             ).join("")}
           </div></div>
         </section>
       </div>`;
     status();
+    paintCamera();
   }
 
   function addItem(type, x, y) {
@@ -146,10 +210,23 @@ function renderVenueDesigner(container, context) {
   }
 
   container.addEventListener("click", click => {
+    const cameraControl = click.target.closest("[data-venue-camera]");
+    if (cameraControl) {
+      const action = cameraControl.dataset.venueCamera;
+      if (action === "reset") resetCamera();
+      else if (Object.hasOwn(cameraControls, action)) adjustCamera(cameraControls[action]);
+      return;
+    }
     const control = click.target.closest("[data-venue]");
     if (control) {
       const { venue: action, kind, mode: view } = control.dataset;
-      if (action === "mode") { mode = view; placeType = null; draw(); return; }
+      if (action === "mode") {
+        mode = view;
+        placeType = null;
+        draw();
+        container.querySelector('[data-venue=mode][aria-pressed=true]')?.focus();
+        return;
+      }
       if (action === "print") { window.print(); return; }
       if (action === "retry") { error = ""; save(); return; }
       if (action === "place") { placeType = kind; mode = "plan"; draw(); return; }
@@ -207,6 +284,14 @@ function renderVenueDesigner(container, context) {
   });
 
   container.addEventListener("pointerdown", down => {
+    const stage = down.target.closest("[data-venue-camera-stage]");
+    if (stage) {
+      if (down.button !== 0 || cameraPointers.size >= 2) return;
+      cameraPointers.set(down.pointerId, { x: down.clientX, y: down.clientY });
+      stage.setPointerCapture(down.pointerId);
+      stage.classList.add("is-orbiting");
+      return;
+    }
     const button = down.target.closest("[data-venue-item]");
     if (!button || placeType || mode !== "plan" || down.button !== 0 || !down.isPrimary) return;
     const item = layout.items.find(entry => entry.id === button.dataset.venueItem);
@@ -217,6 +302,19 @@ function renderVenueDesigner(container, context) {
   });
 
   container.addEventListener("pointermove", move => {
+    const last = cameraPointers.get(move.pointerId);
+    if (last) {
+      const pinch = cameraPointers.size === 2;
+      const previousGap = pinch ? cameraGap() : 0;
+      cameraPointers.set(move.pointerId, { x: move.clientX, y: move.clientY });
+      if (pinch) {
+        const gap = cameraGap();
+        if (gap > 0 && previousGap > 0) adjustCamera({ zoom: gap / previousGap });
+      } else {
+        adjustCamera({ yaw: (move.clientX - last.x) * .5, pitch: (last.y - move.clientY) * .4 });
+      }
+      return;
+    }
     if (!pointer || move.pointerId !== pointer.id) return;
     const { button, item, area, x, y, start } = pointer;
     if (!pointer.moved && Math.hypot(move.clientX - x, move.clientY - y) < 3) return;
@@ -229,6 +327,7 @@ function renderVenueDesigner(container, context) {
   });
 
   container.addEventListener("pointerup", up => {
+    if (stopCameraPointer(up)) return;
     if (!pointer || up.pointerId !== pointer.id) return;
     selected = pointer.item.id;
     const moved = pointer.moved;
@@ -238,13 +337,33 @@ function renderVenueDesigner(container, context) {
   });
 
   container.addEventListener("pointercancel", cancel => {
+    if (stopCameraPointer(cancel)) return;
     if (!pointer || cancel.pointerId !== pointer.id) return;
     Object.assign(pointer.item, pointer.start);
     pointer = null;
     draw();
   });
 
+  container.addEventListener("lostpointercapture", stopCameraPointer);
+  container.addEventListener("wheel", wheel => {
+    const stage = wheel.target.closest("[data-venue-camera-stage]");
+    if (!stage || !wheel.deltaY) return;
+    wheel.preventDefault();
+    const multiplier = wheel.deltaMode === 1 ? 16 : wheel.deltaMode === 2 ? stage.clientHeight : 1;
+    adjustCamera({ zoom: Math.exp(-bounded(wheel.deltaY * multiplier, -350, 350) / 410) });
+  }, { passive: false });
+
   container.addEventListener("keydown", key => {
+    if (key.target.matches("[data-venue-camera-stage]")) {
+      if (Object.hasOwn(cameraKeys, key.key)) {
+        key.preventDefault();
+        adjustCamera(cameraKeys[key.key]);
+      } else if (key.key === "Home" || key.key === "0") {
+        key.preventDefault();
+        resetCamera();
+      }
+      return;
+    }
     const button = key.target.closest("[data-venue-item]");
     if (!button || mode !== "plan") return;
     if (key.key === "Enter" || key.key === " ") {

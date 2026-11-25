@@ -213,7 +213,8 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     return controls + draggable;
   }
 
-  function chairPositions(shape, capacity) {
+  function chairPositions(shape, capacity, sideBySide) {
+    if (sideBySide) return [[68, -9, "top"], [32, -9, "top"]];
     const count = Math.min(capacity, 36);
     if (shape === "round") {
       return Array.from({ length: count }, (_, index) => {
@@ -236,9 +237,10 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   function floorTable(table, occupants, unavailable) {
     const shape = shapes.some(([value]) => value === table.shape) ? table.shape : "round";
     const width = shape === "rectangle" ? Math.min(314, 116 + table.capacity * 7.5) : Math.min(150, 100 + table.capacity * 1.7);
-    const chairs = chairPositions(shape, table.capacity).map(([x, y, edge], index) => {
+    const sideBySide = shape === "rectangle" && table.capacity === 2 && table.chairLayout === "side-by-side";
+    const chairs = chairPositions(shape, table.capacity, sideBySide).map(([x, y, edge], index) => {
       const person = occupants.get(index + 1);
-      const initials = person ? person.name.trim().split(/\s+/).filter(Boolean).slice(0, 2).map(name => Array.from(name)[0]).join("").toUpperCase() : "";
+      const initials = person ? person.name.trim().split(/\s+/).filter(Boolean).slice(0, sideBySide ? 3 : 2).map(name => Array.from(name)[0]).join("").toUpperCase() : "";
       return `<button type="button" class="seating-chair${person ? " is-filled" : ""}" ${chairAttributes(table, index + 1, person, unavailable)}
         data-chair-edge="${edge}" style="left:${x}%;top:${y}%">
         <span class="seating-chair-initials" aria-hidden="true">${escapeHtml(initials)}</span>
@@ -247,7 +249,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     }).join("");
 
     return `<div class="seating-table seating-table--${shape}${selected === table.id ? " is-selected" : ""}" data-seat-group="${escapeHtml(table.id)}"
-    data-chair-labels="${shape === "rectangle" && table.rotation === 0 && table.capacity >= 10 ? "row" : "compact"}"
+    data-chair-labels="${sideBySide ? "pair" : shape === "rectangle" && table.rotation === 0 && table.capacity >= 10 ? "row" : "compact"}"
       style="left:${table.x}%;top:${table.y}%;--table-width:${width}px;--table-rotation:${table.rotation}deg">
       <button type="button" class="seating-table-handle" data-seat-table="${escapeHtml(table.id)}"
         aria-pressed="${selected === table.id}" aria-label="${escapeHtml(table.name)}, ${occupants.size} of ${table.capacity} seats filled">

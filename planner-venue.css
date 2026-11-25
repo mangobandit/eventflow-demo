@@ -12,8 +12,16 @@
 .venue-item-stage { background: #e1dbe7; }
 .venue-item-bar { background: #f2dfda; }
 .venue-item:is([aria-pressed="true"],:focus-visible) { z-index: 2; outline: 2px solid var(--workspace-pine); outline-offset: 2px; }
-.venue-3d .venue-board { width: 88%; transform: rotateX(55deg) rotateZ(-12deg); box-shadow: 10px 16px 0 #a69d8c33; }
-.venue-3d .venue-item { transform: translate(-50%,-50%) rotate(var(--venue-rotation)) translateZ(14px); box-shadow: 0 12px 0 #86796955; cursor: default; }
+.venue-camera { display: grid; gap: 7px; margin: 0 0 5px; }
+.venue-camera-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 5px; }
+.venue-camera-actions button[aria-label] { min-width: 40px; padding-inline: 9px; font-size: 15px; line-height: 1; }
+.venue-camera-zoom { display: inline-block; min-width: 4ch; color: var(--workspace-pine); font-size: 12px; font-variant-numeric: tabular-nums; text-align: center; }
+.venue-camera p { margin: 0; color: var(--ink-soft); font-size: 12px; }
+.venue-3d .venue-stage { min-height: clamp(320px, 55vh, 620px); cursor: grab; touch-action: none; user-select: none; }
+.venue-3d .venue-stage.is-orbiting { cursor: grabbing; }
+.venue-3d .venue-stage:focus-visible { outline: 2px solid var(--workspace-pine); outline-offset: -2px; }
+.venue-3d .venue-board { width: min(78%, calc(var(--venue-aspect) * clamp(200px, 43vh, 480px))); min-height: 0; max-height: none; transform: rotateX(var(--venue-pitch, 55deg)) rotateZ(var(--venue-yaw, -12deg)) scale(var(--venue-zoom, 1)); box-shadow: 10px 16px 0 #a69d8c33; }
+.venue-3d .venue-item { transform: translate(-50%,-50%) rotate(var(--venue-rotation)) translateZ(14px); box-shadow: 0 12px 0 #86796955; cursor: inherit; }
 @media (max-width: 930px) { .venue-layout { grid-template-columns: minmax(0,1fr); } }
 @media print {
   body:has(.venue-preview) .planner-sidebar,
@@ -21,7 +29,9 @@
   body:has(.venue-preview) .workspace-heading,
   body:has(.venue-preview) .workspace-section-head,
   body:has(.venue-preview) .venue-toolbar,
+  body:has(.venue-preview) .venue-camera,
   body:has(.venue-preview) [data-venue-status] { display: none; }
   body:has(.venue-preview) .planner-shell { display: block; }
   .venue-layout { display: block; }
+  .venue-3d .venue-board { transform: rotateX(55deg) rotateZ(-12deg); }
 }

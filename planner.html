@@ -7,21 +7,23 @@
   <meta name="robots" content="noindex,nofollow,noarchive">
   <title>Matt & Cara · Private Wedding Planner</title>
   <link rel="stylesheet" href="style.css">
-  <link rel="stylesheet" href="planner.css?v=20261125-private-planner">
-  <link rel="stylesheet" href="planner-seating.css?v=20261125-tools">
-  <link rel="stylesheet" href="planner-workspace.css?v=20261125-tools">
+  <link rel="stylesheet" href="planner.css?v=20261125-grouped-nav">
+  <link rel="stylesheet" href="planner-seating.css?v=20261125-sweetheart">
+  <link rel="stylesheet" href="planner-workspace.css?v=20261125-private-sections">
   <link rel="stylesheet" href="planner-operations.css?v=20261125-tools">
-  <link rel="stylesheet" href="planner-venue.css?v=20261125-tools">
+  <link rel="stylesheet" href="planner-venue.css?v=20261125-venue-camera">
   <link rel="stylesheet" href="responsive.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260913-guest-details"></script>
-  <script defer src="planner-core.js?v=20260913-guest-details"></script>
-  <script defer src="planner-auth.js?v=20261125-tools"></script>
-  <script defer src="planner-views.js?v=20261125-tools"></script>
-  <script defer src="planner-seating.js?v=20261125-tools"></script>
+  <script defer src="planner-core.js?v=20261125-grouped-nav"></script>
+  <script defer src="planner-nav.js?v=20261125-grouped-nav"></script>
+  <script defer src="planner-auth.js?v=20261125-grouped-nav"></script>
+  <script defer src="planner-views.js?v=20261125-grouped-nav"></script>
+  <script defer src="planner-seating.js?v=20261125-sweetheart"></script>
   <script defer src="planner-operations.js?v=20261125-tools"></script>
-  <script defer src="planner-venue.js?v=20261125-tools"></script>
-  <script defer src="planner-workspace.js?v=20261125-tools"></script>
+  <script defer src="planner-venue.js?v=20261125-venue-camera"></script>
+  <script defer src="planner-workspace.js?v=20261125-private-sections"></script>
+  <script defer src="planner-updates.js?v=20261125-updates"></script>
   <script defer src="planner-forms.js?v=20260630-user-login"></script>
 </head>
 <body class="planner-site">
@@ -74,15 +76,47 @@
       </div>
 
       <nav class="planner-nav" aria-label="Planner sections">
-        <button class="active" type="button" data-view="overview"><span>◫</span>Overview</button>
-        <button type="button" data-view="tasks"><span>✓</span>Tasks</button>
-        <button type="button" data-view="budget"><span>€</span>Budget</button>
-        <button type="button" data-view="guests"><span>◎</span>Guests</button>
-        <button type="button" data-view="seating"><span aria-hidden="true">⊞</span>Seating</button>
-        <button type="button" data-view="vendors"><span>◇</span>Vendors</button>
-        <button type="button" data-view="timeline"><span>◷</span>Timeline</button>
-        <button type="button" data-view="workspace"><span aria-hidden="true">⊕</span>Planning tools</button>
-        <button type="button" data-view="publishing"><span>↗</span>Guest publishing</button>
+        <button class="active" type="button" data-view="overview" aria-current="page"><span aria-hidden="true">&#9707;</span>Overview</button>
+        <button class="planner-nav-all" id="planner-nav-all" type="button" aria-expanded="false"
+          aria-controls="planner-nav-scheduling planner-nav-people planner-nav-wedding planner-nav-tools">
+          <span data-nav-all-label>Show all features</span>
+        </button>
+        <details class="planner-nav-section" id="planner-nav-scheduling">
+          <summary><span aria-hidden="true">&#10003;</span>Planning &amp; scheduling</summary>
+          <div class="planner-nav-items" data-nav-items="scheduling">
+            <button type="button" data-view="workspace-projects"><span aria-hidden="true">&#9638;</span>Projects</button>
+            <button type="button" data-view="workspace-calendar"><span aria-hidden="true">&#9634;</span>Calendar</button>
+            <button type="button" data-view="tasks"><span aria-hidden="true">&#10003;</span>Tasks</button>
+            <button type="button" data-view="workspace-templates"><span aria-hidden="true">&#8801;</span>Templates</button>
+            <button type="button" data-view="timeline"><span aria-hidden="true">&#9719;</span>Timeline</button>
+          </div>
+        </details>
+        <details class="planner-nav-section" id="planner-nav-people">
+          <summary><span aria-hidden="true">&#9678;</span>People &amp; vendors</summary>
+          <div class="planner-nav-items" data-nav-items="people">
+            <button type="button" data-view="guests"><span aria-hidden="true">&#9678;</span>Guests</button>
+            <button type="button" data-view="vendors"><span aria-hidden="true">&#9671;</span>Vendors</button>
+            <button type="button" data-view="workspace-comparison"><span aria-hidden="true">&#8364;</span>Compare suppliers</button>
+            <button type="button" data-view="workspace-notes"><span aria-hidden="true">&#9998;</span>Notes &amp; messages</button>
+          </div>
+        </details>
+        <details class="planner-nav-section" id="planner-nav-wedding">
+          <summary><span aria-hidden="true">&#9638;</span>Wedding details</summary>
+          <div class="planner-nav-items" data-nav-items="wedding">
+            <button type="button" data-view="budget"><span aria-hidden="true">&#8364;</span>Budget</button>
+            <button type="button" data-view="seating"><span aria-hidden="true">&#8862;</span>Seating</button>
+            <button type="button" data-view="workspace-venue"><span aria-hidden="true">&#9635;</span>Venue designer</button>
+            <button type="button" data-view="workspace-site"><span aria-hidden="true">&#8599;</span>Website builder</button>
+            <button type="button" data-view="publishing"><span aria-hidden="true">&#8599;</span>Guest publishing</button>
+          </div>
+        </details>
+        <details class="planner-nav-section" id="planner-nav-tools">
+          <summary><span aria-hidden="true">&#8853;</span>Tools &amp; settings</summary>
+          <div class="planner-nav-items" data-nav-items="tools">
+            <button type="button" data-view="workspace-guides"><span aria-hidden="true">&#8803;</span>Client guides</button>
+            <button type="button" data-view="workspace-access"><span aria-hidden="true">&#9678;</span>Client access</button>
+          </div>
+        </details>
       </nav>
 
       <div class="owner-switch">
@@ -109,6 +143,12 @@
         </div>
         <div class="topbar-actions">
           <span class="sync-state" id="sync-state">Securely synced</span>
+          <div class="planner-updates">
+            <button type="button" class="planner-updates-toggle" id="planner-updates-toggle" aria-expanded="false" aria-controls="planner-updates-panel">
+              Updates <span class="planner-updates-count" id="planner-updates-count" hidden></span>
+            </button>
+            <section class="planner-updates-panel" id="planner-updates-panel" aria-label="Planner updates" hidden></section>
+          </div>
           <button class="primary-action" id="global-add" type="button">+ Add task</button>
         </div>
       </header>

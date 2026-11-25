@@ -4,7 +4,13 @@
 
   async function init() {
     const requestedView = location.hash.replace(/^#/, "");
-    if (["overview", "tasks", "budget", "guests", "seating", "checkin", "vendors", "timeline", "workspace", "publishing"].includes(requestedView)) state.view = requestedView;
+    const tool = plannerWorkspace.toolForView(requestedView);
+    if (tool) {
+      state.view = "workspace";
+      state.workspaceTool = tool;
+    } else if (["overview", "tasks", "budget", "guests", "seating", "checkin", "vendors", "timeline", "workspace", "publishing", "honeymoon"].includes(requestedView)) {
+      state.view = requestedView;
+    }
     bindUi();
     if (!configured) {
       els.setupCard.hidden = false;
@@ -21,6 +27,7 @@
   }
 
   function bindUi() {
+    bindPlannerNavigation();
     els.loginForm.addEventListener("submit", login);
     document.getElementById("signout-button").addEventListener("click", signOut);
     document.getElementById("mobile-sidebar-toggle").addEventListener("click", () => document.body.classList.toggle("sidebar-open"));
@@ -101,6 +108,7 @@
   function showAuth() {
     resetSeatingPlanner();
     resetPlannerWorkspace();
+    plannerUpdates.reset();
     els.authScreen.hidden = false;
     els.plannerShell.hidden = true;
   }
@@ -207,4 +215,5 @@
     renderPublishing();
     if (state.view === "seating") renderSeatingPlanner();
     if (state.view === "workspace") renderPlannerWorkspace();
+    plannerUpdates.refresh();
   }

@@ -10,6 +10,7 @@
     owner: "shared",
     celebration: "all",
     view: "overview",
+    workspaceTool: "projects",
     editing: null,
     data: {
       tasks: [],
@@ -165,7 +166,7 @@
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20260913-no-transport";
+    script.src = "planner-rsvp.js?v=20261125-grouped-nav";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

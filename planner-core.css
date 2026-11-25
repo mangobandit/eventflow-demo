@@ -25,25 +25,101 @@
 .setup-card code { display: block; overflow-wrap: anywhere; margin-top: 8px; padding: 8px; border-radius: 6px; background: rgba(255,255,255,.7); font-size: 11px; }
 
 .planner-shell { display: grid; grid-template-columns: 248px minmax(0, 1fr); min-height: 100vh; }
-.planner-sidebar { position: sticky; top: 0; display: flex; height: 100vh; flex-direction: column; padding: 24px 18px; color: #fff; background: var(--olive-dark); }
-.planner-brand { display: flex; align-items: center; gap: 12px; padding: 4px 8px 24px; border-bottom: 1px solid rgba(255,255,255,.12); }
-.planner-brand .monogram { color: #fff; font-size: 28px; }
-.planner-brand b { display: block; font-family: var(--serif); font-size: 18px; font-weight: 500; }
-.planner-brand small { color: #bfc8b9; font-size: 8px; letter-spacing: .13em; text-transform: uppercase; }
-.planner-nav { display: grid; gap: 5px; margin-top: 24px; }
-.planner-nav button { display: flex; align-items: center; gap: 11px; min-height: 44px; padding: 0 12px; border: 1px solid transparent; border-radius: 9px; color: #cfd6ca; background: transparent; cursor: pointer; text-align: left; font-size: 12px; font-weight: 700; }
-.planner-nav button svg { width: 17px; height: 17px; opacity: .8; }
-.planner-nav button:hover, .planner-nav button.active { color: #fff; border-color: rgba(255,255,255,.12); background: rgba(255,255,255,.08); }
-.owner-switch { margin-top: auto; padding: 16px 8px 8px; border-top: 1px solid rgba(255,255,255,.12); }
+.planner-sidebar {
+  position: sticky;
+  top: 0;
+  display: flex;
+  height: 100vh;
+  height: 100dvh;
+  flex-direction: column;
+  overflow-y: auto;
+  overscroll-behavior-y: contain;
+  scrollbar-width: thin;
+  padding: 20px 16px;
+  color: #fff;
+  background: var(--olive-dark);
+}
+.planner-brand { display: flex; align-items: center; gap: 12px; padding: 2px 6px 15px; border-bottom: 1px solid rgba(255,255,255,.12); }
+.planner-brand .monogram { width: 60px; height: 44px; color: #fff; }
+.planner-brand b { display: block; font-family: var(--serif); font-size: 18px; font-weight: 500; line-height: 1.15; }
+.planner-brand small { display: block; margin-top: 5px; color: #bfc8b9; font-size: 8px; letter-spacing: .12em; line-height: 1.4; text-transform: uppercase; }
+.planner-nav { display: grid; flex-shrink: 0; gap: 4px; margin: 14px 0 16px; }
+.planner-nav button,
+.planner-nav-section > summary {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  width: 100%;
+  min-height: 40px;
+  padding: 0 10px;
+  border: 1px solid transparent;
+  border-radius: 8px;
+  color: #cfd6ca;
+  background: transparent;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-size: 12px;
+  font-weight: 700;
+}
+.planner-nav button[data-view] > :is(span, svg):first-child,
+.planner-nav-section > summary > [aria-hidden='true']:first-child {
+  display: grid;
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  place-items: center;
+  color: #e4d4b9;
+  font-size: 15px;
+  line-height: 1;
+  text-align: center;
+}
+.planner-nav button:hover,
+.planner-nav-section > summary:hover { color: #fff; background: rgba(255,255,255,.06); }
+.planner-nav button:is(.active, [aria-current='page']) {
+  border-color: rgba(255,255,255,.14);
+  color: #fff;
+  background: rgba(255,255,255,.1);
+  box-shadow: inset 2px 0 #dfc197;
+}
+.planner-nav-section > summary { list-style: none; }
+.planner-nav-section > summary::-webkit-details-marker { display: none; }
+.planner-nav-section > summary::after {
+  content: '';
+  flex: 0 0 7px;
+  width: 7px;
+  height: 7px;
+  margin: -4px 2px 0 auto;
+  border-right: 1px solid currentColor;
+  border-bottom: 1px solid currentColor;
+  transform: rotate(45deg);
+}
+.planner-nav-section[open] > summary::after { margin-top: 3px; transform: rotate(-135deg); }
+.planner-nav-section[data-active='true'] > summary { color: #fff; }
+.planner-nav-section[data-active='true']:not([open]) > summary { background: rgba(255,255,255,.1); }
+.planner-nav-items { display: grid; gap: 3px; margin: 2px 0 5px 18px; padding-left: 8px; border-left: 1px solid rgba(255,255,255,.15); }
+.planner-nav-items button { min-height: 36px; padding-inline: 7px; }
+.planner-nav .planner-nav-all {
+  min-height: 32px;
+  color: #daccb5;
+  font-size: 10px;
+}
+.planner-nav .planner-nav-all:is([aria-pressed='true'], [aria-expanded='true']) { color: #fff; background: rgba(255,255,255,.06); }
+.planner-sidebar :is(button, summary):focus-visible { outline: 2px solid #f0d4a9; outline-offset: 2px; }
+.owner-switch { margin-top: auto; padding: 12px 6px 7px; border-top: 1px solid rgba(255,255,255,.12); }
 .owner-switch > span { display: block; margin-bottom: 9px; color: #9faa9b; font-size: 8px; font-weight: 800; letter-spacing: .15em; text-transform: uppercase; }
 .owner-pills { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px; }
 .owner-pills button { min-height: 34px; border: 1px solid rgba(255,255,255,.14); border-radius: 8px; color: #cbd3c6; background: transparent; cursor: pointer; font-size: 9px; font-weight: 800; text-transform: uppercase; }
 .owner-pills button.active { color: var(--olive-dark); background: #fff; }
-.planner-account { display: flex; align-items: center; gap: 10px; margin-top: 14px; padding: 12px 8px 0; border-top: 1px solid rgba(255,255,255,.12); }
+.planner-account { display: flex; align-items: center; gap: 10px; margin-top: 11px; padding: 10px 6px 0; border-top: 1px solid rgba(255,255,255,.12); }
 .account-avatar { display: grid; width: 34px; height: 34px; place-items: center; border-radius: 50%; color: var(--olive-dark); background: #e8eee4; font-family: var(--serif); font-size: 16px; }
 .planner-account b { display: block; font-size: 11px; }
 .planner-account small { display: block; max-width: 120px; overflow: hidden; color: #aeb8a9; font-size: 8px; text-overflow: ellipsis; white-space: nowrap; }
 .signout-button { margin-left: auto; border: 0; color: #c5cdc0; background: transparent; cursor: pointer; font-size: 17px; }
+
+@media (max-width: 900px) {
+  body:not(.sidebar-open) .planner-sidebar { visibility: hidden; }
+}
 
 .planner-main { min-width: 0; }
 .planner-topbar { position: sticky; top: 0; z-index: 80; display: flex; min-height: 78px; align-items: center; justify-content: space-between; gap: 20px; padding: 12px 32px; border-bottom: 1px solid var(--line); background: rgba(246,240,230,.91); backdrop-filter: blur(18px); }

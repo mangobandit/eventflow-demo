@@ -76,6 +76,51 @@
 .workspace-list-row small { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 11px; }
 .workspace-record + .workspace-record { margin-top: 9px; }
 .workspace-message-list { max-height: 390px; overflow: auto; margin-bottom: 12px; }
+.workspace-budget-summaries {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(310px, 100%), 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+.workspace-budget-summary {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  padding: 15px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+}
+.workspace-budget-ring {
+  --budget-fill: var(--workspace-pine);
+  display: grid;
+  flex: 0 0 106px;
+  place-items: center;
+  width: 106px;
+  height: 106px;
+  border-radius: 50%;
+  background: conic-gradient(var(--budget-fill) 0 var(--budget-paid), var(--workspace-tint) var(--budget-paid) 100%);
+}
+.workspace-budget-summary.is-over .workspace-budget-ring { --budget-fill: #9d5a36; }
+.workspace-budget-ring > div {
+  display: grid;
+  place-content: center;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: var(--workspace-paper);
+  color: var(--workspace-pine);
+  text-align: center;
+}
+.workspace-budget-ring strong { font-size: 16px; font-variant-numeric: tabular-nums; }
+.workspace-budget-ring span { font-size: 11px; }
+.workspace-budget-figures { flex: 1 1 140px; min-width: 0; }
+.workspace-budget-figures h4 { margin: 0 0 6px; color: var(--workspace-pine); font-size: 14px; }
+.workspace-budget-figures dl { display: grid; gap: 4px; margin: 0; font-size: 12px; }
+.workspace-budget-figures dl > div { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 3px 7px; }
+.workspace-budget-figures dt { color: var(--ink-soft); }
+.workspace-budget-figures dd { margin: 0; color: var(--ink); font-weight: 700; font-variant-numeric: tabular-nums; }
+.workspace-budget-over :is(dt, dd) { color: #874328; }
 .workspace-budget-row { margin: 10px 0; }
 .workspace-budget-row header { font-size: 12px; }
 .workspace-budget-row header small { color: var(--ink-soft); }

@@ -55,6 +55,10 @@ const plannerWorkspace = (function createPlannerWorkspace() {
       token = session;
       if (state.celebration === "spain") scope = "spain";
     }
+    if (active !== state.workspaceTool) {
+      active = state.workspaceTool;
+      editor = null;
+    }
     paint();
     if (!records && !loading && !error) load();
   }
@@ -232,6 +236,30 @@ const plannerWorkspace = (function createPlannerWorkspace() {
       </div>`;
   }
 
+  function budgetSummary({ currency, estimated, paid }) {
+    const balance = Math.round((estimated - paid) * 100) / 100;
+    const remaining = Math.max(balance, 0);
+    const abovePlan = Math.max(-balance, 0);
+    const percentage = estimated > 0 ? paid / estimated : 0;
+    const fill = estimated > 0 ? Math.min(100, percentage * 100) : abovePlan > 0 ? 100 : 0;
+    const share = new Intl.NumberFormat("en", { style: "percent", maximumFractionDigits: 1 });
+    const amount = value => escapeHtml(formatMoney(value, currency));
+    return `<section class="workspace-budget-summary${abovePlan > 0 ? " is-over" : ""}" aria-label="${escapeHtml(currency)} budget">
+      <div class="workspace-budget-ring" style="--budget-paid: ${fill}%" aria-hidden="true">
+        <div><strong>${estimated > 0 ? share.format(percentage) : "—"}</strong><span>${estimated > 0 ? "paid" : "no plan"}</span></div>
+      </div>
+      <div class="workspace-budget-figures">
+        <h4>${escapeHtml(currency)} budget</h4>
+        <dl>
+          <div><dt>Planned</dt><dd>${amount(estimated)}</dd></div>
+          <div><dt>Paid${estimated > 0 ? ` (${share.format(percentage)})` : ""}</dt><dd>${amount(paid)}</dd></div>
+          <div><dt>Remaining</dt><dd>${amount(remaining)}</dd></div>
+          ${abovePlan > 0 ? `<div class="workspace-budget-over"><dt>Above plan</dt><dd>${amount(abovePlan)}</dd></div>` : ""}
+        </dl>
+      </div>
+    </section>`;
+  }
+
   function comparisonView() {
     const copy = getEditing("vendor_score");
     const addQuote = editor?.kind === "vendor_score" ? form("vendor_score", copy, [
@@ -244,15 +272,23 @@ const plannerWorkspace = (function createPlannerWorkspace() {
       formField("body", "Quote details and questions", copy?.data.body, { type: "textarea", max: 3000 })
     ]) + deleteButton(copy) : "";
     const costs = new Map();
+    const currencyTotals = new Map();
     const weddingScope = celebrations.some(item => item.id === scope);
     const included = item => item.celebration === scope || (weddingScope && item.celebration === "shared");
     for (const item of state.data.budget_items.filter(included)) {
+      const currency = item.currency || "EUR";
       const category = item.category || "General";
-      const key = `${item.currency}:${category}`;
-      const total = costs.get(key) || { category, currency: item.currency, estimated: 0, paid: 0 };
-      total.estimated += Number(item.estimated || 0);
-      total.paid += Number(item.paid || item.deposit || 0);
+      const estimated = Number(item.estimated || 0);
+      const paid = Number(item.paid || item.deposit || 0);
+      const key = `${currency}:${category}`;
+      const total = costs.get(key) || { category, currency, estimated: 0, paid: 0 };
+      const currencyTotal = currencyTotals.get(currency) || { currency, estimated: 0, paid: 0 };
+      total.estimated += estimated;
+      total.paid += paid;
       costs.set(key, total);
+      currencyTotal.estimated += estimated;
+      currencyTotal.paid += paid;
+      currencyTotals.set(currency, currencyTotal);
     }
     const quoteRows = scoped("vendor_score").map(row => `
       <tr><th scope="row">${escapeHtml(row.title)}</th><td>${escapeHtml(row.data.category)}</td>
@@ -262,14 +298,18 @@ const plannerWorkspace = (function createPlannerWorkspace() {
       <td><button class="secondary-action" type="button" data-work-action="edit" data-kind="vendor_score" data-record="${escapeHtml(row.id)}">Edit</button></td></tr>
     `).join("");
     const vendors = state.data.vendors.filter(included).filter(item => item.quote_amount != null);
+    const summaries = Array.from(currencyTotals.values()).sort((a, b) => a.currency.localeCompare(b.currency));
     return `${heading("Suppliers & budget", add("vendor_score", "+ Add comparison quote"))}${addQuote}
+      <section class="workspace-card"><h3>Budget at a glance</h3>${summaries.length
+        ? `<div class="workspace-budget-summaries">${summaries.map(budgetSummary).join("")}</div>`
+        : empty("No budget items recorded for this project.")}</section>
       <section class="workspace-card"><h3>Compare quotes</h3>${quoteRows
         ? `<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Supplier</th><th>Category</th><th>Quote</th><th>Deposit</th><th>Score</th><th>Actions</th></tr></thead><tbody>${quoteRows}</tbody></table></div>`
         : empty("Add quotes to compare supplier prices, deposits and your scores.")}</section>
       <div class="workspace-grid workspace-subgrid">
         <section class="workspace-card"><h3>Budget by category</h3>${Array.from(costs.values()).sort((a, b) => a.currency.localeCompare(b.currency) || b.estimated - a.estimated).map(row => `
           <div class="workspace-budget-row"><header><b>${escapeHtml(row.category)}</b><small>${escapeHtml(formatMoney(row.paid, row.currency))} paid of ${escapeHtml(formatMoney(row.estimated, row.currency))}</small></header>
-            <progress value="${Math.min(row.estimated || 1, row.paid)}" max="${row.estimated || 1}" aria-label="${escapeHtml(row.category)} paid"></progress></div>
+            ${row.estimated > 0 ? `<progress value="${Math.min(row.estimated, row.paid)}" max="${row.estimated}" aria-label="${escapeHtml(`${row.category} ${row.currency} paid`)}"></progress>` : ""}</div>
         `).join("") || empty("No budget costs for this project.")}</section>
         <section class="workspace-card"><h3>Quotes from suppliers</h3>${vendors.map(row => `<div class="workspace-list-row"><b>${escapeHtml(row.name)}</b><span>${escapeHtml(formatMoney(row.quote_amount, row.currency))}</span></div>`).join("") || empty("No supplier quotes recorded.")}</section>
       </div>`;
@@ -407,8 +447,8 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     try {
       if (workAction === "reload") return load();
       if (workAction === "tab") {
-        active = tool;
-        editor = null;
+        switchView(viewForTool(tool));
+        return;
       } else if (workAction === "open-project") {
         setScope(button.dataset.scope);
         return;
@@ -493,7 +533,15 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     paint();
   });
 
-  return { render, reset };
+  function viewForTool(tool) {
+    return `workspace-${tool}`;
+  }
+
+  function toolForView(view) {
+    return tools.find(([tool]) => viewForTool(tool) === view)?.[0];
+  }
+
+  return { render, reset, viewForTool, toolForView };
 })();
 
 function renderPlannerWorkspace() { plannerWorkspace.render(); }

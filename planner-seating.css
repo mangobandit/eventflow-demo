@@ -151,6 +151,7 @@
 }
 .seating-chair.is-filled { border-color: var(--seat-pine); background: var(--seat-pine); cursor: grab; }
 .seating-chair-initials { font-size: clamp(6px, .64vw, 9px); font-weight: 800; transform: rotate(calc(-1 * var(--table-rotation))); }
+.seating-table[data-chair-labels="pair"] .seating-chair-initials { font-size: clamp(6px, .58vw, 8px); }
 .seating-chair:is([aria-pressed="true"], :focus-visible, .is-drop-target) {
   outline: 2px solid var(--seat-gold);
   outline-offset: 2px;
