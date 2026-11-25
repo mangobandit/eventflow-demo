@@ -166,7 +166,7 @@
     document.head.appendChild(stylesheet);
 
     const script = document.createElement("script");
-    script.src = "planner-rsvp.js?v=20261125-grouped-nav";
+    script.src = "planner-rsvp.js?v=20261125-budget-editing";
     script.dataset.mxcRsvpAdmin = "true";
     document.body.appendChild(script);
   });

@@ -286,6 +286,31 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     </section>`;
   }
 
+  function budgetCategory(group, expanded) {
+    const { key, category, currency, estimated, paid, items } = group;
+    const groupKey = escapeHtml(key);
+    const amount = value => escapeHtml(formatMoney(value, currency));
+    const single = items.length === 1;
+    const summary = `<span class="workspace-budget-category-title"><b>${escapeHtml(category)}</b> <small>${escapeHtml(currency)}</small></span>
+      <span class="workspace-budget-category-total">${amount(paid)} paid of ${amount(estimated)}</span>
+      <span class="workspace-budget-category-action">${single ? "Edit" : "Edit items"}</span>
+      ${estimated > 0 ? `<progress value="${Math.max(0, Math.min(estimated, paid))}" max="${estimated}" aria-hidden="true"></progress>` : ""}`;
+
+    if (single) {
+      return `<div class="workspace-budget-row" data-budget-category="${groupKey}">
+        <button class="workspace-budget-category" type="button" data-budget-trigger data-work-action="edit-budget-item" data-record="${escapeHtml(items[0].id)}">${summary}</button>
+      </div>`;
+    }
+
+    return `<details class="workspace-budget-row" data-budget-category="${groupKey}"${expanded ? " open" : ""}>
+      <summary class="workspace-budget-category" data-budget-trigger>${summary}</summary>
+      <ul class="workspace-budget-items">${items.map(item => `<li>
+        <div><b>${escapeHtml(item.title)}</b><small>${escapeHtml(labelCelebration(item.celebration))} &middot; ${amount(item.paid || item.deposit || 0)} paid of ${amount(item.estimated)}</small></div>
+        <button class="secondary-action" type="button" data-work-action="edit-budget-item" data-record="${escapeHtml(item.id)}" aria-label="Edit ${escapeHtml(item.title)}">Edit</button>
+      </li>`).join("")}</ul>
+    </details>`;
+  }
+
   function comparisonView() {
     const copy = getEditing("vendor_score");
     const addQuote = editor?.kind === "vendor_score" ? form("vendor_score", copy, [
@@ -307,10 +332,11 @@ const plannerWorkspace = (function createPlannerWorkspace() {
       const estimated = Number(item.estimated || 0);
       const paid = Number(item.paid || item.deposit || 0);
       const key = `${currency}:${category}`;
-      const total = costs.get(key) || { category, currency, estimated: 0, paid: 0 };
+      const total = costs.get(key) || { key, category, currency, estimated: 0, paid: 0, items: [] };
       const currencyTotal = currencyTotals.get(currency) || { currency, estimated: 0, paid: 0 };
       total.estimated += estimated;
       total.paid += paid;
+      total.items.push(item);
       costs.set(key, total);
       currencyTotal.estimated += estimated;
       currencyTotal.paid += paid;
@@ -325,6 +351,8 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     `).join("");
     const vendors = state.data.vendors.filter(included).filter(item => item.quote_amount != null);
     const summaries = Array.from(currencyTotals.values()).sort((a, b) => a.currency.localeCompare(b.currency));
+    const expanded = new Set(Array.from(root.querySelectorAll("details[data-budget-category][open]"), item => item.dataset.budgetCategory));
+    const categories = Array.from(costs.values()).sort((a, b) => a.currency.localeCompare(b.currency) || b.estimated - a.estimated);
     return `${heading("Suppliers & budget", add("vendor_score", "+ Add comparison quote"))}${addQuote}
       <section class="workspace-card"><h3>Budget at a glance</h3>${summaries.length
         ? `<div class="workspace-budget-summaries">${summaries.map(budgetSummary).join("")}</div>`
@@ -333,10 +361,8 @@ const plannerWorkspace = (function createPlannerWorkspace() {
         ? `<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Supplier</th><th>Category</th><th>Quote</th><th>Deposit</th><th>Score</th><th>Actions</th></tr></thead><tbody>${quoteRows}</tbody></table></div>`
         : empty("Add quotes to compare supplier prices, deposits and your scores.")}</section>
       <div class="workspace-grid workspace-subgrid">
-        <section class="workspace-card"><h3>Budget by category</h3>${Array.from(costs.values()).sort((a, b) => a.currency.localeCompare(b.currency) || b.estimated - a.estimated).map(row => `
-          <div class="workspace-budget-row"><header><b>${escapeHtml(row.category)}</b><small>${escapeHtml(formatMoney(row.paid, row.currency))} paid of ${escapeHtml(formatMoney(row.estimated, row.currency))}</small></header>
-            ${row.estimated > 0 ? `<progress value="${Math.min(row.estimated, row.paid)}" max="${row.estimated}" aria-label="${escapeHtml(`${row.category} ${row.currency} paid`)}"></progress>` : ""}</div>
-        `).join("") || empty("No budget costs for this project.")}</section>
+        <section class="workspace-card"><h3 data-budget-heading tabindex="-1">Budget by category</h3>${categories
+          .map(group => budgetCategory(group, expanded.has(group.key))).join("") || empty("No budget costs for this project.")}</section>
         <section class="workspace-card"><h3>Quotes from suppliers</h3>${vendors.map(row => `<div class="workspace-list-row"><b>${escapeHtml(row.name)}</b><span>${escapeHtml(formatMoney(row.quote_amount, row.currency))}</span></div>`).join("") || empty("No supplier quotes recorded.")}</section>
       </div>`;
   }
@@ -474,6 +500,19 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     const button = click.target.closest("[data-work-action]");
     if (!button) return;
     const { workAction, kind, record: id, tool } = button.dataset;
+    if (workAction === "edit-budget-item") {
+      const item = state.data.budget_items.find(row => row.id === id);
+      if (!item) return;
+      const key = button.closest("[data-budget-category]").dataset.budgetCategory;
+      const project = scope;
+      openEntity("budget_items", item, null, () => {
+        if (state.view !== "workspace" || active !== "comparison" || scope !== project) return;
+        const category = root.querySelector(`[data-budget-category="${CSS.escape(key)}"]`);
+        const trigger = category?.querySelector(`[data-record="${CSS.escape(id)}"]`) || category?.querySelector("[data-budget-trigger]");
+        (trigger || root.querySelector("[data-budget-heading]"))?.focus({ preventScroll: true });
+      });
+      return;
+    }
     const record = records?.find(row => row.id === id);
     error = null;
     try {

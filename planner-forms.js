@@ -1,6 +1,6 @@
-  function openEntity(table, record = null, defaults = null) {
+  function openEntity(table, record = null, defaults = null, restoreFocus = null) {
     if (!definitions[table]) table = "tasks";
-    state.editing = { table, record };
+    state.editing = { table, record, restoreFocus };
     const definition = definitions[table];
     els.modalTitle.textContent = `${record ? "Edit" : "Add"} ${definition.title}`;
     els.entityForm.innerHTML = definition.fields.map((spec) => renderField(spec, record || defaults)).join("") + renderFormActions(Boolean(record));
@@ -96,10 +96,12 @@
   }
 
   function closeModal() {
+    const restoreFocus = state.editing?.restoreFocus;
     els.modal.hidden = true;
     els.entityForm.innerHTML = "";
     state.editing = null;
     document.body.style.overflow = "";
+    if (restoreFocus) queueMicrotask(restoreFocus);
   }
 
   function bindRowEditors(selector, table) {
