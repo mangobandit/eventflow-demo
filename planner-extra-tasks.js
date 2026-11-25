@@ -22,7 +22,8 @@
       state.data.tasks.push({ id: id(), title, owner, celebration, category, priority, status, due_date, description, notes, created_at: now, updated_at: now });
     };
     const addBudget = (title, owner, celebration, category, currency, estimated, status, notes = "") => {
-      if (exists("budget_items", "title", title)) return;
+      // Signed-in budgets already have their own editable database records.
+      if (state.session.token || exists("budget_items", "title", title)) return;
       state.data.budget_items.push({ id: id(), title, owner, celebration, category, currency, estimated, deposit: 0, paid: 0, due_date: null, status, notes, created_at: now, updated_at: now });
     };
     const addTimeline = (title, celebration, item_date, item_time, location, notes = "") => {
