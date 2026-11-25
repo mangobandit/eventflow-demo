@@ -7,6 +7,18 @@
 .action-row small { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 9px; }
 .action-row time { color: var(--ink-soft); font-size: 9px; }
 
+.task-filters { display: grid; grid-template-columns: repeat(2, minmax(120px, 180px)) minmax(180px, 1fr); gap: 12px; margin-bottom: 16px; }
+.task-filters .form-label { margin: 0; }
+.task-card h4 button { padding: 0; border: 0; color: inherit; background: transparent; font: inherit; text-align: left; cursor: pointer; }
+.task-card h4 button:hover { text-decoration: underline; text-underline-offset: 3px; }
+.task-status-control { display: flex; align-items: center; gap: 9px; margin-top: 9px; color: var(--ink-soft); font-size: 11px; }
+.task-status-control select { min-width: 0; padding: 5px 7px; border: 1px solid var(--line); border-radius: 6px; background: var(--paper); color: var(--ink); font: inherit; }
+.planner-main:has([data-view-panel="seating"].active) #global-add { display: none; }
+@media (max-width: 680px) {
+  .task-filters { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .task-filters label:last-child { grid-column: 1 / -1; }
+}
+
 .kanban-board { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; align-items: start; }
 .kanban-column { min-height: 520px; padding: 14px; border: 1px solid var(--line); border-radius: var(--radius); background: rgba(255,255,255,.44); }
 .kanban-column-head { display: flex; justify-content: space-between; align-items: center; padding: 4px 4px 14px; }
