@@ -94,6 +94,7 @@
         field("owner", "Planner owner", "select", { options: OWNER_OPTIONS, default: "shared" }),
         field("celebration", "Wedding", "select", { options: [["spain", "Spain"], ["south_africa", "South Africa"]], default: "spain" }),
         field("rsvp_status", "Attendance", "select", { options: [["yes", "Yes"], ["no", "No"], ["tbc", "TBC"], ["no_response", "No response"]], default: "no_response" }),
+        field("is_child", "Child guest", "checkbox", { full: true, default: false }),
         field("dietary", "Dietary notes", "textarea", { full: true }),
         field("transport", "Transport", "text", { placeholder: "Required, not required, TBC..." }),
         field("accommodation", "Accommodation", "text"),

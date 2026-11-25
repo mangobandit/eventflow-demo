@@ -52,6 +52,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     }
     draw();
     if (!entry() && !loading && !loadError) load();
+    loadMealColours();
   }
 
   async function load(onlyEvent) {
@@ -128,6 +129,11 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         </div>
         <div class="seating-save" role="status">${escapeHtml(statusText)} ${retry}</div>
       </div>
+      <div class="seating-colour-tools">
+        <div data-seat-colour-legend></div>
+        <button type="button" class="secondary-action" data-seat-action="refresh-meals">Refresh meals</button>
+        <p data-seat-meal-status role="status"></p>
+      </div>
       ${editing === "quick-setup" ? `<form class="seating-card seating-quick-setup" data-seat-form="quick-setup">
         <label class="seating-label">Tables<input name="count" type="number" min="1" max="20" value="4" required></label>
         <label class="seating-label">Chairs per table<input name="capacity" type="number" min="1" max="200" value="8" required></label>
@@ -160,6 +166,55 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     const list = room.querySelector(".seating-chair-list");
     if (list) list.scrollTop = chairScroll;
     room.querySelector("[data-seat-pool]").scrollTop = poolScroll;
+    decorateSeats();
+  }
+
+  function loadMealColours(refresh = false) {
+    const session = token;
+    const button = room.querySelector('[data-seat-action="refresh-meals"]');
+    if (refresh && button) button.disabled = true;
+    plannerRegisters.loadMeals(session, refresh).then(() => {
+      if (session === token) decorateSeats();
+      if (button?.isConnected) button.disabled = false;
+    });
+  }
+
+  function decorateSeats() {
+    const legend = room.querySelector("[data-seat-colour-legend]");
+    if (state.view !== "seating" || !legend) return;
+    const people = new Map(guests().map(person => [person.id, person]));
+    const assigned = Object.keys(entry().plan.assignments).map(id => people.get(id)).filter(Boolean);
+    const { rows, error } = plannerRegisters.getMeals(token);
+    const colours = plannerSeatColours.build(assigned, rows);
+    legend.innerHTML = colours.legend;
+    room.querySelector("[data-seat-meal-status]").textContent = error
+      ? "Could not load the latest meal choices. Use Refresh meals to try again."
+      : rows ? "" : "Loading meal choices…";
+
+    for (const chair of room.querySelectorAll("[data-seat-chair][data-seat-guest]")) {
+      const person = people.get(chair.dataset.seatGuest);
+      if (!person) continue;
+      const info = colours.seat(person);
+      const mealLabel = info.preference ? `${info.label} preference` : info.label || (rows ? "No meal recorded" : "");
+      const details = [mealLabel, info.child ? "Child guest" : "", info.dietary ? "Dietary note" : ""].filter(Boolean);
+      const label = [chair.dataset.seatLabel, ...details].join(", ");
+      chair.dataset.seatMeal = info.colour;
+      chair.setAttribute("aria-label", label);
+      chair.title = label;
+      const badges = chair.querySelector("[data-seat-flags]");
+      if (badges) badges.innerHTML = `${info.child ? '<span class="seating-chair-badge is-child">C</span>' : ""}${info.dietary ? '<span class="seating-chair-badge is-dietary">D</span>' : ""}`;
+      const description = chair.querySelector("[data-seat-food-description]");
+      if (description) description.textContent = details.join(" · ");
+    }
+
+    const form = room.querySelector("[data-seat-meal-form]");
+    if (!form) return;
+    const input = form.elements.meal;
+    const saved = rows?.get(form.dataset.seatMealForm)?.choice || "";
+    if (input.disabled || input.value === input.defaultValue) input.value = saved;
+    input.defaultValue = saved;
+    input.disabled = !rows;
+    form.querySelector('[type="submit"]').disabled = !rows || input.readOnly || input.value.trim() === saved;
   }
 
   function reconcileSeats(plan) {
@@ -209,7 +264,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     const controls = `data-seat-chair="${number}" data-chair-table="${escapeHtml(table.id)}"
       aria-pressed="${selected === table.id && selectedChair === number}"
       aria-label="${escapeHtml(label)}" title="${escapeHtml(label)}"`;
-    const draggable = person ? ` data-seat-guest="${escapeHtml(person.id)}" draggable="${!unavailable}"` : "";
+    const draggable = person ? ` data-seat-guest="${escapeHtml(person.id)}" data-seat-label="${escapeHtml(label)}" draggable="${!unavailable}"` : "";
     return controls + draggable;
   }
 
@@ -245,6 +300,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         data-chair-edge="${edge}" style="left:${x}%;top:${y}%">
         <span class="seating-chair-initials" aria-hidden="true">${escapeHtml(initials)}</span>
         <span class="seating-chair-name" aria-hidden="true">${escapeHtml(person?.name || "")}</span>
+        ${person ? '<span class="seating-chair-flags" data-seat-flags aria-hidden="true"></span>' : ""}
       </button>`;
     }).join("");
 
@@ -267,7 +323,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       return `<li class="seating-chair-row">
         <button type="button" class="seating-chair-choice" ${chairAttributes(table, number, person, unavailable)}>
           <span class="seating-chair-number">${number}</span>
-          <span class="seating-chair-person">${escapeHtml(person?.name || "Empty chair")}${person?.dietary ? "<small> Dietary note</small>" : ""}</span>
+          <span class="seating-chair-person">${escapeHtml(person?.name || "Empty chair")}${person ? '<small data-seat-food-description></small>' : ""}</span>
         </button>
         ${person ? `<button type="button" class="seating-unseat" aria-label="Unseat ${escapeHtml(person.name)}" data-seat-action="unseat"
           data-unseat-guest="${escapeHtml(person.id)}"${unavailable ? " disabled" : ""}>×</button>` : ""}
@@ -327,6 +383,12 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       </div>
       ${extra}
       ${occupant ? `<button class="secondary-action seating-move-current" type="button" data-seat-action="pick" data-pick-guest="${escapeHtml(occupant.id)}"${disabled}>Move ${escapeHtml(occupant.name)}</button>` : ""}
+      ${occupant ? `<form class="seating-seat-meal" data-seat-meal-form="${escapeHtml(occupant.id)}">
+        <label class="seating-label">Meal choice for ${escapeHtml(occupant.name)}<input name="meal" maxlength="120" type="text" placeholder="e.g. Chicken, vegetarian, kids' meal" disabled></label>
+        <button class="secondary-action" type="submit" disabled>Save meal</button>
+        <button class="secondary-action" type="button" data-seat-action="edit-guest">Edit guest</button>
+        <p data-seat-meal-feedback role="status"></p>
+      </form>` : ""}
       <form class="seating-add-guest" data-seat-form="assign">
         <label class="seating-label">${selectedChair ? `Guest for chair ${selectedChair}` : "Add a guest"}
           <select name="guest" required${peopleDisabled ? " disabled" : ""}>
@@ -510,6 +572,13 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (action === "reload") {
       if (current?.unsaved && !window.confirm("Discard the unsaved seating change and load the latest plan?")) return;
       load(current ? event : undefined);
+    } else if (action === "refresh-meals") {
+      loadMealColours(true);
+    } else if (action === "edit-guest") {
+      const person = guests().find(item => item.id === button.closest("[data-seat-meal-form]").dataset.seatMealForm);
+      if (person) openEntity("guests", person, null, () => {
+        if (state.view === "seating") room.querySelector('[data-seat-action="edit-guest"]')?.focus();
+      });
     } else if (action === "retry") {
       save();
     } else if (action === "undo" && current?.history.length) {
@@ -585,6 +654,13 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   });
 
   room.addEventListener("input", input => {
+    const mealForm = input.target.closest("[data-seat-meal-form]");
+    if (mealForm) {
+      const field = mealForm.elements.meal;
+      mealForm.querySelector('[type="submit"]').disabled = field.readOnly || field.value.trim() === field.defaultValue;
+      mealForm.querySelector("[data-seat-meal-feedback]").textContent = "";
+      return;
+    }
     if (!input.target.matches("[data-seat-search]")) return;
     query = input.target.value;
     const current = entry();
@@ -594,6 +670,11 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
   room.addEventListener("submit", submit => {
     const form = submit.target;
+    if (form.matches("[data-seat-meal-form]")) {
+      submit.preventDefault();
+      saveSeatMeal(form);
+      return;
+    }
     if (!form.dataset.seatForm) return;
     submit.preventDefault();
     const values = new FormData(form);
@@ -668,6 +749,27 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       return plan;
     });
   });
+
+  async function saveSeatMeal(form) {
+    const input = form.elements.meal;
+    const button = form.querySelector('[type="submit"]');
+    const feedback = form.querySelector("[data-seat-meal-feedback]");
+    if (button.disabled) return;
+    input.readOnly = true;
+    button.disabled = true;
+    feedback.textContent = "Saving meal…";
+    try {
+      const row = await plannerRegisters.saveMeal(token, form.dataset.seatMealForm, input.value.trim());
+      if (!row) return;
+      input.value = row.choice || "";
+      feedback.textContent = "Meal choice saved.";
+    } catch (error) {
+      feedback.textContent = error.message || "Could not save this meal choice.";
+    } finally {
+      input.readOnly = false;
+      decorateSeats();
+    }
+  }
 
   function bounds(x, y, button) {
     const frame = room.querySelector("[data-seating-floor]").getBoundingClientRect();

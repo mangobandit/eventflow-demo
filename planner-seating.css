@@ -38,6 +38,58 @@
 .seating-save, .seating-feedback { display: flex; align-items: center; flex-wrap: wrap; gap: 8px; color: var(--ink-soft); font-size: 12px; }
 .seating-feedback { min-height: 106px; padding: 18px; border: 1px solid var(--line); border-radius: var(--radius); background: var(--seat-paper); }
 
+#seatingPlanner [data-seat-meal="unrecorded"] { --seat-meal-colour: #586167; }
+#seatingPlanner [data-seat-meal="beef"] { --seat-meal-colour: #8d3541; }
+#seatingPlanner [data-seat-meal="chicken"] { --seat-meal-colour: #87520d; }
+#seatingPlanner [data-seat-meal="fish"] { --seat-meal-colour: #225887; }
+#seatingPlanner [data-seat-meal="vegetarian"] { --seat-meal-colour: #2e6846; }
+#seatingPlanner [data-seat-meal="vegan"] { --seat-meal-colour: #326a15; }
+#seatingPlanner [data-seat-meal="plant"] { --seat-meal-colour: #637121; }
+#seatingPlanner [data-seat-meal="pescatarian"] { --seat-meal-colour: #147275; }
+#seatingPlanner [data-seat-meal="childrens"] { --seat-meal-colour: #9a3a77; }
+#seatingPlanner [data-seat-meal="custom-0"] { --seat-meal-colour: #694397; }
+#seatingPlanner [data-seat-meal="custom-1"] { --seat-meal-colour: #a34729; }
+#seatingPlanner [data-seat-meal="custom-2"] { --seat-meal-colour: #306683; }
+#seatingPlanner [data-seat-meal="custom-3"] { --seat-meal-colour: #596926; }
+#seatingPlanner [data-seat-meal="custom-4"] { --seat-meal-colour: #864554; }
+#seatingPlanner [data-seat-meal="custom-5"] { --seat-meal-colour: #28586a; }
+#seatingPlanner [data-seat-meal="custom-6"] { --seat-meal-colour: #71533f; }
+#seatingPlanner [data-seat-meal="custom-7"] { --seat-meal-colour: #495498; }
+
+.seating-colour-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px 12px;
+  margin-bottom: 12px;
+}
+.seating-colour-tools > [data-seat-colour-legend] { flex: 1 1 300px; min-width: 0; }
+.seating-colour-tools > [data-seat-meal-status] { flex-basis: 100%; margin: 0; color: var(--ink-soft); font-size: 12px; }
+.seating-colour-tools > [data-seat-meal-status]:empty { display: none; }
+.seating-meal-legend {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 6px 11px;
+  color: var(--seat-pine-deep);
+  font-size: 12px;
+}
+.seating-meal-legend ul { display: flex; flex-wrap: wrap; gap: 5px 10px; padding: 0; margin: 0; list-style: none; }
+.seating-meal-legend li { display: inline-flex; align-items: center; gap: 4px; min-width: 0; overflow-wrap: anywhere; }
+.seating-meal-swatch { display: inline-block; flex: 0 0 12px; height: 12px; border-radius: 3px; background: var(--seat-meal-colour); }
+.seating-key-badge, .seating-chair-badge {
+  display: grid;
+  place-items: center;
+  border: 1px solid var(--seat-paper);
+  color: #fff;
+  font-weight: 800;
+  line-height: 1;
+}
+.seating-key-badge { width: 15px; height: 15px; border-radius: 50%; font-size: 9px; }
+.seating-key-badge.is-child, .seating-chair-badge.is-child { background: #563372; }
+.seating-key-badge.is-dietary, .seating-chair-badge.is-dietary { background: #1d2327; }
+
 .seating-workspace {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(240px, 290px);
@@ -149,8 +201,21 @@
   pointer-events: auto;
   cursor: pointer;
 }
-.seating-chair.is-filled { border-color: var(--seat-pine); background: var(--seat-pine); cursor: grab; }
+.seating-chair.is-filled { border-color: var(--seat-meal-colour, var(--seat-pine)); background: var(--seat-meal-colour, var(--seat-pine)); cursor: grab; }
 .seating-chair-initials { font-size: clamp(6px, .64vw, 9px); font-weight: 800; transform: rotate(calc(-1 * var(--table-rotation))); }
+.seating-chair-flags { display: contents; }
+.seating-chair-badge {
+  position: absolute;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  font-size: 7px;
+  transform: rotate(calc(-1 * var(--table-rotation)));
+  pointer-events: none;
+}
+.seating-chair-badge.is-child { top: -5px; right: -4px; }
+.seating-chair-badge.is-dietary { bottom: -5px; left: -4px; }
 .seating-table[data-chair-labels="pair"] .seating-chair-initials { font-size: clamp(6px, .58vw, 8px); }
 .seating-chair:is([aria-pressed="true"], :focus-visible, .is-drop-target) {
   outline: 2px solid var(--seat-gold);
@@ -242,7 +307,11 @@
 .seating-card li :is(.seating-chair-choice, .seating-guest-pick) { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; height: auto; min-height: 34px; padding: 5px; border: 1px solid transparent; color: var(--seat-pine-deep); background: transparent; font: inherit; text-align: left; }
 .seating-card li [draggable="true"] { cursor: grab; }
 .seating-chair-number { display: grid; flex: 0 0 25px; min-height: 24px; place-items: center; border-radius: 6px; color: var(--seat-pine-deep); background: var(--seat-cloth); font-size: 11px; font-weight: 800; }
+.seating-chair-choice[data-seat-meal] .seating-chair-number { color: var(--seat-paper); background: var(--seat-meal-colour); }
 .seating-chair-person { min-width: 0; overflow-wrap: anywhere; }
+.seating-seat-meal { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: end; gap: 6px; margin-top: 10px; }
+.seating-seat-meal :is([role="status"], [role="alert"]) { grid-column: 1 / -1; margin: 0; color: var(--ink-soft); font-size: 11px; }
+.seating-seat-meal :is([role="status"], [role="alert"]):empty { display: none; }
 .seating-card li :is(.seating-chair-choice, .seating-guest-pick):is([aria-pressed="true"], .is-drop-target, :hover) { border-color: var(--seat-outline); background: var(--seat-cloth); }
 .seating-move-current { max-width: 100%; margin-top: 10px; }
 
@@ -258,6 +327,9 @@
   .seating-floor { min-height: 390px; }
   .seating-table { height: 56px; width: min(var(--table-width), 49%); }
   .seating-table--round, .seating-table--square { height: auto; width: min(var(--table-width), 28%); }
+  .seating-chair-badge { width: 9px; height: 9px; font-size: 6px; }
+  .seating-chair-badge.is-child { top: -6px; right: calc(50% - 4.5px); }
+  .seating-chair-badge.is-dietary { bottom: -6px; left: calc(50% - 4.5px); }
 }
 @media (prefers-reduced-motion: reduce) {
   .seating-table-shape { transition: none; }

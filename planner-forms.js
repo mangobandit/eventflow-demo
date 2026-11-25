@@ -49,16 +49,19 @@
       payload[spec.name] = value;
     });
     if (table === "content_blocks" && !payload.slug) payload.slug = slugify(payload.title);
+    if (table === "guests" && record && payload.is_child === Boolean(record.is_child)) delete payload.is_child;
 
     setSync("Saving...", true);
     let saved;
     try {
-      saved = await plannerRpc("planner_save_entity", {
+      const params = {
         p_session_token: state.session?.token || "",
-        p_table: table,
         p_record_id: record?.id || null,
         p_payload: payload
-      });
+      };
+      saved = table === "guests"
+        ? await plannerRpc("planner_save_guest", params)
+        : await plannerRpc("planner_save_entity", { ...params, p_table: table });
     } catch (error) {
       toast(error.message, true);
       setSync("Save failed", false);
