@@ -4,6 +4,14 @@
   min-inline-size: 0;
 }
 
+.planner-workbook-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .planner-workbook-heading {
   margin: 0;
   color: var(--ink);
@@ -68,6 +76,27 @@
 
 .planner-workbook-table td {
   min-inline-size: 7rem;
+}
+
+.planner-workbook-link {
+  color: var(--workspace-pine);
+  text-decoration: underline;
+  text-underline-offset: 0.16em;
+}
+
+.planner-workbook-formula {
+  color: var(--ink-soft);
+  font-size: 0.88em;
+}
+
+.planner-workbook-formula summary {
+  width: fit-content;
+  cursor: pointer;
+}
+
+.planner-workbook-table :is(a, summary):focus-visible {
+  outline: 2px solid var(--workspace-pine);
+  outline-offset: 2px;
 }
 
 .planner-workbook-table thead th {

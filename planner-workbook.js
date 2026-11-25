@@ -27,6 +27,40 @@ const plannerWorkbook = (() => {
     return value == null ? "" : String(value);
   }
 
+  function workbookLink(target) {
+    if (typeof target !== "string") return null;
+    try {
+      const url = new URL(target);
+      return ["https:", "http:", "mailto:"].includes(url.protocol) ? url : null;
+    } catch (_error) {
+      return null;
+    }
+  }
+
+  function worksheetCell(sheet, address, value) {
+    const text = displayCell(value);
+    const url = workbookLink(sheet.payload.links?.[address]);
+    const cell = makeElement("td", null, url ? null : text);
+    if (url) {
+      const link = makeElement("a", "planner-workbook-link", text || url.href);
+      link.href = url.href;
+      if (url.protocol !== "mailto:") {
+        link.target = "_blank";
+        link.rel = "noopener noreferrer";
+      }
+      cell.append(link);
+    }
+    const formula = sheet.payload.formulas?.[address];
+    if (typeof formula === "string" && formula) {
+      const details = makeElement("details", "planner-workbook-formula");
+      const summary = makeElement("summary", null, "Formula");
+      summary.setAttribute("aria-label", `Formula in ${address}`);
+      details.append(summary, makeElement("code", null, formula.startsWith("=") ? formula : `=${formula}`));
+      cell.append(details);
+    }
+    return cell;
+  }
+
   async function load(token) {
     try {
       const result = await plannerRpc("planner_load_workbook", { p_session_token: token });
@@ -37,6 +71,32 @@ const plannerWorkbook = (() => {
       if (session === token) loadError = true;
     } finally {
       if (session === token) request = null;
+    }
+  }
+
+  async function downloadSource(token, button) {
+    button.disabled = true;
+    button.textContent = "Preparing workbook…";
+    try {
+      const source = await plannerRpc("planner_load_workbook_source", { p_session_token: token });
+      if (session !== token) return;
+      if (!source?.name || !source?.content) throw new Error("The workbook copy is unavailable.");
+
+      const bytes = Uint8Array.from(atob(source.content), character => character.charCodeAt(0));
+      const file = new Blob([bytes], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
+      const objectUrl = URL.createObjectURL(file);
+      const link = makeElement("a");
+      link.href = objectUrl;
+      link.download = source.name;
+      document.body.append(link);
+      link.click();
+      link.remove();
+      window.setTimeout(() => URL.revokeObjectURL(objectUrl), 30000);
+    } catch (error) {
+      if (session === token) toast(error.message || "The workbook could not be downloaded.", true);
+    } finally {
+      button.textContent = "Download workbook";
+      button.disabled = false;
     }
   }
 
@@ -59,7 +119,8 @@ const plannerWorkbook = (() => {
       rowLabel.scope = "row";
       row.append(rowLabel);
       for (let index = 0; index < sheet.payload.columns.length; index += 1) {
-        row.append(makeElement("td", null, displayCell(values[index])));
+        const address = `${sheet.payload.columns[index]}${sourceRow}`;
+        row.append(worksheetCell(sheet, address, values[index]));
       }
       body.append(row);
     }
@@ -108,12 +169,17 @@ const plannerWorkbook = (() => {
       session = token;
     }
     const section = makeElement("section", "workspace-card planner-workbook");
-    const header = makeElement("h2", "planner-workbook-heading", "South Africa workbook");
+    const header = makeElement("header", "planner-workbook-header");
+    const download = makeElement("button", "secondary-action", "Download workbook");
+    download.type = "button";
+    download.addEventListener("click", () => downloadSource(token, download));
+    header.append(makeElement("h2", "planner-workbook-heading", "South Africa workbook"), download);
     section.append(header);
     container.replaceChildren(section);
 
     function paint() {
       if (!section.isConnected || session !== token) return;
+      download.hidden = !worksheets?.length;
       section.replaceChildren(header);
       if (loadError) {
         const message = makeElement("p", "empty-state", "The workbook could not load.");
@@ -167,7 +233,11 @@ const plannerWorkbook = (() => {
         const sheet = worksheets.find(worksheet => worksheet.name === selectedName);
         const query = search.trim().toLocaleLowerCase();
         const matches = value => displayCell(value).toLocaleLowerCase().includes(query);
-        const rows = query ? sheet.payload.rows.filter(([number, values]) => matches(number) || values.some(matches)) : sheet.payload.rows;
+        const rows = query ? sheet.payload.rows.filter(([number, values]) => matches(number) ||
+          sheet.payload.columns.some((column, index) => {
+            const address = `${column}${number}`;
+            return matches(values[index]) || matches(sheet.payload.links?.[address]) || matches(sheet.payload.formulas?.[address]);
+          })) : sheet.payload.rows;
         const labels = sheet.payload.drawings || [];
         const drawings = query ? labels.filter(drawing => matches(drawing.text) || matches(drawing.anchor)) : labels;
         const availableImages = Array.isArray(sheet.payload.images) ? sheet.payload.images : [];
