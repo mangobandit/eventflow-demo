@@ -1,4 +1,4 @@
-﻿  function filtered(table, { ignoreOwner = false, ignoreCelebration = false } = {}) {
+  function filtered(table, { ignoreOwner = false, ignoreCelebration = false } = {}) {
     return (state.data[table] || []).filter((row) => {
       const ownerMatch = ignoreOwner || !row.owner || row.owner === state.owner;
       const celebrationMatch = ignoreCelebration || state.celebration === "all" || row.celebration === state.celebration || row.celebration === "shared";
@@ -159,7 +159,8 @@
   function renderTimeline(search = "") {
     let rows = filtered("timeline_items");
     rows = searchRows(rows, search, ["title", "location", "notes", "audience"]);
-    rows.sort(sortByDate("item_date"));
+    rows.sort((first, second) => compareDates(first.item_date, second.item_date) ||
+      (first.sort_order ?? 0) - (second.sort_order ?? 0) || (first.item_time || "").localeCompare(second.item_time || ""));
     const body = document.getElementById("timeline-table-body");
     body.innerHTML = rows.length ? rows.map((item) => `<tr data-id="${item.id}"><td><b>${formatDate(item.item_date, { short: false })}</b></td><td>${escapeHtml(item.item_time?.slice(0, 5) || "Not set")}</td><td><b>${escapeHtml(item.title)}</b><br><small>${escapeHtml(item.notes || "")}</small></td><td>${labelCelebration(item.celebration)}</td><td>${ownerTag(item.owner)}</td><td>${escapeHtml(item.audience === "guest" ? "Guest facing" : "Private")}</td><td>${escapeHtml(item.location || "Not set")}</td><td>${statusBadge(item.status)}</td></tr>`).join("") : tableEmpty(8, "No timeline items in this planner lens.");
     text("timeline-summary", `${filtered("timeline_items").length} milestones`);
