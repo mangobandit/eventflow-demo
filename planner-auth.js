@@ -109,6 +109,7 @@
     resetSeatingPlanner();
     resetPlannerWorkspace();
     resetPlannerHome();
+    resetPlannerWorkbook();
     plannerRegisters.reset();
     plannerUpdates.reset();
     els.authScreen.hidden = false;

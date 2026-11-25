@@ -15,19 +15,21 @@
   <link rel="stylesheet" href="planner-home.css?v=20261125-planner-home">
   <link rel="stylesheet" href="planner-registers.css?v=20261125-planner-home">
   <link rel="stylesheet" href="planner-conversations.css?v=20261125-planner-home">
+  <link rel="stylesheet" href="planner-workbook.css?v=20261125-sa-workbook">
   <link rel="stylesheet" href="responsive.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260913-guest-details"></script>
   <script defer src="planner-core.js?v=20261125-meal-colours"></script>
   <script defer src="planner-nav.js?v=20261125-grouped-nav"></script>
-  <script defer src="planner-auth.js?v=20261125-planner-home"></script>
+  <script defer src="planner-auth.js?v=20261125-sa-workbook"></script>
   <script defer src="planner-views.js?v=20261125-planner-home"></script>
   <script defer src="planner-seat-colours.js?v=20261125-meal-colours"></script>
   <script defer src="planner-seat-viewport.js?v=20261125-seating-viewport"></script>
   <script defer src="planner-seating.js?v=20261125-seating-viewport"></script>
   <script defer src="planner-operations.js?v=20261125-tools"></script>
   <script defer src="planner-venue.js?v=20261125-venue-camera"></script>
-  <script defer src="planner-workspace.js?v=20261125-budget-editing"></script>
+  <script defer src="planner-workbook.js?v=20261125-sa-workbook"></script>
+  <script defer src="planner-workspace.js?v=20261125-sa-workbook"></script>
   <script defer src="planner-updates.js?v=20261125-planner-home"></script>
   <script defer src="planner-home.js?v=20261125-planner-home"></script>
   <script defer src="planner-registers.js?v=20261125-meal-colours"></script>
@@ -42,7 +44,7 @@
         <div><b>Wedding House</b><small>Private planning portal</small></div>
       </div>
       <div class="auth-message">
-        <p class="eyebrow">For Matt & Cara only</p>
+        <p class="eyebrow">For the wedding planning team</p>
         <h1>Everything,<br>beautifully clear.</h1>
         <p>One calm place for private tasks, budgets, guests, suppliers, timelines and the guest information you choose to publish.</p>
       </div>
@@ -51,7 +53,7 @@
       <div class="auth-card">
         <p class="eyebrow">Secure access</p>
         <h2>Enter the planner</h2>
-        <p>Use the private planner username and password for Matt or Cara. No email link needed.</p>
+        <p>Sign in with your private planner username and password.</p>
 
         <div class="setup-card" id="setup-card" hidden>
           <b>The secure database still needs connecting.</b>
@@ -61,10 +63,10 @@
 
         <form class="auth-form" id="login-form">
           <label class="form-label">Username
-            <input id="login-username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" placeholder="matt or cara" required>
+            <input id="login-username" type="text" autocomplete="username" autocapitalize="off" spellcheck="false" required>
           </label>
           <label class="form-label">Password
-            <input id="login-password" type="password" autocomplete="current-password" inputmode="numeric" required>
+            <input id="login-password" type="password" autocomplete="current-password" required>
           </label>
           <button class="button button-dark" type="submit">Enter planner</button>
           <div class="auth-status" id="auth-status" role="status" aria-live="polite"></div>
@@ -126,6 +128,7 @@
           <div class="planner-nav-items" data-nav-items="tools">
             <button type="button" data-view="workspace-guides"><span aria-hidden="true">&#8803;</span>Client guides</button>
             <button type="button" data-view="workspace-access"><span aria-hidden="true">&#9678;</span>Client access</button>
+            <button type="button" data-view="workspace-workbook"><span aria-hidden="true">&#9638;</span>South Africa workbook</button>
           </div>
         </details>
       </nav>
