@@ -1,0 +1,63 @@
+.planner-register-summary dl {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
+  margin: 12px 0 0;
+}
+
+.planner-register-summary dt {
+  color: var(--muted);
+  font-size: 0.8rem;
+}
+
+.planner-register-summary dd {
+  margin: 4px 0 0;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.planner-register-link {
+  display: block;
+  border: 0;
+  padding: 0;
+  background: transparent;
+  color: var(--ink);
+  font: inherit;
+  text-align: left;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+  cursor: pointer;
+}
+
+.planner-register-filters {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 12px 0;
+}
+
+.planner-meal-form {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.planner-meal-form input {
+  min-width: 9rem;
+  width: 100%;
+  min-height: 38px;
+  padding: 6px 8px;
+  border: 1px solid var(--line, #dcd5c9);
+  border-radius: 7px;
+  background: #fff;
+  color: var(--ink);
+  font: inherit;
+}
+
+.planner-meal-form button:disabled {
+  opacity: 0.65;
+}
+
+[data-meals-status]:empty {
+  display: none;
+}

@@ -1,0 +1,186 @@
+.planner-home-layout {
+  display: grid;
+  align-items: start;
+  gap: 16px;
+  margin-bottom: 18px;
+}
+
+.planner-home-aside {
+  display: grid;
+  min-width: 0;
+  gap: 16px;
+}
+
+.planner-home-card {
+  min-width: 0;
+  padding: clamp(13px, 2vw, 22px);
+  background: var(--paper);
+}
+
+.planner-home-card-head,
+.planner-home-month-head,
+.planner-home-load-error {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 9px;
+}
+
+.planner-home-card-head h2,
+.planner-home-month-head h3,
+.planner-home-agenda h3 {
+  margin: 0;
+  color: var(--olive-dark);
+  font-family: var(--serif);
+  font-weight: 600;
+}
+
+.planner-home-card-head h2 { font-size: clamp(23px, 2.4vw, 31px); }
+.planner-home-month-head h3 { font-size: 20px; }
+.planner-home-agenda h3 { font-size: 17px; }
+.planner-home-month-head { margin: 14px 0 6px; }
+.planner-home-month-head > div { display: flex; gap: 5px; }
+.planner-home-month-head button { min-width: 37px; min-height: 36px; padding-inline: 8px; }
+.planner-home-month-head button[data-home-shift] { font-size: 18px; }
+
+.planner-home-filter {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 7px;
+  color: var(--ink-soft);
+  font-size: 11px;
+  font-weight: 700;
+}
+
+.planner-home-filter select {
+  max-width: min(220px, 100%);
+  min-height: 36px;
+  padding: 5px 8px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--ink);
+  background: var(--paper);
+  font: inherit;
+}
+
+.planner-home-weekdays,
+.planner-home-month {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.planner-home-weekdays {
+  margin-bottom: 4px;
+  color: var(--ink-soft);
+  font-size: 10px;
+  font-weight: 750;
+  text-align: center;
+}
+
+.planner-home-day,
+.planner-home-date-spacer {
+  min-width: 0;
+  min-height: clamp(37px, 5vw, 48px);
+  border-radius: 8px;
+}
+
+.planner-home-date-spacer { background: #f3ede4; }
+
+.planner-home-day {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  padding: 3px 0;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  background: #fffdf9;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.planner-home-day:hover,
+.planner-home-day[aria-current='date'] { border-color: var(--olive); }
+
+.planner-home-day[aria-pressed='true'] {
+  border-color: var(--olive-dark);
+  color: #fff;
+  background: var(--olive-dark);
+}
+
+.planner-home-day-count {
+  display: grid;
+  min-width: 16px;
+  min-height: 16px;
+  place-items: center;
+  padding: 0 3px;
+  border-radius: 999px;
+  color: var(--olive-dark);
+  background: #e6ded1;
+  font-size: 9px;
+  line-height: 1;
+}
+
+.planner-home-agenda {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--line);
+}
+
+.planner-home-agenda ul,
+.planner-home-projects,
+.planner-home-shortcuts {
+  display: grid;
+  gap: 6px;
+  margin: 9px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.planner-home-shortcuts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+.planner-home-agenda li button,
+.planner-home-projects li button,
+.planner-home-shortcuts li button {
+  display: flex;
+  width: 100%;
+  height: 100%;
+  min-height: 42px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 7px 9px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  color: var(--olive-dark);
+  background: #fffdf9;
+  font: inherit;
+  font-size: 12px;
+  font-weight: 700;
+  text-align: left;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.planner-home-layout :is(button, select):focus-visible {
+  outline: 2px solid var(--olive);
+  outline-offset: 2px;
+}
+
+.planner-home-layout li button:hover { border-color: var(--olive); }
+.planner-home-shortcuts li button { justify-content: flex-start; }
+.planner-home-shortcuts li button span { flex: 0 0 14px; font-size: 15px; text-align: center; }
+.planner-home-layout li button small { display: block; margin-top: 3px; color: var(--ink-soft); font-size: 11px; font-weight: 500; }
+.planner-home-empty,
+.planner-home-load-error { margin: 7px 0 0; color: var(--ink-soft); font-size: 12px; }
+.planner-home-load-error { color: var(--danger); }
+
+@media (min-width: 1070px) {
+  .planner-home-layout { grid-template-columns: minmax(0, 1.7fr) minmax(250px, 1fr); }
+}

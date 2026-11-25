@@ -4,6 +4,7 @@ const plannerUpdates = (() => {
   const badge = document.getElementById("planner-updates-count");
   let session;
   let records = [];
+  let unanswered = [];
   let lastLoaded = 0;
   let pending = false;
 
@@ -34,6 +35,9 @@ const plannerUpdates = (() => {
       if (record.kind === "reminder" && !record.data.completed) {
         add(record.title, "Reminder", record.data.date, "workspace-calendar", true);
       }
+      if (record.kind === "project_task" && !record.data.completed) {
+        add(record.title, "Project action due", record.data.date, "workspace-projects", true);
+      }
       if (record.kind === "meeting" || (record.kind === "slot" && record.data.booked)) {
         add(record.title, "Meeting", record.data.date, "workspace-calendar", false);
       }
@@ -43,10 +47,14 @@ const plannerUpdates = (() => {
 
   function paint() {
     const items = dueItems();
-    badge.textContent = String(items.length);
-    badge.hidden = items.length === 0;
+    const count = items.length + unanswered.length;
+    badge.textContent = String(count);
+    badge.hidden = count === 0;
     if (panel.hidden) return;
-    panel.innerHTML = '<h2>Planner updates</h2><p>Overdue and due in the next 7 days</p>' + (items.length
+    const messages = unanswered.length ? '<p>Awaiting a reply</p><ul>' + unanswered.map(item =>
+      `<li><button type="button" data-update-view="workspace-conversations" data-update-project="${escapeHtml(item.scope)}" data-update-thread="${escapeHtml(item.link_id)}">
+        <b>${escapeHtml(item.name || "Client message")}</b><small>Client message &middot; ${escapeHtml(formatDate(item.created_at))}</small></button></li>`).join("") + '</ul>' : '';
+    panel.innerHTML = '<h2>Planner updates</h2>' + messages + '<p>Overdue and due in the next 7 days</p>' + (items.length
       ? '<ul>' + items.map(item => '<li><button type="button" data-update-view="' + item.view + '">' +
         '<b>' + escapeHtml(item.title) + '</b><small>' + escapeHtml(item.type) + ' &middot; ' +
         escapeHtml(item.overdue ? "Overdue " + formatDate(item.date) : formatDate(item.date)) + '</small></button></li>').join("") + '</ul>'
@@ -64,6 +72,7 @@ const plannerUpdates = (() => {
     if (token !== session) {
       session = token;
       records = [];
+      unanswered = [];
       lastLoaded = 0;
       pending = false;
     }
@@ -71,13 +80,15 @@ const plannerUpdates = (() => {
     if (pending || (!force && Date.now() - lastLoaded < 60000)) return;
     pending = true;
     try {
-      const result = await plannerRpc("planner_workspace_load", { p_token: token });
+      const [schedule, messages] = await Promise.allSettled([
+        plannerRpc("planner_workspace_load", { p_token: token }),
+        plannerRpc("planner_workspace_unanswered", { p_token: token })
+      ]);
       if (session !== token) return;
-      records = Array.isArray(result) ? result : [];
+      if (schedule.status === "fulfilled" && Array.isArray(schedule.value)) records = schedule.value;
+      if (messages.status === "fulfilled" && Array.isArray(messages.value)) unanswered = messages.value;
       lastLoaded = Date.now();
       paint();
-    } catch (_error) {
-      // Core action and payment deadlines remain available when the workspace is offline.
     } finally {
       if (session === token) pending = false;
     }
@@ -95,6 +106,12 @@ const plannerUpdates = (() => {
   panel.addEventListener("click", event => {
     const link = event.target.closest("[data-update-view]");
     if (!link) return;
+    if (link.dataset.updateThread) {
+      const url = new URL(location.href);
+      url.searchParams.set("project", link.dataset.updateProject);
+      url.searchParams.set("thread", link.dataset.updateThread);
+      history.replaceState(null, "", url);
+    }
     close();
     switchView(link.dataset.updateView);
   });
@@ -107,10 +124,13 @@ const plannerUpdates = (() => {
       toggle.focus();
     }
   });
+  document.addEventListener("visibilitychange", () => { if (!document.hidden) refresh(); });
+  window.setInterval(() => { if (!document.hidden) refresh(); }, 60000);
 
   function reset() {
     session = null;
     records = [];
+    unanswered = [];
     lastLoaded = 0;
     pending = false;
     badge.hidden = true;

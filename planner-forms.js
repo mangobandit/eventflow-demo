@@ -1,9 +1,9 @@
-  function openEntity(table, record = null) {
+  function openEntity(table, record = null, defaults = null) {
     if (!definitions[table]) table = "tasks";
     state.editing = { table, record };
     const definition = definitions[table];
     els.modalTitle.textContent = `${record ? "Edit" : "Add"} ${definition.title}`;
-    els.entityForm.innerHTML = definition.fields.map((spec) => renderField(spec, record)).join("") + renderFormActions(Boolean(record));
+    els.entityForm.innerHTML = definition.fields.map((spec) => renderField(spec, record || defaults)).join("") + renderFormActions(Boolean(record));
     els.entityForm.onsubmit = saveEntity;
     els.entityForm.querySelector("[data-delete]")?.addEventListener("click", deleteEntity);
     els.modal.hidden = false;

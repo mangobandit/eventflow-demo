@@ -215,13 +215,22 @@
     if (tool) state.workspaceTool = tool;
     state.view = tool ? "workspace" : view || "overview";
     const destination = state.view === "workspace" ? plannerWorkspace.viewForTool(state.workspaceTool) : state.view;
-    if (history.replaceState) history.replaceState(null, "", `#${destination}`);
+    if (history.replaceState) {
+      const url = new URL(location.href);
+      url.hash = destination;
+      if (destination !== "workspace-conversations") {
+        url.searchParams.delete("project");
+        url.searchParams.delete("thread");
+      }
+      history.replaceState(null, "", url);
+    }
     updatePlannerNavigation(destination);
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === state.view));
-    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", seating: "Seating", checkin: "Guest Check In", vendors: "Vendors", timeline: "Timeline", workspace: "Planning tools", publishing: "Guest publishing", honeymoon: "Honeymoon" }[state.view] || "Planner";
+    const label = { overview: "Planner Home", tasks: "Tasks", budget: "Budget", guests: "Guests", seating: "Seating", checkin: "Guest Check In", vendors: "Vendors", timeline: "Timeline", workspace: plannerWorkspace.labelForTool(state.workspaceTool), publishing: "Guest publishing", honeymoon: "Honeymoon" }[state.view] || "Planner";
     els.topbarTitle.textContent = label;
     els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner \u00b7 ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
     const addButton = document.getElementById("global-add");
+    addButton.hidden = state.view === "workspace";
     addButton.textContent = state.view === "publishing" ? "+ Add update" : state.view === "overview" ? "+ Add task" : `+ Add ${definitions[tableForView(state.view)]?.singular || "item"}`;
     document.body.classList.remove("sidebar-open");
     if (rerender) renderAll();
