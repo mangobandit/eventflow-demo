@@ -7,6 +7,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   const eventLabel = Object.fromEntries(events);
   const minTableScale = .65;
   const maxTableScale = 1.8;
+  const tableHandles = "[data-seat-table], [data-seat-resize], [data-seat-rotate]";
   let event = "south_africa";
   let cache = {};
   let token;
@@ -91,7 +92,9 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
   function draw() {
     if (state.view !== "seating" || !token) return;
-    const focusedResize = document.activeElement?.dataset.seatResize;
+    const focused = document.activeElement?.dataset;
+    const focusedHandle = focused?.seatRotate ? `[data-seat-rotate="${CSS.escape(focused.seatRotate)}"]` :
+      focused?.seatResize ? `[data-seat-resize="${CSS.escape(focused.seatResize)}"]` : null;
     drag = null;
     const current = entry();
     const tabs = events.map(([value, label]) =>
@@ -151,7 +154,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         <div class="seating-floor" data-seating-floor>
           ${tables.map(item => floorTable(item, filled.get(item.id), unavailable)).join("")}
           ${tables.length ? "" : '<p class="seating-empty-floor">Add a table to start arranging the room.</p>'}
-          <div class="seating-floor-help" id="seating-floor-help">Drag guests onto chairs. To resize a selected table, drag its corner handle or use the arrow keys on it.</div>
+          <div class="seating-floor-help" id="seating-floor-help">Drag guests onto chairs. Select a table to resize or rotate with its handles or the arrow keys.</div>
         </div>
         <aside class="seating-side" aria-label="Guests and table settings">
           <section class="seating-card">
@@ -171,7 +174,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (list) list.scrollTop = chairScroll;
     room.querySelector("[data-seat-pool]").scrollTop = poolScroll;
     decorateSeats();
-    if (focusedResize) room.querySelector(`[data-seat-resize="${CSS.escape(focusedResize)}"]`)?.focus({ preventScroll: true });
+    if (focusedHandle) room.querySelector(focusedHandle)?.focus({ preventScroll: true });
   }
 
   function loadMealColours(refresh = false) {
@@ -322,7 +325,11 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         <span class="seating-table-label"><b>${escapeHtml(table.name)}</b><small>${occupants.size} / ${table.capacity}</small></span>
       </button>
       ${chairs}
-      ${selected === table.id ? `<button type="button" class="seating-table-resize" data-seat-resize="${escapeHtml(table.id)}"
+      ${selected === table.id ? `<button type="button" class="seating-table-rotate" data-seat-rotate="${escapeHtml(table.id)}"
+        aria-disabled="${unavailable}" aria-label="${escapeHtml(`Rotate ${table.name}, ${normalizeRotation(table.rotation)}°`)}" aria-describedby="seating-floor-help"
+        aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown" title="Drag to rotate. Hold Shift to snap to 15° increments.">
+        <span aria-hidden="true">&#8635;</span><span class="seating-rotation-angle" data-seat-angle aria-hidden="true">${normalizeRotation(table.rotation)}°</span></button>
+      <button type="button" class="seating-table-resize" data-seat-resize="${escapeHtml(table.id)}"
         aria-disabled="${unavailable}" aria-label="${escapeHtml(`Resize ${table.name}, ${sizeText}`)}" aria-describedby="seating-floor-help"
         aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown" title="Drag to resize"><span aria-hidden="true">&#8600;</span></button>` : ""}
     </div>`;
@@ -638,11 +645,8 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         return plan;
       });
     } else if (action === "rotate") {
-      edit(plan => {
-        const table = plan.tables.find(item => item.id === selected);
-        table.rotation = (table.rotation + 15) % 360;
-        return plan;
-      });
+      const table = current?.plan.tables.find(item => item.id === selected);
+      if (table) rotateTable(table.id, table.rotation + 15);
     } else if (action === "remove") {
       const table = current?.plan.tables.find(item => item.id === selected);
       if (table && window.confirm(`Remove ${table.name} from the floor plan? Its guests will become unseated.`)) {
@@ -859,6 +863,28 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     });
   }
 
+  function normalizeRotation(angle) {
+    return ((angle % 360) + 360) % 360;
+  }
+
+  function rotateTable(id, angle) {
+    const rotation = normalizeRotation(angle);
+    edit(plan => {
+      const table = plan.tables.find(item => item.id === id);
+      if (!table || normalizeRotation(table.rotation) === rotation) return;
+      table.rotation = rotation;
+      return plan;
+    });
+  }
+
+  function rotationPivot(group, down) {
+    const { left, top, width, height } = group.getBoundingClientRect();
+    const x = left + width / 2;
+    const y = top + height / 2;
+    const startAngle = Math.atan2(down.clientY - y, down.clientX - x);
+    return { x, y, startAngle, label: group.querySelector("[data-seat-angle]") };
+  }
+
   function moveTable(id, x, y) {
     edit(plan => {
       const table = plan.tables.find(item => item.id === id);
@@ -872,15 +898,16 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   }
 
   room.addEventListener("pointerdown", down => {
-    const button = down.target.closest("[data-seat-table], [data-seat-resize]");
+    const button = down.target.closest(tableHandles);
     const current = entry();
     if (!button || !current || !down.isPrimary || down.button !== 0 || loading || current.saving || current.unsaved) return;
-    const resizeId = button.dataset.seatResize;
-    const table = current.plan.tables.find(item => item.id === (resizeId || button.dataset.seatTable));
+    const { seatRotate, seatResize, seatTable } = button.dataset;
+    const table = current.plan.tables.find(item => item.id === (seatRotate || seatResize || seatTable));
     const floor = room.querySelector("[data-seating-floor]");
     const group = button.closest("[data-seat-group]");
     drag = { button: group, table, frame: floor.getBoundingClientRect(), pointer: down.pointerId, x0: down.clientX, y0: down.clientY,
-      geometry: resizeId ? resizeGeometry(table, group, floor) : null };
+      geometry: seatResize ? resizeGeometry(table, group, floor) : null,
+      pivot: seatRotate ? rotationPivot(group, down) : null };
     button.setPointerCapture(down.pointerId);
   });
 
@@ -888,7 +915,20 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (!drag || drag.pointer !== move.pointerId) return;
     const dx = move.clientX - drag.x0;
     const dy = move.clientY - drag.y0;
-    if (!drag.position && !drag.size && Math.hypot(dx, dy) < 4) return;
+    if (!drag.position && !drag.size && drag.rotation == null && Math.hypot(dx, dy) < 4) return;
+    if (drag.pivot) {
+      const { x, y, startAngle, label } = drag.pivot;
+      const localX = move.clientX - x;
+      const localY = move.clientY - y;
+      if (Math.hypot(localX, localY) < 8) return;
+      const angle = drag.table.rotation + (Math.atan2(localY, localX) - startAngle) * 180 / Math.PI;
+      const step = move.shiftKey ? 15 : 1;
+      drag.rotation = normalizeRotation(Math.round(angle / step) * step);
+      drag.button.style.setProperty("--table-rotation", `${drag.rotation}deg`);
+      drag.button.classList.add("is-rotating");
+      label.textContent = `${drag.rotation}°`;
+      return;
+    }
     if (drag.geometry) {
       drag.size = pointerTableSize(drag.geometry, dx, dy);
       drag.button.classList.add("is-resizing");
@@ -904,10 +944,11 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
   room.addEventListener("pointerup", up => {
     if (!drag || drag.pointer !== up.pointerId) return;
-    const { button, position: destination, table, size } = drag;
+    const { button, position: destination, table, rotation, size } = drag;
     drag = null;
-    button.classList.remove("is-dragging", "is-resizing");
-    if (size) resizeTable(table, size);
+    button.classList.remove("is-dragging", "is-resizing", "is-rotating");
+    if (rotation != null) rotateTable(table.id, rotation);
+    else if (size) resizeTable(table, size);
     else if (destination) {
       lastDrag = performance.now();
       moveTable(table.id, destination.x, destination.y);
@@ -923,7 +964,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   room.addEventListener("lostpointercapture", cancelTableDrag);
 
   room.addEventListener("keydown", key => {
-    const button = key.target.closest("[data-seat-table], [data-seat-resize]");
+    const button = key.target.closest(tableHandles);
     const deltas = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
     if (key.key === "Escape" && drag) {
       key.preventDefault();
@@ -933,6 +974,12 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (!button || !Object.hasOwn(deltas, key.key)) return;
     key.preventDefault();
     const [dx, dy] = deltas[key.key];
+    if (button.dataset.seatRotate) {
+      if (button.getAttribute("aria-disabled") === "true") return;
+      const table = entry().plan.tables.find(item => item.id === button.dataset.seatRotate);
+      rotateTable(table.id, table.rotation + (dx || dy) * (key.shiftKey ? 15 : 1));
+      return;
+    }
     if (button.dataset.seatResize) {
       if (button.getAttribute("aria-disabled") === "true") return;
       const table = entry().plan.tables.find(item => item.id === button.dataset.seatResize);
