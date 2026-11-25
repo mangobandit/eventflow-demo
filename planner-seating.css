@@ -82,26 +82,36 @@
 
 .seating-table {
   position: absolute;
-  display: grid;
-  width: min(var(--table-width), 39%);
+  width: min(var(--table-width), 43%);
   height: 66px;
-  place-items: center;
   transform: translate(-50%, -50%) rotate(var(--table-rotation));
+  pointer-events: none;
+}
+.seating-table--round { width: min(var(--table-width), 29%); height: auto; aspect-ratio: 1; }
+.seating-table--square { width: min(var(--table-width), 26%); height: auto; aspect-ratio: 1; }
+.seating-table.is-selected { z-index: 2; }
+.seating-table.is-dragging { z-index: 4; }
+.seating-table:has(.seating-chair:is(:hover, :focus-visible, .is-drop-target)) { z-index: 5; }
+.seating-table-handle {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 100%;
   padding: 0;
   border: 0;
   background: transparent;
   color: var(--seat-pine-deep);
   font: inherit;
   text-align: center;
+  outline-offset: 9px;
   touch-action: none;
   user-select: none;
+  pointer-events: auto;
   cursor: grab;
-  outline-offset: 10px;
 }
-.seating-table--round { width: min(var(--table-width), 27%); height: auto; aspect-ratio: 1; border-radius: 50%; }
-.seating-table--square { width: min(var(--table-width), 24%); height: auto; aspect-ratio: 1; }
-.seating-table[aria-pressed="true"], .seating-table:focus-visible { z-index: 2; }
-.seating-table.is-dragging { z-index: 3; cursor: grabbing; }
+.seating-table.is-dragging .seating-table-handle { cursor: grabbing; }
 .seating-table-shape {
   position: absolute;
   inset: 0;
@@ -109,11 +119,11 @@
   border-radius: 15px;
   background: var(--seat-cloth);
   box-shadow: 0 7px 14px #322c211b;
-  transition: box-shadow .15s, border-color .15s, background .15s;
+  transition: box-shadow .15s, border-color .15s;
   pointer-events: none;
 }
 .seating-table--round .seating-table-shape { border-radius: 50%; }
-.seating-table:is(:hover, :focus-visible, [aria-pressed="true"]) .seating-table-shape {
+.seating-table-handle:is(:hover, :focus-visible, [aria-pressed="true"]) .seating-table-shape {
   border-color: var(--seat-pine);
   box-shadow: 0 0 0 3px var(--seat-paper), 0 0 0 5px var(--seat-pine), 0 8px 21px #322c2129;
 }
@@ -123,14 +133,66 @@
 .seating-table-label small { font-size: 10px; font-weight: 800; letter-spacing: .05em; }
 .seating-chair {
   position: absolute;
-  width: clamp(6px, 1vw, 11px);
-  height: clamp(7px, 1vw, 12px);
+  z-index: 1;
+  display: grid;
+  width: clamp(12px, 1.45vw, 18px);
+  height: clamp(12px, 1.45vw, 18px);
+  place-items: center;
   transform: translate(-50%, -50%);
+  padding: 0;
   border: 1px solid var(--seat-outline);
-  border-radius: 4px;
+  border-radius: 5px;
   background: var(--seat-blank-chair);
+  color: var(--seat-paper);
+  font: inherit;
+  line-height: 1;
+  pointer-events: auto;
+  cursor: pointer;
 }
-.seating-chair.is-filled { border-color: var(--seat-pine); background: var(--seat-pine); }
+.seating-chair.is-filled { border-color: var(--seat-pine); background: var(--seat-pine); cursor: grab; }
+.seating-chair-initials { font-size: clamp(6px, .64vw, 9px); font-weight: 800; transform: rotate(calc(-1 * var(--table-rotation))); }
+.seating-chair:is([aria-pressed="true"], :focus-visible, .is-drop-target) {
+  outline: 2px solid var(--seat-gold);
+  outline-offset: 2px;
+}
+.seating-chair-name {
+  position: absolute;
+  bottom: calc(100% + 6px);
+  left: 50%;
+  display: none;
+  z-index: 2;
+  transform: translateX(-50%) rotate(calc(-1 * var(--table-rotation)));
+  color: var(--seat-paper);
+  background: var(--seat-pine-deep);
+  border-radius: 5px;
+  padding: 5px 7px;
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1.2;
+  white-space: nowrap;
+  pointer-events: none;
+}
+.seating-chair.is-filled:is(:hover, :focus-visible, [aria-pressed="true"]) .seating-chair-name { display: block; }
+@media (min-width: 1100px) and (hover: hover) {
+  .seating-table.is-selected[data-chair-labels="row"] .seating-chair.is-filled:is([data-chair-edge="top"],[data-chair-edge="bottom"]):not(:hover):not(:focus-visible):not([aria-pressed="true"]) .seating-chair-name {
+    display: block;
+    padding: 0;
+    max-height: 72px;
+    overflow: hidden;
+    transform: translateX(-50%) rotate(180deg);
+    writing-mode: vertical-rl;
+    color: var(--seat-pine-deep);
+    background: transparent;
+    font-size: 9px;
+    text-align: left;
+    text-overflow: ellipsis;
+  }
+  .seating-table.is-selected[data-chair-labels="row"] .seating-chair.is-filled[data-chair-edge="bottom"]:not(:hover):not(:focus-visible):not([aria-pressed="true"]) .seating-chair-name {
+    top: calc(100% + 5px);
+    bottom: auto;
+    transform: translateX(-50%);
+  }
+}
 
 .seating-side { display: grid; gap: 12px; min-width: 0; }
 .seating-card {
@@ -173,6 +235,16 @@
 .seating-card li[draggable="true"] { background: #f4ecdd; cursor: grab; }
 .seating-card li small { display: block; color: var(--ink-soft); font-size: 9px; }
 .seating-card li button { flex: 0 0 30px; height: 28px; border: 1px solid var(--seat-outline); border-radius: 7px; background: var(--seat-paper); color: var(--seat-pine-deep); font: inherit; font-size: 18px; cursor: pointer; }
+.seating-pick-status { display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; padding: 8px 12px; border: 1px solid var(--seat-outline); border-radius: 10px; background: var(--seat-paper); color: var(--seat-pine-deep); font-size: 13px; }
+.seating-card ul.seating-chair-list { max-height: 225px; }
+.seating-card li.seating-chair-row { padding: 0 4px 0 0; }
+.seating-card li :is(.seating-chair-choice, .seating-guest-pick) { display: flex; align-items: center; gap: 7px; flex: 1; min-width: 0; height: auto; min-height: 34px; padding: 5px; border: 1px solid transparent; color: var(--seat-pine-deep); background: transparent; font: inherit; text-align: left; }
+.seating-card li [draggable="true"] { cursor: grab; }
+.seating-chair-number { display: grid; flex: 0 0 25px; min-height: 24px; place-items: center; border-radius: 6px; color: var(--seat-pine-deep); background: var(--seat-cloth); font-size: 11px; font-weight: 800; }
+.seating-chair-person { min-width: 0; overflow-wrap: anywhere; }
+.seating-card li :is(.seating-chair-choice, .seating-guest-pick):is([aria-pressed="true"], .is-drop-target, :hover) { border-color: var(--seat-outline); background: var(--seat-cloth); }
+.seating-move-current { max-width: 100%; margin-top: 10px; }
+
 #seatingPlanner :is(button, select):disabled { opacity: .55; cursor: default; }
 
 @media (max-width: 901px) {
