@@ -5,6 +5,8 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   const events = [["south_africa", "South Africa"], ["spain", "Spain"]];
   const shapes = [["round", "Round"], ["rectangle", "Banquet"], ["square", "Square"]];
   const eventLabel = Object.fromEntries(events);
+  const minTableScale = .65;
+  const maxTableScale = 1.8;
   let event = "south_africa";
   let cache = {};
   let token;
@@ -89,6 +91,8 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
   function draw() {
     if (state.view !== "seating" || !token) return;
+    const focusedResize = document.activeElement?.dataset.seatResize;
+    drag = null;
     const current = entry();
     const tabs = events.map(([value, label]) =>
       `<button type="button" data-seat-event="${value}" aria-pressed="${event === value}">${label}</button>`
@@ -147,7 +151,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         <div class="seating-floor" data-seating-floor>
           ${tables.map(item => floorTable(item, filled.get(item.id), unavailable)).join("")}
           ${tables.length ? "" : '<p class="seating-empty-floor">Add a table to start arranging the room.</p>'}
-          <div class="seating-floor-help">Drag a guest onto a chair, or choose a guest and tap a chair.</div>
+          <div class="seating-floor-help" id="seating-floor-help">Drag guests onto chairs. To resize a selected table, drag its corner handle or use the arrow keys on it.</div>
         </div>
         <aside class="seating-side" aria-label="Guests and table settings">
           <section class="seating-card">
@@ -167,6 +171,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (list) list.scrollTop = chairScroll;
     room.querySelector("[data-seat-pool]").scrollTop = poolScroll;
     decorateSeats();
+    if (focusedResize) room.querySelector(`[data-seat-resize="${CSS.escape(focusedResize)}"]`)?.focus({ preventScroll: true });
   }
 
   function loadMealColours(refresh = false) {
@@ -292,6 +297,10 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   function floorTable(table, occupants, unavailable) {
     const shape = shapes.some(([value]) => value === table.shape) ? table.shape : "round";
     const width = shape === "rectangle" ? Math.min(314, 116 + table.capacity * 7.5) : Math.min(150, 100 + table.capacity * 1.7);
+    const size = tableSize(table);
+    const sizeText = shape === "rectangle"
+      ? `${Math.round(size.width * 100)}% width, ${Math.round(size.depth * 100)}% depth`
+      : `${Math.round(size.width * 100)}% size`;
     const sideBySide = shape === "rectangle" && table.capacity === 2 && table.chairLayout === "side-by-side";
     const chairs = chairPositions(shape, table.capacity, sideBySide).map(([x, y, edge], index) => {
       const person = occupants.get(index + 1);
@@ -306,13 +315,16 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
     return `<div class="seating-table seating-table--${shape}${selected === table.id ? " is-selected" : ""}" data-seat-group="${escapeHtml(table.id)}"
     data-chair-labels="${sideBySide ? "pair" : shape === "rectangle" && table.rotation === 0 && table.capacity >= 10 ? "row" : "compact"}"
-      style="left:${table.x}%;top:${table.y}%;--table-width:${width}px;--table-rotation:${table.rotation}deg">
+      style="left:${table.x}%;top:${table.y}%;--table-width:${width}px;--table-rotation:${table.rotation}deg;--table-width-scale:${size.width};--table-depth-scale:${size.depth}">
       <button type="button" class="seating-table-handle" data-seat-table="${escapeHtml(table.id)}"
         aria-pressed="${selected === table.id}" aria-label="${escapeHtml(table.name)}, ${occupants.size} of ${table.capacity} seats filled">
         <span class="seating-table-shape" aria-hidden="true"></span>
         <span class="seating-table-label"><b>${escapeHtml(table.name)}</b><small>${occupants.size} / ${table.capacity}</small></span>
       </button>
       ${chairs}
+      ${selected === table.id ? `<button type="button" class="seating-table-resize" data-seat-resize="${escapeHtml(table.id)}"
+        aria-disabled="${unavailable}" aria-label="${escapeHtml(`Resize ${table.name}, ${sizeText}`)}" aria-describedby="seating-floor-help"
+        aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown" title="Drag to resize"><span aria-hidden="true">&#8600;</span></button>` : ""}
     </div>`;
   }
 
@@ -781,6 +793,72 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       y: clamp(y, verticalPadding, Math.min(87, 100 - verticalPadding)) };
   }
 
+  function clampTableScale(value) {
+    return Math.max(minTableScale, Math.min(maxTableScale, value));
+  }
+
+  function tableSize(table) {
+    const width = Number.isFinite(table.widthScale) ? clampTableScale(table.widthScale) : 1;
+    const depth = table.shape !== "rectangle" ? width :
+      Number.isFinite(table.depthScale) ? clampTableScale(table.depthScale) : 1;
+    return { width, depth };
+  }
+
+  function resizeGeometry(table, group, floor) {
+    const start = tableSize(table);
+    const style = getComputedStyle(group);
+    const baseWidth = Math.max(1, parseFloat(style.width) / start.width);
+    const baseDepth = Math.max(1, parseFloat(style.height) / start.depth);
+    const angle = table.rotation * Math.PI / 180;
+    const cos = Math.cos(angle);
+    const sin = Math.sin(angle);
+    const chairRoom = table.shape === "round" ? [.58, .58] : [.54, .59];
+    const extents = size => {
+      const halfWidth = baseWidth * size.width * chairRoom[0];
+      const halfDepth = baseDepth * size.depth * chairRoom[1];
+      return [Math.abs(cos) * halfWidth + Math.abs(sin) * halfDepth,
+        Math.abs(sin) * halfWidth + Math.abs(cos) * halfDepth];
+    };
+    const before = extents(start);
+    const roomLimits = [Math.min(group.offsetLeft, floor.clientWidth - group.offsetLeft) - 12,
+      Math.min(group.offsetTop, floor.clientHeight - group.offsetTop) - 12];
+    // Legacy tables can already be close to an edge. Let them shrink without moving their centre.
+    const limits = before.map((value, axis) => Math.max(value, roomLimits[axis]));
+    return { start, baseWidth, baseDepth, cos, sin, extents, before, limits, locked: table.shape !== "rectangle" };
+  }
+
+  function fitTableSize(geometry, proposed) {
+    const { start, extents, before, limits, locked } = geometry;
+    const width = clampTableScale(proposed.width);
+    const target = { width, depth: locked ? width : clampTableScale(proposed.depth) };
+    const fraction = Math.min(1, ...extents(target).map((value, axis) =>
+      value > limits[axis] ? (limits[axis] - before[axis]) / (value - before[axis]) : 1));
+    const blend = axis => Math.round((start[axis] + (target[axis] - start[axis]) * fraction) * 1000) / 1000;
+    return { width: blend("width"), depth: blend("depth") };
+  }
+
+  function pointerTableSize(geometry, dx, dy) {
+    const { start, baseWidth, baseDepth, cos, sin, locked } = geometry;
+    const widthDelta = 2 * (dx * cos + dy * sin) / baseWidth;
+    const depthDelta = 2 * (dy * cos - dx * sin) / baseDepth;
+    return fitTableSize(geometry, {
+      width: start.width + (locked ? (widthDelta + depthDelta) / 2 : widthDelta),
+      depth: start.depth + depthDelta
+    });
+  }
+
+  function resizeTable(table, size) {
+    const original = tableSize(table);
+    if (original.width === size.width && original.depth === size.depth) return;
+    edit(plan => {
+      const target = plan.tables.find(item => item.id === table.id);
+      if (!target) return;
+      target.widthScale = size.width;
+      target.depthScale = size.depth;
+      return plan;
+    });
+  }
+
   function moveTable(id, x, y) {
     edit(plan => {
       const table = plan.tables.find(item => item.id === id);
@@ -794,12 +872,15 @@ const seatingWorkspace = (function createSeatingWorkspace() {
   }
 
   room.addEventListener("pointerdown", down => {
-    const button = down.target.closest("[data-seat-table]");
+    const button = down.target.closest("[data-seat-table], [data-seat-resize]");
     const current = entry();
-    if (!button || !down.isPrimary || down.button !== 0 || loading || current?.saving || current?.unsaved) return;
-    const table = current.plan.tables.find(item => item.id === button.dataset.seatTable);
-    const frame = room.querySelector("[data-seating-floor]").getBoundingClientRect();
-    drag = { button: button.closest("[data-seat-group]"), table, frame, pointer: down.pointerId, x0: down.clientX, y0: down.clientY };
+    if (!button || !current || !down.isPrimary || down.button !== 0 || loading || current.saving || current.unsaved) return;
+    const resizeId = button.dataset.seatResize;
+    const table = current.plan.tables.find(item => item.id === (resizeId || button.dataset.seatTable));
+    const floor = room.querySelector("[data-seating-floor]");
+    const group = button.closest("[data-seat-group]");
+    drag = { button: group, table, frame: floor.getBoundingClientRect(), pointer: down.pointerId, x0: down.clientX, y0: down.clientY,
+      geometry: resizeId ? resizeGeometry(table, group, floor) : null };
     button.setPointerCapture(down.pointerId);
   });
 
@@ -807,7 +888,14 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (!drag || drag.pointer !== move.pointerId) return;
     const dx = move.clientX - drag.x0;
     const dy = move.clientY - drag.y0;
-    if (!drag.position && Math.hypot(dx, dy) < 4) return;
+    if (!drag.position && !drag.size && Math.hypot(dx, dy) < 4) return;
+    if (drag.geometry) {
+      drag.size = pointerTableSize(drag.geometry, dx, dy);
+      drag.button.classList.add("is-resizing");
+      drag.button.style.setProperty("--table-width-scale", drag.size.width);
+      drag.button.style.setProperty("--table-depth-scale", drag.size.depth);
+      return;
+    }
     drag.position = bounds(drag.table.x + dx * 100 / drag.frame.width, drag.table.y + dy * 100 / drag.frame.height, drag.button);
     drag.button.classList.add("is-dragging");
     drag.button.style.left = `${drag.position.x}%`;
@@ -816,29 +904,48 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
   room.addEventListener("pointerup", up => {
     if (!drag || drag.pointer !== up.pointerId) return;
-    const { button, position: destination, table } = drag;
+    const { button, position: destination, table, size } = drag;
     drag = null;
-    button.classList.remove("is-dragging");
-    if (destination) {
+    button.classList.remove("is-dragging", "is-resizing");
+    if (size) resizeTable(table, size);
+    else if (destination) {
       lastDrag = performance.now();
       moveTable(table.id, destination.x, destination.y);
     }
   });
 
-  room.addEventListener("pointercancel", cancel => {
+  function cancelTableDrag(cancel) {
     if (drag?.pointer !== cancel.pointerId) return;
     drag = null;
     draw();
-  });
+  }
+  room.addEventListener("pointercancel", cancelTableDrag);
+  room.addEventListener("lostpointercapture", cancelTableDrag);
 
   room.addEventListener("keydown", key => {
-    const button = key.target.closest("[data-seat-table]");
+    const button = key.target.closest("[data-seat-table], [data-seat-resize]");
     const deltas = { ArrowLeft: [-1, 0], ArrowRight: [1, 0], ArrowUp: [0, -1], ArrowDown: [0, 1] };
+    if (key.key === "Escape" && drag) {
+      key.preventDefault();
+      draw();
+      return;
+    }
     if (!button || !Object.hasOwn(deltas, key.key)) return;
     key.preventDefault();
+    const [dx, dy] = deltas[key.key];
+    if (button.dataset.seatResize) {
+      if (button.getAttribute("aria-disabled") === "true") return;
+      const table = entry().plan.tables.find(item => item.id === button.dataset.seatResize);
+      const geometry = resizeGeometry(table, button.closest("[data-seat-group]"), room.querySelector("[data-seating-floor]"));
+      const step = key.shiftKey ? .15 : .05;
+      resizeTable(table, fitTableSize(geometry, {
+        width: geometry.start.width + (geometry.locked ? dx || dy : dx) * step,
+        depth: geometry.start.depth + dy * step
+      }));
+      return;
+    }
     const id = button.dataset.seatTable;
     const table = entry().plan.tables.find(item => item.id === id);
-    const [dx, dy] = deltas[key.key];
     const scale = key.shiftKey ? 6 : 2;
     moveTable(id, table.x + dx * scale, table.y + dy * scale);
     room.querySelector(`[data-seat-table="${CSS.escape(id)}"]`)?.focus();
