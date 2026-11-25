@@ -18,7 +18,8 @@
     addPanel();
     bind();
     data = load();
-    render();
+    if (state.view === "honeymoon") switchHoneymoon();
+    else render();
   }
 
   function addStyles() {
@@ -38,8 +39,12 @@
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.view = "honeymoon";
-    button.innerHTML = "<span>âœˆ</span>Honeymoon";
-    nav.appendChild(button);
+    const icon = document.createElement("span");
+    icon.setAttribute("aria-hidden", "true");
+    icon.textContent = "\u2708\uFE0E";
+    button.append(icon, "Honeymoon");
+    const destination = nav.querySelector('[data-nav-items="tools"]') || nav;
+    destination.appendChild(button);
   }
 
   function addPanel() {
@@ -68,9 +73,6 @@
 
   function bind() {
     document.querySelector('[data-view="honeymoon"]')?.addEventListener("click", () => switchHoneymoon());
-    document.querySelectorAll("[data-view]").forEach((button) => button.addEventListener("click", () => {
-      if (button.dataset.view === "honeymoon") switchHoneymoon();
-    }));
     document.querySelectorAll("[data-hm-tab]").forEach((button) => button.addEventListener("click", () => {
       data.tab = button.dataset.hmTab;
       save();
@@ -88,10 +90,11 @@
   function switchHoneymoon() {
     state.view = "honeymoon";
     if (history.replaceState) history.replaceState(null, "", "#honeymoon");
-    document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === "honeymoon"));
+    if (typeof updatePlannerNavigation === "function") updatePlannerNavigation("honeymoon");
+    else document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === "honeymoon"));
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === "honeymoon"));
     els.topbarTitle.textContent = "Honeymoon";
-    els.topbarSubtitle.textContent = "Japan planner Â· draft itinerary and booking tracker";
+    els.topbarSubtitle.textContent = "Japan planner · draft itinerary and booking tracker";
     document.getElementById("global-add").textContent = "+ Add honeymoon task";
     document.body.classList.remove("sidebar-open");
     render();

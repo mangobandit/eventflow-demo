@@ -15,8 +15,8 @@
   const access = hasSupabaseSettings ? null : addScript("planner-access.js", "mxc-access");
   const loadPlannerExtras = () => {
     addScript("planner-extra-tasks.js?v=20260630-user-login", "mxc-extra-tasks");
-    addScript("planner-checkin.js?v=20260913-no-transport", "mxc-checkin");
-    addScript("planner-honeymoon.js?v=20260630-user-login", "mxc-honeymoon");
+    addScript("planner-checkin.js?v=20261125-grouped-nav", "mxc-checkin");
+    addScript("planner-honeymoon.js?v=20261125-grouped-nav", "mxc-honeymoon");
   };
 
   if (access) access.addEventListener("load", loadPlannerExtras);

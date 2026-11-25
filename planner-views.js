@@ -211,13 +211,16 @@
   }
 
   function switchView(view, rerender = true) {
-    state.view = view || "overview";
-    if (history.replaceState) history.replaceState(null, "", `#${state.view}`);
-    document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === state.view));
+    const tool = plannerWorkspace.toolForView(view);
+    if (tool) state.workspaceTool = tool;
+    state.view = tool ? "workspace" : view || "overview";
+    const destination = state.view === "workspace" ? plannerWorkspace.viewForTool(state.workspaceTool) : state.view;
+    if (history.replaceState) history.replaceState(null, "", `#${destination}`);
+    updatePlannerNavigation(destination);
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === state.view));
-    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", seating: "Seating", checkin: "Guest Check In", vendors: "Vendors", timeline: "Timeline", workspace: "Planning tools", publishing: "Guest publishing" }[state.view] || "Planner";
+    const label = { overview: "Overview", tasks: "Tasks", budget: "Budget", guests: "Guests", seating: "Seating", checkin: "Guest Check In", vendors: "Vendors", timeline: "Timeline", workspace: "Planning tools", publishing: "Guest publishing", honeymoon: "Honeymoon" }[state.view] || "Planner";
     els.topbarTitle.textContent = label;
-    els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner Â· ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
+    els.topbarSubtitle.textContent = `${ownerLabel(state.owner)} planner \u00b7 ${state.celebration === "all" ? "Spain and South Africa" : labelCelebration(state.celebration)}`;
     const addButton = document.getElementById("global-add");
     addButton.textContent = state.view === "publishing" ? "+ Add update" : state.view === "overview" ? "+ Add task" : `+ Add ${definitions[tableForView(state.view)]?.singular || "item"}`;
     document.body.classList.remove("sidebar-open");

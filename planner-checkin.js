@@ -75,7 +75,7 @@
     const button = document.createElement("button");
     button.type = "button";
     button.dataset.view = "checkin";
-    button.innerHTML = "<span>&#9675;</span>Guest Check In";
+    button.innerHTML = '<span aria-hidden="true">&#9675;</span>Guest Check In';
     const guests = nav.querySelector('[data-view="guests"]');
     if (guests) guests.insertAdjacentElement("afterend", button);
     else nav.appendChild(button);
@@ -104,7 +104,7 @@
   function switchToCheckin(rerender = true) {
     state.view = "checkin";
     if (history.replaceState) history.replaceState(null, "", "#checkin");
-    document.querySelectorAll("[data-view]").forEach((button) => button.classList.toggle("active", button.dataset.view === "checkin"));
+    updatePlannerNavigation("checkin");
     document.querySelectorAll("[data-view-panel]").forEach((panel) => panel.classList.toggle("active", panel.dataset.viewPanel === "checkin"));
     els.topbarTitle.textContent = "Guest Check In";
     els.topbarSubtitle.textContent = "Private guest tracker for Spain and South Africa";
