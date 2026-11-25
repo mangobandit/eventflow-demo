@@ -4,7 +4,7 @@
 
   async function init() {
     const requestedView = location.hash.replace(/^#/, "");
-    if (["overview", "tasks", "budget", "guests", "seating", "checkin", "vendors", "timeline", "publishing"].includes(requestedView)) state.view = requestedView;
+    if (["overview", "tasks", "budget", "guests", "seating", "checkin", "vendors", "timeline", "workspace", "publishing"].includes(requestedView)) state.view = requestedView;
     bindUi();
     if (!configured) {
       els.setupCard.hidden = false;
@@ -100,6 +100,7 @@
 
   function showAuth() {
     resetSeatingPlanner();
+    resetPlannerWorkspace();
     els.authScreen.hidden = false;
     els.plannerShell.hidden = true;
   }
@@ -205,4 +206,5 @@
     renderTimeline();
     renderPublishing();
     if (state.view === "seating") renderSeatingPlanner();
+    if (state.view === "workspace") renderPlannerWorkspace();
   }

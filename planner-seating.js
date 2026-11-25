@@ -110,6 +110,8 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     const statusText = loading ? "Refreshing…" : current.saving ? "Saving…" : current.message || (current.unsaved ? "Unsaved changes" : "All changes saved");
     const unavailable = loading || current.saving || current.unsaved;
     const disabled = unavailable ? " disabled" : "";
+    const availableSeats = tables.reduce((total, item) => total + item.capacity, 0) - Object.keys(assignments).length;
+    const canAutoSeat = !unavailable && pool.length > 0 && availableSeats > 0;
     const retry = current.unsaved && !current.saving && !loading
       ? `<button type="button" class="secondary-action" data-seat-action="${current.conflict ? "reload" : "retry"}">${current.conflict ? "Reload plan" : "Retry save"}</button>` : "";
     const oldList = room.querySelector(".seating-chair-list");
@@ -120,10 +122,19 @@ const seatingWorkspace = (function createSeatingWorkspace() {
         <div class="seating-tools" aria-label="Floor plan tools">
           <button class="secondary-action" type="button" data-seat-action="add-round"${disabled}>+ Round table</button>
           <button class="secondary-action" type="button" data-seat-action="add-rectangle"${disabled}>+ Banquet table</button>
+          <button class="secondary-action" type="button" data-seat-action="quick-setup"${disabled}>Quick setup</button>
+          <button class="secondary-action" type="button" data-seat-action="auto-seat"${canAutoSeat ? "" : " disabled"}>Auto seat</button>
           <button class="secondary-action" type="button" data-seat-action="undo"${unavailable || !current.history.length ? " disabled" : ""}>Undo</button>
         </div>
         <div class="seating-save" role="status">${escapeHtml(statusText)} ${retry}</div>
       </div>
+      ${editing === "quick-setup" ? `<form class="seating-card seating-quick-setup" data-seat-form="quick-setup">
+        <label class="seating-label">Tables<input name="count" type="number" min="1" max="20" value="4" required></label>
+        <label class="seating-label">Chairs per table<input name="capacity" type="number" min="1" max="200" value="8" required></label>
+        <label class="seating-label">Shape<select name="shape">${shapes.map(([value, name]) => `<option value="${value}">${name}</option>`).join("")}</select></label>
+        <button class="primary-action" type="submit"${disabled}>Add tables</button>
+        <button class="secondary-action" type="button" data-seat-action="quick-setup">Cancel</button>
+      </form>` : ""}
       ${picking ? `<div class="seating-pick-status" role="status"><span>Choose a chair for <b>${escapeHtml(picking.name)}</b>.</span>
         <button class="secondary-action" type="button" data-seat-action="cancel-pick">Cancel</button></div>` : ""}
       <div class="seating-workspace">
@@ -400,7 +411,7 @@ const seatingWorkspace = (function createSeatingWorkspace() {
 
   function position(tables) {
     if (!tables.length) return { x: 32, y: 28 };
-    const positions = [[32, 28], [70, 28], [32, 70], [70, 70], [50, 48], [52, 20], [50, 82]];
+    const positions = [24, 41, 58, 75].flatMap(y => [19, 40, 60, 81].map(x => [x, y]));
     const distance = ([x, y]) => Math.min(...tables.map(table => (x - table.x) ** 2 + (y - table.y) ** 2));
     positions.sort((first, second) => distance(second) - distance(first));
     const [x, y] = positions[0];
@@ -513,6 +524,23 @@ const seatingWorkspace = (function createSeatingWorkspace() {
       draw();
     } else if (action === "seat") {
       seat(button.closest("[data-seat-guest]").dataset.seatGuest, selected);
+    } else if (action === "quick-setup") {
+      editing = editing === "quick-setup" ? "" : "quick-setup";
+      draw();
+    } else if (action === "auto-seat") {
+      edit(plan => {
+        const remaining = guests().filter(person => person.rsvp_status !== "no" && !Object.hasOwn(plan.assignments, person.id));
+        for (const table of plan.tables) {
+          const taken = new Set(Object.keys(plan.assignments).filter(id => plan.assignments[id] === table.id).map(id => plan.seats[id]));
+          for (let chair = 1; chair <= table.capacity && remaining.length; chair++) {
+            if (taken.has(chair)) continue;
+            const person = remaining.shift();
+            plan.assignments[person.id] = table.id;
+            plan.seats[person.id] = chair;
+          }
+        }
+        return plan;
+      });
     } else if (action === "split" || action === "merge") {
       editing = editing === action ? "" : action;
       draw();
@@ -567,6 +595,27 @@ const seatingWorkspace = (function createSeatingWorkspace() {
     if (!form.dataset.seatForm) return;
     submit.preventDefault();
     const values = new FormData(form);
+    if (form.dataset.seatForm === "quick-setup") {
+      edit(plan => {
+        const count = Number(values.get("count"));
+        const capacity = Number(values.get("capacity"));
+        const shape = values.get("shape");
+        if (!Number.isInteger(count) || count < 1 || count > 20 || plan.tables.length + count > 160 ||
+          !Number.isInteger(capacity) || capacity < 1 || capacity > 200 || !shapes.some(([value]) => value === shape)) {
+          return notify("Choose up to 20 tables and between 1 and 200 seats per table.");
+        }
+        for (let index = 0; index < count; index++) {
+          const table = newTable(plan, shape);
+          table.capacity = capacity;
+          plan.tables.push(table);
+          if (index === 0) selected = table.id;
+        }
+        selectedChair = null;
+        editing = "";
+        return plan;
+      });
+      return;
+    }
     if (form.dataset.seatForm === "assign") {
       seat(values.get("guest"), selected, selectedChair);
       return;

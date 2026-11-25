@@ -8,14 +8,20 @@
   <title>Matt & Cara · Private Wedding Planner</title>
   <link rel="stylesheet" href="style.css">
   <link rel="stylesheet" href="planner.css?v=20261125-private-planner">
-  <link rel="stylesheet" href="planner-seating.css?v=20261125-named-chairs">
+  <link rel="stylesheet" href="planner-seating.css?v=20261125-tools">
+  <link rel="stylesheet" href="planner-workspace.css?v=20261125-tools">
+  <link rel="stylesheet" href="planner-operations.css?v=20261125-tools">
+  <link rel="stylesheet" href="planner-venue.css?v=20261125-tools">
   <link rel="stylesheet" href="responsive.css">
   <script defer src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script defer src="config.js?v=20260913-guest-details"></script>
   <script defer src="planner-core.js?v=20260913-guest-details"></script>
-  <script defer src="planner-auth.js?v=20261125-private-planner"></script>
-  <script defer src="planner-views.js?v=20261125-private-planner"></script>
-  <script defer src="planner-seating.js?v=20261125-named-chairs"></script>
+  <script defer src="planner-auth.js?v=20261125-tools"></script>
+  <script defer src="planner-views.js?v=20261125-tools"></script>
+  <script defer src="planner-seating.js?v=20261125-tools"></script>
+  <script defer src="planner-operations.js?v=20261125-tools"></script>
+  <script defer src="planner-venue.js?v=20261125-tools"></script>
+  <script defer src="planner-workspace.js?v=20261125-tools"></script>
   <script defer src="planner-forms.js?v=20260630-user-login"></script>
 </head>
 <body class="planner-site">
@@ -75,6 +81,7 @@
         <button type="button" data-view="seating"><span aria-hidden="true">⊞</span>Seating</button>
         <button type="button" data-view="vendors"><span>◇</span>Vendors</button>
         <button type="button" data-view="timeline"><span>◷</span>Timeline</button>
+        <button type="button" data-view="workspace"><span aria-hidden="true">⊕</span>Planning tools</button>
         <button type="button" data-view="publishing"><span>↗</span>Guest publishing</button>
       </nav>
 
@@ -222,6 +229,10 @@
             <div class="table-toolbar"><div class="search-field"><input type="search" data-search-table="timeline" placeholder="Search timeline"></div><div id="timeline-summary">0 milestones</div></div>
             <div class="data-table-wrap"><table class="data-table"><thead><tr><th>Date</th><th>Time</th><th>Milestone</th><th>Wedding</th><th>Owner</th><th>Audience</th><th>Location</th><th>Status</th></tr></thead><tbody id="timeline-table-body"></tbody></table></div>
           </div>
+        </section>
+
+        <section class="planner-view" data-view-panel="workspace" aria-label="Planning tools">
+          <div id="plannerWorkspace"></div>
         </section>
 
         <section class="planner-view" data-view-panel="publishing">

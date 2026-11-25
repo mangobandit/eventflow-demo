@@ -261,3 +261,6 @@
 @media (prefers-reduced-motion: reduce) {
   .seating-table-shape { transition: none; }
 }
+
+.seating-quick-setup { display: grid; grid-template-columns: repeat(3,minmax(80px,1fr)) auto auto; align-items: end; gap: 7px; margin-bottom: 12px; }
+@media (max-width: 620px) { .seating-quick-setup { grid-template-columns: repeat(3,minmax(0,1fr)); } }

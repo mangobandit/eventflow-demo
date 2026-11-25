@@ -1,0 +1,8 @@
+.workspace-calendar-layout { display: grid; grid-template-columns: minmax(0, 1.2fr) minmax(260px, .8fr); gap: 14px; }
+.workspace-calendar-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; margin-top: 15px; }
+.workspace-weekday { color: var(--ink-soft); font-size: 10px; font-weight: 750; text-align: center; }
+.workspace-calendar-day { display: grid; gap: 3px; align-content: center; justify-items: center; min-height: 42px; min-width: 0; padding: 3px; border: 1px solid var(--line); border-radius: 8px; color: var(--workspace-pine); background: transparent; font: inherit; font-size: 12px; cursor: pointer; }
+.workspace-calendar-day[aria-current="date"] { border-color: var(--workspace-pine); }
+.workspace-calendar-day[aria-pressed="true"] { background: var(--workspace-pine); color: var(--workspace-paper); }
+.workspace-calendar-count { min-width: 16px; padding: 1px 3px; border-radius: 6px; background: var(--workspace-tint); color: var(--workspace-pine); font-size: 9px; }
+@media (max-width: 830px) { .workspace-calendar-layout { grid-template-columns: minmax(0, 1fr); } }
