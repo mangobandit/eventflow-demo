@@ -1,0 +1,169 @@
+.planner-workbook {
+  display: grid;
+  gap: 12px;
+  min-inline-size: 0;
+}
+
+.planner-workbook-heading {
+  margin: 0;
+  color: var(--ink);
+  font-family: var(--serif);
+  font-size: clamp(26px, 4vw, 36px);
+  line-height: 1.1;
+}
+
+.planner-workbook-controls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  gap: 10px;
+  max-inline-size: 40rem;
+}
+
+.planner-workbook-controls > label {
+  min-inline-size: 0;
+}
+
+.planner-workbook :is(input, select, .planner-workbook-scroll):focus-visible {
+  outline: 2px solid var(--workspace-pine);
+  outline-offset: 2px;
+}
+
+.planner-workbook .planner-workbook-status {
+  margin: 0;
+}
+
+.planner-workbook-content {
+  display: grid;
+  gap: 18px;
+  min-inline-size: 0;
+}
+
+.planner-workbook-scroll {
+  max-block-size: min(68vh, 42rem);
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffefa;
+}
+
+.planner-workbook-table {
+  border-spacing: 0;
+  width: max-content;
+  min-inline-size: 100%;
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.45;
+  text-align: start;
+}
+
+.planner-workbook-table :is(th, td) {
+  max-inline-size: 24rem;
+  padding: 8px 11px;
+  border-block-end: 1px solid var(--line);
+  border-inline-end: 1px solid var(--line);
+  overflow-wrap: anywhere;
+  vertical-align: top;
+  white-space: pre-wrap;
+}
+
+.planner-workbook-table td {
+  min-inline-size: 7rem;
+}
+
+.planner-workbook-table thead th {
+  position: sticky;
+  inset-block-start: 0;
+  z-index: 2;
+  background: #eee8de;
+  color: var(--ink-soft);
+}
+
+.planner-workbook-table :is(.planner-workbook-row-number, thead th:first-child) {
+  position: sticky;
+  inset-inline-start: 0;
+  min-inline-size: 3rem;
+  text-align: end;
+  font-variant-numeric: tabular-nums;
+}
+
+.planner-workbook-row-number {
+  z-index: 1;
+  background: var(--workspace-paper);
+  color: var(--ink-soft);
+  font-weight: 600;
+}
+
+.planner-workbook-table thead th:first-child {
+  z-index: 3;
+}
+
+.planner-workbook .empty-state {
+  margin: 0;
+  padding: 18px;
+}
+
+.planner-workbook > .secondary-action {
+  justify-self: start;
+}
+
+.planner-workbook-labels {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(13rem, 100%), 1fr));
+  gap: 8px;
+  margin: 8px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.planner-workbook-labels li {
+  padding: 8px 11px;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffefa;
+  color: var(--ink);
+  font-size: 13px;
+  overflow-wrap: anywhere;
+  white-space: pre-wrap;
+}
+
+.planner-workbook-labels small {
+  display: block;
+  margin-top: 2px;
+  color: var(--ink-soft);
+}
+
+.planner-workbook-gallery {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(16rem, 100%), 1fr));
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.planner-workbook-gallery figure {
+  justify-self: start;
+  max-inline-size: 100%;
+  margin: 0;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  background: #fffefa;
+}
+
+.planner-workbook-gallery img {
+  display: block;
+  max-inline-size: 100%;
+  max-block-size: 30rem;
+  object-fit: contain;
+}
+
+.planner-workbook-gallery figcaption {
+  padding: 8px 11px;
+  color: var(--ink-soft);
+  font-size: 12px;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 540px) {
+  .planner-workbook-controls { grid-template-columns: 1fr; }
+  .planner-workbook-table :is(th, td) { max-inline-size: 70vw; }
+}

@@ -7,7 +7,7 @@ const plannerWorkspace = (function createPlannerWorkspace() {
     ["notes", "Notes & messages"], ["conversations", "Client messages"],
     ["catering", "Catering"], ["comparison", "Suppliers & budget"], ["payments", "Payments"],
     ["venue", "Venue designer"], ["guides", "Client guides"],
-    ["site", "Website builder"], ["access", "Client access"]
+    ["site", "Website builder"], ["access", "Client access"], ["workbook", "South Africa workbook"]
   ];
   const celebrations = [
     { id: "south_africa", title: "South Africa", date: "2026-12-19", location: "KZN Midlands" },
@@ -460,7 +460,7 @@ const plannerWorkspace = (function createPlannerWorkspace() {
         <nav class="workspace-tools" aria-label="Planning tools">${tools.map(([id, name]) =>
           `<button type="button" data-work-action="tab" data-tool="${id}" aria-pressed="${active === id}">${name}</button>`
         ).join("")}</nav>
-        ${formField("workspace-scope", "Wedding project", scope, { choices: [...projects().map(item => [item.id, item.title]), ["shared", "Shared planning"]] })}
+        ${active === "workbook" ? "" : formField("workspace-scope", "Wedding project", scope, { choices: [...projects().map(item => [item.id, item.title]), ["shared", "Shared planning"]] })}
       </header>
       ${error ? `<p class="workspace-error" role="alert">${escapeHtml(error)}</p>` : ""}
       <div class="workspace-content" data-workspace-content>${lists[active]?.() || ""}</div>
@@ -484,6 +484,8 @@ const plannerWorkspace = (function createPlannerWorkspace() {
       plannerRegisters.renderMeals(content, { scope, token });
     } else if (active === "payments") {
       plannerRegisters.renderPayments(content, scope);
+    } else if (active === "workbook") {
+      renderPlannerWorkbook(content, { token });
     } else if (active === "access" && !links) loadLinks();
   }
 
