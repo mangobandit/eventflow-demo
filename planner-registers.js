@@ -81,7 +81,14 @@ const plannerRegisters = (() => {
     renderRows();
   }
 
-  function requestMeals(token) {
+  function loadMeals(token, refresh = false) {
+    if (!token || token !== state.session?.token) return Promise.resolve();
+    if (token !== mealSession) {
+      reset();
+      mealSession = token;
+    }
+    if (mealRequest) return mealRequest;
+    if (!refresh && (meals || mealError)) return Promise.resolve();
     mealError = "";
     const request = (async () => {
       try {
@@ -96,11 +103,24 @@ const plannerRegisters = (() => {
     return request;
   }
 
+  function getMeals(token) {
+    if (token !== mealSession) return { rows: null, error: "" };
+    return { rows: meals, error: mealError };
+  }
+
+  async function saveMeal(token, guestId, choice) {
+    if (mealRequest) await mealRequest;
+    if (token !== mealSession || !meals) throw new Error("Load meal choices before saving.");
+    const row = await plannerRpc("planner_set_guest_meal", {
+      p_token: token, p_guest_id: guestId, p_choice: choice, p_expected_version: meals.get(guestId)?.version || 0
+    });
+    if (token !== mealSession) return null;
+    meals.set(guestId, row);
+    return row;
+  }
+
   function renderMeals(root, { scope, token }) {
-    if (token !== mealSession) {
-      reset();
-      mealSession = token;
-    }
+    const initial = loadMeals(token);
     root.innerHTML = `<header class="workspace-section-head"><h2>Catering</h2><button class="secondary-action" type="button" data-meals-refresh>Refresh choices</button></header>
       <section class="workspace-card" data-meals-list aria-label="Meal choices and dietary requirements"><p role="status">Loading meal choices&hellip;</p></section>`;
     const content = root.querySelector("[data-meals-list]");
@@ -168,16 +188,12 @@ const plannerRegisters = (() => {
         const button = form.querySelector("button");
         if (button.disabled) return;
         const guestId = form.dataset.mealGuest;
-        const previous = meals.get(guestId);
         button.disabled = true;
         input.readOnly = true;
         refresh.disabled = true;
         try {
-          const row = await plannerRpc("planner_set_guest_meal", {
-            p_token: token, p_guest_id: guestId, p_choice: input.value.trim(), p_expected_version: previous?.version || 0
-          });
-          if (token !== mealSession) return;
-          meals.set(guestId, row);
+          const row = await saveMeal(token, guestId, input.value.trim());
+          if (!row) return;
           input.value = row.choice || "";
           status.textContent = "Meal choice saved.";
           updateSummary();
@@ -196,11 +212,11 @@ const plannerRegisters = (() => {
 
     refresh.addEventListener("click", () => {
       refresh.disabled = true;
-      (mealRequest || requestMeals(token)).then(paint);
+      loadMeals(token, true).then(paint);
     });
     if (meals || mealError) paint();
-    else (mealRequest || requestMeals(token)).then(paint);
+    else initial.then(paint);
   }
 
-  return { renderMeals, renderPayments, reset };
+  return { renderMeals, renderPayments, loadMeals, getMeals, saveMeal, reset };
 })();
